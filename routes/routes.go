@@ -6,7 +6,17 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func SetupRoutes(app *fiber.App) {
+type Routes struct {
+	Handler *handlers.Handler
+}
+
+func InitializeRoutes(handler *handlers.Handler) *Routes {
+	return &Routes{
+		Handler: handler,
+	}
+}
+
+func (r *Routes) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	api.Get("/status", func(c fiber.Ctx) error {
 		return utils.RespondWithOK(c, "KMH WebProfile API is running", nil)
@@ -14,6 +24,6 @@ func SetupRoutes(app *fiber.App) {
 	// Additional routes can be added here
 	user := api.Group("/user")
 	user.Post("/", func(c fiber.Ctx) error {
-		return handlers.CreateUser(c)
+		return r.Handler.CreateUser(c)
 	})
 }

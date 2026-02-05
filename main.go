@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"os"
 
 	"github.com/KMHTelU/KMH-WebProfile-API/configs"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
@@ -10,8 +11,10 @@ import (
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/services"
 	"github.com/KMHTelU/KMH-WebProfile-API/routes"
 	"github.com/KMHTelU/KMH-WebProfile-API/utils"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/yokeTH/gofiber-scalar/scalar/v3"
 )
 
 var (
@@ -21,6 +24,8 @@ var (
 	repo    *repositories.Repository
 	service *services.Service
 	cleaner *utils.TokenCleaner
+	handler *handlers.Handler
+	route   *routes.Routes
 )
 
 func init() {
@@ -36,7 +41,8 @@ func init() {
 
 	repo = repositories.InitializeRepository(db, queries)
 	service = services.InitializeService(repo, cleaner)
-	handlers.InitializeHandler(service)
+	handler = handlers.InitializeHandler(service)
+	route = routes.InitializeRoutes(handler)
 }
 
 func main() {
@@ -45,21 +51,30 @@ func main() {
 		CaseSensitive:      true,
 		StrictRouting:      true,
 		EnableIPValidation: true,
-		ServerHeader:       "KMH Tel-U",
-		AppName:            "KMH Tel-U Profile Web API v" + config.Version,
+		StructValidator: &utils.Validator{
+			Validator: validator.New(),
+		},
+		ServerHeader: "KMH Tel-U",
+		AppName:      "KMH Tel-U Profile Web API v" + config.Version,
 	})
 
-	routes.SetupRoutes(app)
+	route.SetupRoutes(app)
 
-	app.Hooks().OnPostShutdown(func(err error) error {
-		if err != nil {
-			log.Infof("Shutdown error: %v", err)
-		} else {
-			log.Info("Server shutdown completed successfully")
-		}
-		return nil
-	})
-	go app.Listen(":" + config.ServerPort)
+	swaggerBytes, err := os.ReadFile("./api/swagger.json")
+	if err != nil {
+		log.Fatalf("Failed to read Swagger file: %v", err)
+	}
 
-	app.Shutdown()
+	fileContentString := string(swaggerBytes)
+
+	app.Get("/docs/*", scalar.New(scalar.Config{
+		BasePath:          "/",
+		FileContentString: fileContentString,
+		Path:              "/docs",
+		Title:             "KMH Tel-U Profile Web API Docs v" + config.Version,
+		Theme:             scalar.ThemeKepler,
+	}))
+
+	log.Fatal(app.Listen(":" + config.ServerPort))
+
 }
