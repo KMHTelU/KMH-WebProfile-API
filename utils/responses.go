@@ -6,6 +6,7 @@ type APIResponse struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+	Error   interface{} `json:"error,omitempty"`
 }
 
 func RespondWithOK(c fiber.Ctx, message string, data interface{}) error {
@@ -28,5 +29,13 @@ func RespondWithError(c fiber.Ctx, statusCode int, message string) error {
 	return c.Status(statusCode).JSON(APIResponse{
 		Status:  "error",
 		Message: message,
+	})
+}
+
+func RespondWithValidationError(c fiber.Ctx, errors map[string]string) error {
+	return c.Status(fiber.StatusBadRequest).JSON(APIResponse{
+		Status:  "error",
+		Message: "validation error",
+		Error:   errors,
 	})
 }
