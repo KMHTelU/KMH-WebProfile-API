@@ -8,6 +8,7 @@ This is the backend API for the KMH Web Profile.
 - JWT Auth
 - RBAC
 - sqlc + dbmate
+- Scalar docs
 
 # Development Inquiry
 ### First of all pls make sure you have installed _Go 1.25+_. 
@@ -49,3 +50,6 @@ go mod tidy
 ```go
 go run main.go
 ```
+
+### Swagger Docs
+please refer to this: https://swagger.io/docs/specification/v3_0/basic-structure/
