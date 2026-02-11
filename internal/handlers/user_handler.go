@@ -19,7 +19,7 @@ func (h *Handler) CreateUser(c fiber.Ctx) error {
 
 	if err := h.Service.CreateUserService(request, c); err != nil {
 		//if failed, then must check repository.InsertUser and repository.InsertLog
-		return utils.RespondWithError(c, fiber.StatusInternalServerError, "Failed to create user")
+		return utils.RespondWithError(c, err.Code, err.Message)
 	}
 
 	return utils.RespondWithCreated(c, "User created successfully", nil)

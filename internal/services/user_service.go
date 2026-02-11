@@ -10,16 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx) error {
+func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx) *fiber.Error {
 	claim, err := s.TokenCleaner.GetCleanToken(c)
 	if err != nil || claim == nil {
-		return utils.RespondWithError(c, fiber.StatusUnauthorized, "Unauthorized")
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
 
 	newId := uuid.New()
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return utils.RespondWithError(c, fiber.StatusInternalServerError, "Failed to hash password")
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
 	}
 	var params generated.CreateUserParams = generated.CreateUserParams{
 		ID:           newId,
@@ -30,7 +30,7 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 	}
 
 	if err := s.Repository.InsertUser(params, c); err != nil {
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create user")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
@@ -41,7 +41,7 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 		IpAddress: sql.NullString{String: c.IP()},
 		UserAgent: sql.NullString{String: c.UserAgent()},
 	}, c); err != nil {
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
 	return nil
 }
