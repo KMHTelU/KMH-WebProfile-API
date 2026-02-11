@@ -7,19 +7,21 @@ import (
 )
 
 type TokenCleaner struct {
-	SecretKey []byte
+	AccessSecretKey  []byte
+	RefreshSecretKey []byte
 }
 
-func InitializeTokenCleaner(secret string) *TokenCleaner {
+func InitializeTokenCleaner(accessSecret string, refreshSecret string) *TokenCleaner {
 	return &TokenCleaner{
-		SecretKey: []byte(secret),
+		AccessSecretKey:  []byte(accessSecret),
+		RefreshSecretKey: []byte(refreshSecret),
 	}
 }
 
 func (tc *TokenCleaner) GetCleanToken(c fiber.Ctx) (*Claims, error) {
 	token := c.Get("Authorization")
 	token = strings.TrimPrefix(token, "Bearer ")
-	claims, err := ValidateJWT(token, tc.SecretKey)
+	claims, err := ValidateJWT(token, tc.AccessSecretKey)
 	if err != nil {
 		return nil, err
 	}

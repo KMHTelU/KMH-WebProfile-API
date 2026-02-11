@@ -12,17 +12,39 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(userID uuid.UUID, secretKey []byte) (string, error) {
-	claims := Claims{
+func GenerateJWT(userID uuid.UUID, accessSecretKey []byte, refreshSecretKey []byte) (string, string, time.Time, error) {
+	accessExpiresAt := time.Now().Add(1 * time.Hour)
+	accessClaims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// You can add expiration time and other claims here
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(accessExpiresAt),
 			Issuer:    "KMHTelU-API",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(secretKey)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
+	accessToken, err := token.SignedString(accessSecretKey)
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
+
+	refreshExpiresAt := time.Now().Add(7 * 24 * time.Hour)
+	refreshClaims := Claims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(refreshExpiresAt),
+			Issuer:    "KMHTelU-API",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+	refreshTokenString, err := refreshToken.SignedString(refreshSecretKey)
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
+
+	return accessToken, refreshTokenString, accessExpiresAt, nil
 }
 
 func ValidateJWT(tokenString string, secretKey []byte) (*Claims, error) {
