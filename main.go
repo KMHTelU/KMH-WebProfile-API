@@ -37,7 +37,7 @@ func init() {
 	db = configs.ConnectDatabase(config.DatabaseURL)
 	queries = generated.New(db)
 
-	cleaner = utils.InitializeTokenCleaner(config.JWTSecret)
+	cleaner = utils.InitializeTokenCleaner(config.JWTSecret, config.JWTRefreshSecret)
 
 	repo = repositories.InitializeRepository(db, queries)
 	service = services.InitializeService(repo, cleaner)

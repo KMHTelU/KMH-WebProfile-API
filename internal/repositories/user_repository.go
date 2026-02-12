@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
@@ -44,4 +46,12 @@ func (r *Repository) GetAllUsers(params generated.GetUsersParams, c fiber.Ctx) (
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *Repository) GetUserByEmail(email string, c fiber.Ctx) (generated.GetUserByEmailRow, error) {
+	user, err := r.Queries.GetUserByEmail(c, sql.NullString{String: email})
+	if err != nil {
+		return generated.GetUserByEmailRow{}, err
+	}
+	return user, nil
 }

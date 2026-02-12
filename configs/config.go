@@ -8,11 +8,12 @@ import (
 )
 
 type Config struct {
-	ServerPort  string
-	DatabaseURL string
-	Environment string
-	Version     string
-	JWTSecret   string
+	ServerPort       string
+	DatabaseURL      string
+	Environment      string
+	Version          string
+	JWTSecret        string
+	JWTRefreshSecret string
 }
 
 func LoadConfig() (*Config, error) {
@@ -21,11 +22,12 @@ func LoadConfig() (*Config, error) {
 		log.Fatal("No .env file found, relying on environment variables")
 	}
 	return &Config{
-		ServerPort:  GetEnv("SERVER_PORT", "8080"),
-		DatabaseURL: GetEnv("DATABASE_URL", "postgres://user:password@localhost:5432/dbname"),
-		Environment: GetEnv("ENVIRONMENT", "development"),
-		Version:     GetEnv("VERSION", "1.0.0"),
-		JWTSecret:   GetEnv("JWT_SECRET", "your-default-jwt-secret"),
+		ServerPort:       GetEnv("SERVER_PORT", "8080"),
+		DatabaseURL:      GetEnv("DATABASE_URL", "postgres://user:password@localhost:5432/dbname"),
+		Environment:      GetEnv("ENVIRONMENT", "development"),
+		Version:          GetEnv("VERSION", "1.0.0"),
+		JWTSecret:        GetEnv("JWT_SECRET", "your-default-jwt-secret"),
+		JWTRefreshSecret: GetEnv("JWT_REFRESH_SECRET", "your-default-jwt-refresh-secret"),
 	}, nil
 }
 

@@ -35,7 +35,7 @@ func RespondWithError(c fiber.Ctx, statusCode int, message string) error {
 func RespondWithValidationError(c fiber.Ctx, errors map[string]string) error {
 	return c.Status(fiber.StatusBadRequest).JSON(APIResponse{
 		Status:  "error",
-		Message: "validation error",
+		Message: "Validation error",
 		Error:   errors,
 	})
 }

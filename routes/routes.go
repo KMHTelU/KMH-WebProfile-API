@@ -26,4 +26,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	user.Post("/", func(c fiber.Ctx) error {
 		return r.Handler.CreateUser(c)
 	})
+
+	auth := api.Group("/auth")
+	auth.Post("/login", func(c fiber.Ctx) error {
+		return r.Handler.AuthenticateUser(c)
+	})
+	auth.Post("/refresh", func(c fiber.Ctx) error {
+		return r.Handler.RefreshToken(c)
+	})
 }
