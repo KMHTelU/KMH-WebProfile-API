@@ -23,8 +23,20 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	// Additional routes can be added here
 	user := api.Group("/user")
-	user.Post("/", func(c fiber.Ctx) error {
+	user.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateUser(c)
+	})
+	user.Get("", func(c fiber.Ctx) error {
+		return r.Handler.GetAllUsers(c)
+	})
+	user.Get("/:id", func(c fiber.Ctx) error {
+		return r.Handler.GetUserByID(c)
+	})
+	user.Put("/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateUser(c)
+	})
+	user.Delete("/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteUser(c)
 	})
 
 	auth := api.Group("/auth")

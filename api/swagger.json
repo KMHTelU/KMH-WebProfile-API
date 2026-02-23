@@ -18,26 +18,90 @@
   "paths": {
     "/user": {
       "get": {
-        "summary": "Returns a list of users.",
-        "description": "Optional extended description in CommonMark or HTML.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Get All Users",
+        "description": "Retrieves a list of users with optional pagination.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of users to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Number of users to skip before starting to collect the result set",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A JSON array of user names",
+            "description": "A JSON array of user data",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Users retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
-        "summary": "Creates a new user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Create User",
+        "description": "Creates a new user in the system.",
         "requestBody": {
           "description": "User object that needs to be added",
           "required": true,
@@ -51,17 +115,42 @@
         },
         "responses": {
           "201": {
-            "status": "created",
             "description": "User created successfully",
-            "data": null
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User created successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "status": "error",
             "description": "Validation error",
-            "error": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
               }
             }
           },
@@ -88,9 +177,290 @@
         }
       }
     },
+    "/user/{id}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Get User by ID",
+        "description": "Retrieves a user by their unique ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User retrieved successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/NotFoundResponse"
+                }
+              }
+            },
+            "description": "User not found"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Update User",
+        "description": "Updates an existing user in the system.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "User object that needs to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User updated successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Delete User",
+        "description": "Deletes a user by their unique ID. WARNING: HARD DELETE - This action cannot be undone.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/NotFoundResponse"
+                }
+              }
+            },
+            "description": "User not found"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
-        "summary": "Authenticates a user and returns a token.",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Authenticate/Login User",
+        "description": "Authenticates a user and returns a token.",
         "requestBody": {
           "description": "User credentials",
           "required": true,
@@ -108,7 +478,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/responses/AuthenticateUserResponse"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User authenticated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/responses/AuthenticateUserResponse"
+                    }
+                  }
                 }
               }
             }
@@ -135,14 +518,50 @@
     },
     "/auth/refresh": {
       "post": {
-        "summary": "Refreshes the authentication token.",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh Auth Token",
+        "description": "Refreshes the authentication token.",
+        "requestBody": {
+          "description": "Refresh token",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refresh_token"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Token refreshed successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/responses/RefreshTokenResponse"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Token refreshed successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/responses/RefreshTokenResponse"
+                    }
+                  }
                 }
               }
             }
@@ -178,6 +597,16 @@
       }
     }
   },
+  "tags": [
+    {
+      "name": "User Management",
+      "description": "APIs related to user management"
+    },
+    {
+      "name": "Authentication",
+      "description": "APIs related to user authentication and token management"
+    }
+  ],
   "components": {
     "requests": {
       "CreateUserRequest": {
@@ -221,6 +650,40 @@
           "email",
           "password"
         ]
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "properties": {
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ]
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "role_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "responses": {
@@ -234,7 +697,8 @@
             "type": "string"
           },
           "expires_in": {
-            "type": "integer"
+            "type": "integer",
+            "example": 3600
           },
           "user": {
             "$ref": "#/components/schemas/User"
@@ -352,6 +816,13 @@
             "format": "date-time"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
