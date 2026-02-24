@@ -17,12 +17,27 @@ func InitializeRoutes(handler *handlers.Handler) *Routes {
 }
 
 func (r *Routes) SetupRoutes(app *fiber.App) {
+	// Unprotected routes
 	api := app.Group("/api")
 	api.Get("/status", func(c fiber.Ctx) error {
 		return utils.RespondWithOK(c, "KMH WebProfile API is running", nil)
 	})
-	// Additional routes can be added here
-	user := api.Group("/user")
+	api.Get("/homepage-banners", func(c fiber.Ctx) error {
+		return r.Handler.GetHomepageBannersHandler(c)
+	})
+
+	// Authentication routes
+	api.Post("/login", func(c fiber.Ctx) error {
+		return r.Handler.AuthenticateUser(c)
+	})
+	api.Post("/refresh", func(c fiber.Ctx) error {
+		return r.Handler.RefreshToken(c)
+	})
+
+	// Protected routes
+	protected := api.Group("/protected")
+
+	user := protected.Group("/user")
 	user.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateUser(c)
 	})
@@ -39,11 +54,14 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 		return r.Handler.DeleteUser(c)
 	})
 
-	auth := api.Group("/auth")
-	auth.Post("/login", func(c fiber.Ctx) error {
-		return r.Handler.AuthenticateUser(c)
+	homepageBanner := protected.Group("/homepage-banners")
+	homepageBanner.Post("", func(c fiber.Ctx) error {
+		return r.Handler.CreateHomepageBannerHandler(c)
 	})
-	auth.Post("/refresh", func(c fiber.Ctx) error {
-		return r.Handler.RefreshToken(c)
+	homepageBanner.Get("", func(c fiber.Ctx) error {
+		return r.Handler.GetPaginatedHomepageBannersHandler(c)
+	})
+	homepageBanner.Delete("/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteHomepageBannerHandler(c)
 	})
 }
