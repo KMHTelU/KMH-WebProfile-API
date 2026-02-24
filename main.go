@@ -11,6 +11,7 @@ import (
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/services"
 	"github.com/KMHTelU/KMH-WebProfile-API/routes"
 	"github.com/KMHTelU/KMH-WebProfile-API/utils"
+	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
@@ -38,9 +39,13 @@ func init() {
 	queries = generated.New(db)
 
 	cleaner = utils.InitializeTokenCleaner(config.JWTSecret, config.JWTRefreshSecret)
+	cld, err := cloudinary.NewFromParams(config.CloudinaryCloudName, config.CloudinaryAPIKey, config.CloudinaryAPISecret)
+	if err != nil {
+		log.Fatalf("Failed to initialize Cloudinary: %v", err)
+	}
 
 	repo = repositories.InitializeRepository(db, queries)
-	service = services.InitializeService(repo, cleaner)
+	service = services.InitializeService(repo, cleaner, cld)
 	handler = handlers.InitializeHandler(service)
 	route = routes.InitializeRoutes(handler)
 }
@@ -55,7 +60,7 @@ func main() {
 			Validator: validator.New(),
 		},
 		ServerHeader: "KMH Tel-U",
-		AppName:      "KMH Tel-U Profile Web API v" + config.Version,
+		AppName:      "🔥 KMH Tel-U Profile Web API v" + config.Version,
 	})
 
 	route.SetupRoutes(app)

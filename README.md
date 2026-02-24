@@ -45,10 +45,15 @@ cp .env.example .env
 ```go
 go mod tidy
 ```
-5. Run go run
+5. Install air-verse (if you already installed this, then skip)
 
 ```go
-go run main.go
+go install github.com/air-verse/air@latest
+```
+6. Run air
+
+```bash
+air
 ```
 
 ### Swagger Docs

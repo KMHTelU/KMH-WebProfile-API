@@ -7,16 +7,53 @@
   },
   "servers": [
     {
-      "url": "http://api.example.com/v1",
-      "description": "Optional server description, e.g. Main (production) server"
-    },
-    {
       "url": "http://127.0.0.1:8080/api",
       "description": "Local Development Server"
+    },
+    {
+      "url": "http://api.example.com/v1",
+      "description": "Optional server description, e.g. Main (production) server"
     }
   ],
   "paths": {
-    "/user": {
+    "/homepage-banners": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "Get All Home Banners (Public)",
+        "description": "Retrieves a list of active home banners for the landing page. This endpoint is public and does not require authentication. Only banners that are currently active (based on the current date and the banner's start_date and end_date) will be returned.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of active home banner data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Home banners retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HomepageBanner"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected/user": {
       "get": {
         "security": [
           {
@@ -177,7 +214,7 @@
         }
       }
     },
-    "/user/{id}": {
+    "/protected/user/{id}": {
       "get": {
         "security": [
           {
@@ -454,7 +491,275 @@
         }
       }
     },
-    "/auth/login": {
+    "/protected/homepage-banners": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "HomePage Banner Management"
+        ],
+        "summary": "Get All Home Banners",
+        "description": "Retrieves a list of home banners with optional pagination.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of home banners to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Number of home banners to skip before starting to collect the result set",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of home banner data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Home banners retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HomepageBanner"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "HomePage Banner Management"
+        ],
+        "summary": "Create Home Banner",
+        "description": "Creates a new home banner in the system.",
+        "requestBody": {
+          "description": "Home banner object that needs to be added",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/requests/CreateHomepageBannerRequest"
+                  },
+                  "media": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file for the home banner (JPEG, PNG, GIF)"
+                  }
+                }
+              },
+              "encoding": {
+                "data": {
+                  "contentType": "application/json"
+                },
+                "media": {
+                  "contentType": "image/jpeg, image/png, image/gif"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Home banner created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Home banner created successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "HomePage Banner Management"
+        ],
+        "summary": "Delete Home Banner",
+        "description": "Deletes a home banner by its unique ID. WARNING: HARD DELETE - This action cannot be undone.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the home banner to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Home banner deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Home banner deleted successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Home banner not found"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/login": {
       "post": {
         "tags": [
           "Authentication"
@@ -516,7 +821,7 @@
         }
       }
     },
-    "/auth/refresh": {
+    "/refresh": {
       "post": {
         "tags": [
           "Authentication"
@@ -599,12 +904,40 @@
   },
   "tags": [
     {
-      "name": "User Management",
-      "description": "APIs related to user management"
+      "name": "Public APIs",
+      "description": "Unprotected APIs for landing page and other public features"
     },
     {
       "name": "Authentication",
       "description": "APIs related to user authentication and token management"
+    },
+    {
+      "name": "User Management",
+      "description": "APIs related to user management"
+    },
+    {
+      "name": "HomePage Banner Management",
+      "description": "APIs related to homepage banner management"
+    },
+    {
+      "name": "Organization Profile Management",
+      "description": "APIs related to organization profile management"
+    },
+    {
+      "name": "Event Management",
+      "description": "APIs related to event management"
+    },
+    {
+      "name": "Gallery Management",
+      "description": "APIs related to gallery management"
+    },
+    {
+      "name": "Division Management",
+      "description": "APIs related to division management"
+    },
+    {
+      "name": "Contact Management",
+      "description": "APIs related to contact management"
     }
   ],
   "components": {
@@ -684,6 +1017,47 @@
             "type": "boolean"
           }
         }
+      },
+      "CreateHomepageBannerRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "cta_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "alt_text": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "is_active",
+          "start_date",
+          "end_date"
+        ]
       }
     },
     "responses": {
@@ -814,6 +1188,79 @@
           "last_login_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          },
+          "alt_text": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          }
+        }
+      },
+      "HomepageBanner": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "cta_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "alt_text": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "media": {
+            "$ref": "#/components/schemas/Media"
           }
         }
       }

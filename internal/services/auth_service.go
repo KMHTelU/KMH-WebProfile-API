@@ -41,7 +41,7 @@ func (s *Service) AuthenticateUserService(request requests.AuthenticateUserReque
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresAt:    expiresAt,
-		User:         userResponse,
+		User:         &userResponse,
 	}
 
 	return auth, nil
