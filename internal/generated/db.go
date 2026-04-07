@@ -243,6 +243,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateDivisionStmt, err = db.PrepareContext(ctx, updateDivision); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateDivision: %w", err)
 	}
+	if q.updateDivisionIconStmt, err = db.PrepareContext(ctx, updateDivisionIcon); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateDivisionIcon: %w", err)
+	}
 	if q.updateEventStmt, err = db.PrepareContext(ctx, updateEvent); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateEvent: %w", err)
 	}
@@ -251,6 +254,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateMemberStmt, err = db.PrepareContext(ctx, updateMember); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateMember: %w", err)
+	}
+	if q.updateMemberPhotoStmt, err = db.PrepareContext(ctx, updateMemberPhoto); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateMemberPhoto: %w", err)
 	}
 	if q.updateOrganizationProfileStmt, err = db.PrepareContext(ctx, updateOrganizationProfile); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateOrganizationProfile: %w", err)
@@ -631,6 +637,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateDivisionStmt: %w", cerr)
 		}
 	}
+	if q.updateDivisionIconStmt != nil {
+		if cerr := q.updateDivisionIconStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateDivisionIconStmt: %w", cerr)
+		}
+	}
 	if q.updateEventStmt != nil {
 		if cerr := q.updateEventStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateEventStmt: %w", cerr)
@@ -644,6 +655,11 @@ func (q *Queries) Close() error {
 	if q.updateMemberStmt != nil {
 		if cerr := q.updateMemberStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateMemberStmt: %w", cerr)
+		}
+	}
+	if q.updateMemberPhotoStmt != nil {
+		if cerr := q.updateMemberPhotoStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateMemberPhotoStmt: %w", cerr)
 		}
 	}
 	if q.updateOrganizationProfileStmt != nil {
@@ -773,9 +789,11 @@ type Queries struct {
 	updateBlogPostStmt                 *sql.Stmt
 	updateBlogTagStmt                  *sql.Stmt
 	updateDivisionStmt                 *sql.Stmt
+	updateDivisionIconStmt             *sql.Stmt
 	updateEventStmt                    *sql.Stmt
 	updateGalleryStmt                  *sql.Stmt
 	updateMemberStmt                   *sql.Stmt
+	updateMemberPhotoStmt              *sql.Stmt
 	updateOrganizationProfileStmt      *sql.Stmt
 	updateRoleStmt                     *sql.Stmt
 	updateUserStmt                     *sql.Stmt
@@ -858,9 +876,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateBlogPostStmt:                 q.updateBlogPostStmt,
 		updateBlogTagStmt:                  q.updateBlogTagStmt,
 		updateDivisionStmt:                 q.updateDivisionStmt,
+		updateDivisionIconStmt:             q.updateDivisionIconStmt,
 		updateEventStmt:                    q.updateEventStmt,
 		updateGalleryStmt:                  q.updateGalleryStmt,
 		updateMemberStmt:                   q.updateMemberStmt,
+		updateMemberPhotoStmt:              q.updateMemberPhotoStmt,
 		updateOrganizationProfileStmt:      q.updateOrganizationProfileStmt,
 		updateRoleStmt:                     q.updateRoleStmt,
 		updateUserStmt:                     q.updateUserStmt,

@@ -1,6 +1,6 @@
 -- name: InsertMember :one
-INSERT INTO members (id, name, npm, email, phone, photo_media_id, bio, instagram_url, period_start, period_end)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+INSERT INTO members (id, name, npm, email, phone, bio, instagram_url, period_start, period_end)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
 -- name: UpdateMember :one
@@ -8,15 +8,20 @@ UPDATE members
 SET name = $2,
     email = $3,
     phone = $4,
-    photo_media_id = $5,
-    bio = $6,
-    instagram_url = $7,
-    period_start = $8,
-    period_end = $9,
-    is_active = $10,
+    bio = $5,
+    instagram_url = $6,
+    period_start = $7,
+    period_end = $8,
+    is_active = $9,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: UpdateMemberPhoto :exec
+UPDATE members
+SET photo_media_id = $2,
+    updated_at = NOW()
+WHERE id = $1;
 
 -- name: GetMemberByID :one
 SELECT *
