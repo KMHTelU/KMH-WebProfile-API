@@ -1,6 +1,6 @@
 -- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, icon_media_id, coordinator_id, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO divisions (id, name, slug, description, coordinator_id)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: UpdateDivision :one
@@ -8,12 +8,17 @@ UPDATE divisions
 SET name = $2,
     slug = $3,
     description = $4,
-    icon_media_id = $5,
-    coordinator_id = $6,
-    is_active = $7,
+    coordinator_id = $5,
+    is_active = $6,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: UpdateDivisionIcon :exec
+UPDATE divisions
+SET icon_media_id = $2,
+    updated_at = NOW()
+WHERE id = $1;
 
 -- name: GetDivisionByID :one
 SELECT *

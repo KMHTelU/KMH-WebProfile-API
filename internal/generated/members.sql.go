@@ -173,8 +173,8 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (GetMemberByI
 }
 
 const insertMember = `-- name: InsertMember :one
-INSERT INTO members (id, name, npm, email, phone, photo_media_id, bio, instagram_url, period_start, period_end)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+INSERT INTO members (id, name, npm, email, phone, bio, instagram_url, period_start, period_end)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
 `
 
@@ -184,7 +184,6 @@ type InsertMemberParams struct {
 	Npm          sql.NullString `json:"npm"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
-	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
 	PeriodStart  interface{}    `json:"period_start"`
@@ -198,7 +197,6 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 		arg.Npm,
 		arg.Email,
 		arg.Phone,
-		arg.PhotoMediaID,
 		arg.Bio,
 		arg.InstagramUrl,
 		arg.PeriodStart,
@@ -228,12 +226,11 @@ UPDATE members
 SET name = $2,
     email = $3,
     phone = $4,
-    photo_media_id = $5,
-    bio = $6,
-    instagram_url = $7,
-    period_start = $8,
-    period_end = $9,
-    is_active = $10,
+    bio = $5,
+    instagram_url = $6,
+    period_start = $7,
+    period_end = $8,
+    is_active = $9,
     updated_at = NOW()
 WHERE id = $1
 RETURNING id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
@@ -244,7 +241,6 @@ type UpdateMemberParams struct {
 	Name         sql.NullString `json:"name"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
-	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
 	PeriodStart  interface{}    `json:"period_start"`
@@ -258,7 +254,6 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 		arg.Name,
 		arg.Email,
 		arg.Phone,
-		arg.PhotoMediaID,
 		arg.Bio,
 		arg.InstagramUrl,
 		arg.PeriodStart,
@@ -282,4 +277,21 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateMemberPhoto = `-- name: UpdateMemberPhoto :exec
+UPDATE members
+SET photo_media_id = $2,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateMemberPhotoParams struct {
+	ID           uuid.UUID     `json:"id"`
+	PhotoMediaID uuid.NullUUID `json:"photo_media_id"`
+}
+
+func (q *Queries) UpdateMemberPhoto(ctx context.Context, arg UpdateMemberPhotoParams) error {
+	_, err := q.exec(ctx, q.updateMemberPhotoStmt, updateMemberPhoto, arg.ID, arg.PhotoMediaID)
+	return err
 }

@@ -64,4 +64,24 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	homepageBanner.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteHomepageBannerHandler(c)
 	})
+
+	member := protected.Group("/members")
+	member.Post("", func(c fiber.Ctx) error {
+		return r.Handler.CreateMemberHandler(c)
+	})
+	member.Get("/:id", func(c fiber.Ctx) error {
+		return r.Handler.GetMemberByIDHandler(c)
+	})
+	member.Get("", func(c fiber.Ctx) error {
+		return r.Handler.GetPaginatedAllMembersHandler(c)
+	})
+	member.Put("/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateMemberHandler(c)
+	})
+	member.Post("/:id/upload", func(c fiber.Ctx) error {
+		return r.Handler.UploadAndUpdateMemberPhotoHandler(c)
+	})
+	member.Delete("/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteMemberHandler(c)
+	})
 }

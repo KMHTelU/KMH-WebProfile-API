@@ -205,8 +205,8 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 }
 
 const insertDivision = `-- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, icon_media_id, coordinator_id, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO divisions (id, name, slug, description, coordinator_id)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
@@ -215,9 +215,7 @@ type InsertDivisionParams struct {
 	Name          sql.NullString `json:"name"`
 	Slug          sql.NullString `json:"slug"`
 	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
 	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
 }
 
 func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) (Division, error) {
@@ -226,9 +224,7 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		arg.Name,
 		arg.Slug,
 		arg.Description,
-		arg.IconMediaID,
 		arg.CoordinatorID,
-		arg.IsActive,
 	)
 	var i Division
 	err := row.Scan(
@@ -250,9 +246,8 @@ UPDATE divisions
 SET name = $2,
     slug = $3,
     description = $4,
-    icon_media_id = $5,
-    coordinator_id = $6,
-    is_active = $7,
+    coordinator_id = $5,
+    is_active = $6,
     updated_at = NOW()
 WHERE id = $1
 RETURNING id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
@@ -263,7 +258,6 @@ type UpdateDivisionParams struct {
 	Name          sql.NullString `json:"name"`
 	Slug          sql.NullString `json:"slug"`
 	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
 	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
 	IsActive      sql.NullBool   `json:"is_active"`
 }
@@ -274,7 +268,6 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		arg.Name,
 		arg.Slug,
 		arg.Description,
-		arg.IconMediaID,
 		arg.CoordinatorID,
 		arg.IsActive,
 	)
@@ -291,4 +284,21 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateDivisionIcon = `-- name: UpdateDivisionIcon :exec
+UPDATE divisions
+SET icon_media_id = $2,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateDivisionIconParams struct {
+	ID          uuid.UUID     `json:"id"`
+	IconMediaID uuid.NullUUID `json:"icon_media_id"`
+}
+
+func (q *Queries) UpdateDivisionIcon(ctx context.Context, arg UpdateDivisionIconParams) error {
+	_, err := q.exec(ctx, q.updateDivisionIconStmt, updateDivisionIcon, arg.ID, arg.IconMediaID)
+	return err
 }
