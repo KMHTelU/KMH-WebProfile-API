@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  kmh-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: KMHWebProfile-BE
+    ports:
+      - "8010:8010"
+    # Menggunakan file .env yang ada di host machine
+    env_file:
+      - .env
+    restart: unless-stopped
