@@ -35,7 +35,7 @@ func init() {
 		log.Infof("Failed to load configuration: %v", err)
 	}
 	config = conf
-	db = configs.ConnectDatabase(config.DatabaseURL)
+	db = configs.ConnectDatabase(config.DSN())
 	queries = generated.New(db)
 
 	cleaner = utils.InitializeTokenCleaner(config.JWTSecret, config.JWTRefreshSecret)
