@@ -65,7 +65,7 @@ func main() {
 
 	route.SetupRoutes(app)
 
-	swaggerBytes, err := os.ReadFile("./api/swagger.json")
+	swaggerBytes, err := os.ReadFile("./docs/swagger.json")
 	if err != nil {
 		log.Fatalf("Failed to read Swagger file: %v", err)
 	}

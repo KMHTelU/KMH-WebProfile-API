@@ -162,13 +162,12 @@ SET name = $2,
     vision = $5,
     mission = $6,
     history = $7,
-    logo_media_id = $8,
-    address = $9,
-    email = $10,
-    phone = $11,
-    instagram_url = $12,
-    youtube_url = $13,
-    website_url = $14,
+    address = $8,
+    email = $9,
+    phone = $10,
+    instagram_url = $11,
+    youtube_url = $12,
+    website_url = $13,
     updated_at = NOW()
 WHERE id = $1
 RETURNING id, name, short_name, description, vision, mission, history, logo_media_id, address, email, phone, instagram_url, youtube_url, website_url, created_at, updated_at
@@ -182,7 +181,6 @@ type UpdateOrganizationProfileParams struct {
 	Vision       sql.NullString `json:"vision"`
 	Mission      sql.NullString `json:"mission"`
 	History      sql.NullString `json:"history"`
-	LogoMediaID  uuid.NullUUID  `json:"logo_media_id"`
 	Address      sql.NullString `json:"address"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
@@ -200,7 +198,6 @@ func (q *Queries) UpdateOrganizationProfile(ctx context.Context, arg UpdateOrgan
 		arg.Vision,
 		arg.Mission,
 		arg.History,
-		arg.LogoMediaID,
 		arg.Address,
 		arg.Email,
 		arg.Phone,
@@ -208,6 +205,43 @@ func (q *Queries) UpdateOrganizationProfile(ctx context.Context, arg UpdateOrgan
 		arg.YoutubeUrl,
 		arg.WebsiteUrl,
 	)
+	var i OrganizationProfile
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ShortName,
+		&i.Description,
+		&i.Vision,
+		&i.Mission,
+		&i.History,
+		&i.LogoMediaID,
+		&i.Address,
+		&i.Email,
+		&i.Phone,
+		&i.InstagramUrl,
+		&i.YoutubeUrl,
+		&i.WebsiteUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateOrganizationProfileLogo = `-- name: UpdateOrganizationProfileLogo :one
+UPDATE organization_profile
+SET logo_media_id = $2,
+    updated_at = NOW()
+WHERE id = $1
+RETURNING id, name, short_name, description, vision, mission, history, logo_media_id, address, email, phone, instagram_url, youtube_url, website_url, created_at, updated_at
+`
+
+type UpdateOrganizationProfileLogoParams struct {
+	ID          uuid.UUID     `json:"id"`
+	LogoMediaID uuid.NullUUID `json:"logo_media_id"`
+}
+
+func (q *Queries) UpdateOrganizationProfileLogo(ctx context.Context, arg UpdateOrganizationProfileLogoParams) (OrganizationProfile, error) {
+	row := q.queryRow(ctx, q.updateOrganizationProfileLogoStmt, updateOrganizationProfileLogo, arg.ID, arg.LogoMediaID)
 	var i OrganizationProfile
 	err := row.Scan(
 		&i.ID,

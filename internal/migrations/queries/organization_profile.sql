@@ -11,13 +11,19 @@ SET name = $2,
     vision = $5,
     mission = $6,
     history = $7,
-    logo_media_id = $8,
-    address = $9,
-    email = $10,
-    phone = $11,
-    instagram_url = $12,
-    youtube_url = $13,
-    website_url = $14,
+    address = $8,
+    email = $9,
+    phone = $10,
+    instagram_url = $11,
+    youtube_url = $12,
+    website_url = $13,
+    updated_at = NOW()
+WHERE id = $1
+RETURNING *;
+
+-- name: UpdateOrganizationProfileLogo :one
+UPDATE organization_profile
+SET logo_media_id = $2,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;
