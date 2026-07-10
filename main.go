@@ -32,7 +32,7 @@ var (
 func init() {
 	conf, err := configs.LoadConfig()
 	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+		log.Infof("Failed to load configuration: %v", err)
 	}
 	config = conf
 	db = configs.ConnectDatabase(config.DatabaseURL)
@@ -41,7 +41,7 @@ func init() {
 	cleaner = utils.InitializeTokenCleaner(config.JWTSecret, config.JWTRefreshSecret)
 	cld, err := cloudinary.NewFromParams(config.CloudinaryCloudName, config.CloudinaryAPIKey, config.CloudinaryAPISecret)
 	if err != nil {
-		log.Fatalf("Failed to initialize Cloudinary: %v", err)
+		log.Infof("Failed to initialize Cloudinary: %v", err)
 	}
 
 	repo = repositories.InitializeRepository(db, queries)
@@ -67,7 +67,7 @@ func main() {
 
 	swaggerBytes, err := os.ReadFile("./docs/swagger.json")
 	if err != nil {
-		log.Fatalf("Failed to read Swagger file: %v", err)
+		log.Infof("Failed to read Swagger file: %v", err)
 	}
 
 	fileContentString := string(swaggerBytes)
