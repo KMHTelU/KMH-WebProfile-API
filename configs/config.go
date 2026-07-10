@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gofiber/fiber/v3/log"
@@ -9,7 +10,12 @@ import (
 
 type Config struct {
 	ServerPort          string
-	DatabaseURL         string
+	DBHost              string
+	DBPort              string
+	DBUser              string
+	DBPass              string
+	DBName              string
+	DBSSLMode           string
 	Environment         string
 	Version             string
 	JWTSecret           string
@@ -26,7 +32,12 @@ func LoadConfig() (*Config, error) {
 	}
 	return &Config{
 		ServerPort:          GetEnv("SERVER_PORT", "8080"),
-		DatabaseURL:         GetEnv("DATABASE_URL", "postgres://user:password@localhost:5432/dbname"),
+		DBHost:              GetEnv("DB_HOST", "localhost"),
+		DBPort:              GetEnv("DB_PORT", "5432"),
+		DBUser:              GetEnv("DB_USER", "postgres"),
+		DBPass:              GetEnv("DB_PASS", "password"),
+		DBName:              GetEnv("DB_NAME", "dbname"),
+		DBSSLMode:           GetEnv("DB_SSLMODE", "disable"),
 		Environment:         GetEnv("ENVIRONMENT", "development"),
 		Version:             GetEnv("VERSION", "1.0.0"),
 		JWTSecret:           GetEnv("JWT_SECRET", "your-default-jwt-secret"),
@@ -42,4 +53,11 @@ func GetEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func (c *Config) DSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=%s",
+		c.DBHost, c.DBPort, c.DBUser, c.DBPass, c.DBName, c.DBSSLMode, "UTC",
+	)
 }
