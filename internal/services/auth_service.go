@@ -5,16 +5,19 @@ import (
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/requests"
 	"github.com/KMHTelU/KMH-WebProfile-API/utils"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/log"
 )
 
 func (s *Service) AuthenticateUserService(request requests.AuthenticateUserRequest, c fiber.Ctx) (entities.Auth, *fiber.Error) {
 	// Implementation for authenticating a user
 	user, err := s.Repository.GetUserByEmail(request.Email, c)
 	if err != nil {
+		log.Errorf("Error retrieving user by email: %v", err)
 		return entities.Auth{}, fiber.NewError(fiber.StatusBadRequest, "Invalid email or password")
 	}
 
 	if !utils.CheckPassword(user.PasswordHash.String, request.Password) {
+		log.Errorf("Invalid password for user: %v", user.ID)
 		return entities.Auth{}, fiber.NewError(fiber.StatusBadRequest, "Invalid email or password")
 	}
 
