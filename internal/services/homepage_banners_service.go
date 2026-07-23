@@ -52,12 +52,12 @@ func (s *Service) CreateHomepageBannerService(request requests.HomepageBannerReq
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
 		Action:    sql.NullString{String: "Create Homepage Banner", Valid: true},
 		Entity:    sql.NullString{String: "HomepageBanner with ID: " + bannerID.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: bannerID},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		EntityID:  uuid.NullUUID{UUID: bannerID, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -122,12 +122,12 @@ func (s *Service) DeleteHomepageBannerService(id uuid.UUID, c fiber.Ctx) *fiber.
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
 		Action:    sql.NullString{String: "Delete Homepage Banner", Valid: true},
 		Entity:    sql.NullString{String: "HomepageBanner with ID: " + id.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}

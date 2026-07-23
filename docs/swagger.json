@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080/api",
+      "url": "http://localhost:8010/api",
       "description": "Local Development Server"
     },
     {
@@ -61,7 +61,7 @@
           }
         ],
         "tags": [
-          "User Management"
+          "Users"
         ],
         "summary": "Get All Users",
         "description": "Retrieves a list of users with optional pagination.",
@@ -135,7 +135,7 @@
           }
         ],
         "tags": [
-          "User Management"
+          "Users"
         ],
         "summary": "Create User",
         "description": "Creates a new user in the system.",
@@ -222,7 +222,7 @@
           }
         ],
         "tags": [
-          "User Management"
+          "Users"
         ],
         "summary": "Get User by ID",
         "description": "Retrieves a user by their unique ID.",
@@ -311,7 +311,7 @@
           }
         ],
         "tags": [
-          "User Management"
+          "Users"
         ],
         "summary": "Update User",
         "description": "Updates an existing user in the system.",
@@ -408,7 +408,7 @@
           }
         ],
         "tags": [
-          "User Management"
+          "Users"
         ],
         "summary": "Delete User",
         "description": "Deletes a user by their unique ID. WARNING: HARD DELETE - This action cannot be undone.",
@@ -499,7 +499,7 @@
           }
         ],
         "tags": [
-          "HomePage Banner Management"
+          "Homepage Banners"
         ],
         "summary": "Get All Home Banners",
         "description": "Retrieves a list of home banners with optional pagination.",
@@ -573,7 +573,7 @@
           }
         ],
         "tags": [
-          "HomePage Banner Management"
+          "Homepage Banners"
         ],
         "summary": "Create Home Banner",
         "description": "Creates a new home banner in the system.",
@@ -676,7 +676,7 @@
           }
         ],
         "tags": [
-          "HomePage Banner Management"
+          "Homepage Banners"
         ],
         "summary": "Delete Home Banner",
         "description": "Deletes a home banner by its unique ID. WARNING: HARD DELETE - This action cannot be undone.",
@@ -754,6 +754,1010 @@
                 }
               }
             },
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/divisions": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "List Divisions (Public)",
+        "description": "Retrieves all divisions. This endpoint is public and does not require authentication.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of divisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Divisions retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Division"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/divisions/{id}": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "Get Division (Public)",
+        "description": "Retrieves a division by its unique ID. Public.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Division"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/divisions": {
+      "post": {
+        "tags": [
+          "Divisions"
+        ],
+        "summary": "Create Division",
+        "description": "Creates a new division.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/CreateDivisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Division created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Division created successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/UnauthorizedResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/errorResponses/InternalServerErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected/divisions/{id}": {
+      "put": {
+        "tags": [
+          "Divisions"
+        ],
+        "summary": "Update Division",
+        "description": "Updates an existing division.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/UpdateDivisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Division updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Divisions"
+        ],
+        "summary": "Delete Division",
+        "description": "Deletes a division by its unique ID. WARNING: HARD DELETE - This action cannot be undone.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Division deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/divisions/{id}/upload": {
+      "post": {
+        "tags": [
+          "Divisions"
+        ],
+        "summary": "Upload Division Icon",
+        "description": "Uploads and sets the division icon. Multipart form field name: icon.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "icon": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Icon image file (JPEG, PNG, WebP)"
+                  }
+                },
+                "required": [
+                  "icon"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Division icon uploaded and updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/members": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "List Members (Public)",
+        "description": "Retrieves members with pagination. Public.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Member"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/members/{id}": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "Get Member (Public)",
+        "description": "Retrieves a member by ID. Public.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Member"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "List Members",
+        "description": "Retrieves members with pagination.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Member"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Create Member",
+        "description": "Creates a new member.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/CreateMemberRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Member created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/members/{id}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get Member",
+        "description": "Retrieves a member by ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Member"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Update Member",
+        "description": "Updates an existing member.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/UpdateMemberRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Delete Member",
+        "description": "Deletes a member. WARNING: HARD DELETE - This action cannot be undone.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/members/{id}/upload": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Upload Member Photo",
+        "description": "Uploads and sets the member photo. Multipart form field name: photo.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Photo image file (JPEG, PNG, WebP)"
+                  }
+                },
+                "required": [
+                  "photo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member photo uploaded and updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/media": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload Media",
+        "description": "Generic media upload. Returns a media object with id/url to attach to blog posts (featured_media_id), events (cover_media_id), or gallery items (media_id). Multipart form field name: file.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Media file (JPG/PNG/WebP; video MP4 H.264)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Media uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Media uploaded successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Media"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/organization-profile": {
+      "post": {
+        "tags": [
+          "Organization Profile"
+        ],
+        "summary": "Create Org Profile",
+        "description": "Creates the organization profile.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/CreateOrgProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Organization profile created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/organization-profile/{id}/upload": {
+      "post": {
+        "tags": [
+          "Organization Profile"
+        ],
+        "summary": "Upload Org Profile Logo",
+        "description": "Uploads and sets the organization logo. Multipart form field name: logo.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Logo image file (JPEG, PNG, WebP)"
+                  }
+                },
+                "required": [
+                  "logo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Organization profile logo uploaded and updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
             "description": "Internal Server Error"
           }
         }
@@ -904,7 +1908,7 @@
     "/organization-profile/{id}": {
       "get": {
         "tags": [
-          "Organization Profile"
+          "Public APIs"
         ],
         "summary": "Get Org Profile",
         "description": "Get org profile",
@@ -1004,12 +2008,61 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Organization Profile"
+        ],
+        "summary": "Delete Org Profile",
+        "description": "Deletes the organization profile by ID. WARNING: HARD DELETE - This action cannot be undone.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization profile deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
       }
     },
     "/blog-categories": {
       "get": {
         "tags": [
-          "Blog Categories"
+          "Public APIs"
         ],
         "summary": "List Categories",
         "description": "List all",
@@ -1064,7 +2117,7 @@
     "/blog-categories/{id}": {
       "get": {
         "tags": [
-          "Blog Categories"
+          "Public APIs"
         ],
         "summary": "Get Category",
         "description": "Get by ID",
@@ -1267,7 +2320,7 @@
     "/blog-tags": {
       "get": {
         "tags": [
-          "Blog Tags"
+          "Public APIs"
         ],
         "summary": "List Tags",
         "description": "List all",
@@ -1322,7 +2375,7 @@
     "/blog-tags/{id}": {
       "get": {
         "tags": [
-          "Blog Tags"
+          "Public APIs"
         ],
         "summary": "Get Tag",
         "description": "Get by ID",
@@ -1525,7 +2578,7 @@
     "/blog-posts": {
       "get": {
         "tags": [
-          "Blog Posts"
+          "Public APIs"
         ],
         "summary": "List Posts",
         "description": "List all",
@@ -1580,7 +2633,7 @@
     "/blog-posts/{id}": {
       "get": {
         "tags": [
-          "Blog Posts"
+          "Public APIs"
         ],
         "summary": "Get Post",
         "description": "Get by ID",
@@ -1783,7 +2836,7 @@
     "/events": {
       "get": {
         "tags": [
-          "Events"
+          "Public APIs"
         ],
         "summary": "List Events",
         "description": "List all",
@@ -1838,7 +2891,7 @@
     "/events/{id}": {
       "get": {
         "tags": [
-          "Events"
+          "Public APIs"
         ],
         "summary": "Get Event",
         "description": "Get by ID",
@@ -2041,7 +3094,7 @@
     "/galleries": {
       "get": {
         "tags": [
-          "Galleries"
+          "Public APIs"
         ],
         "summary": "List Galleries",
         "description": "List all",
@@ -2096,7 +3149,7 @@
     "/galleries/{id}": {
       "get": {
         "tags": [
-          "Galleries"
+          "Public APIs"
         ],
         "summary": "Get Gallery",
         "description": "Get by ID",
@@ -2418,7 +3471,7 @@
     "/contact-messages": {
       "post": {
         "tags": [
-          "Contact Messages"
+          "Public APIs"
         ],
         "summary": "Create Message",
         "description": "Create",
@@ -2926,32 +3979,28 @@
       "description": "APIs related to user authentication and token management"
     },
     {
-      "name": "User Management",
+      "name": "Users",
       "description": "APIs related to user management"
     },
     {
-      "name": "HomePage Banner Management",
+      "name": "Homepage Banners",
       "description": "APIs related to homepage banner management"
     },
     {
-      "name": "Organization Profile Management",
-      "description": "APIs related to organization profile management"
-    },
-    {
-      "name": "Event Management",
-      "description": "APIs related to event management"
-    },
-    {
-      "name": "Gallery Management",
-      "description": "APIs related to gallery management"
-    },
-    {
-      "name": "Division Management",
+      "name": "Divisions",
       "description": "APIs related to division management"
     },
     {
-      "name": "Contact Management",
-      "description": "APIs related to contact management"
+      "name": "Members",
+      "description": "APIs related to member management"
+    },
+    {
+      "name": "Media",
+      "description": "APIs related to generic media upload"
+    },
+    {
+      "name": "Organization Profile",
+      "description": "APIs related to organization profile management"
     }
   ],
   "components": {
@@ -3073,34 +4122,102 @@
           "end_date"
         ]
       },
+      "CreateOrgProfileRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "short_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "vision": {
+            "type": "string"
+          },
+          "mission": {
+            "type": "string"
+          },
+          "history": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "instagram_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "youtube_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "website_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "name",
+          "short_name"
+        ]
+      },
       "UpdateOrgProfileRequest": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
+          "short_name": {
+            "type": "string"
+          },
           "description": {
             "type": "string"
           },
-          "logo_media_id": {
-            "type": "string",
-            "format": "uuid"
+          "vision": {
+            "type": "string"
+          },
+          "mission": {
+            "type": "string"
+          },
+          "history": {
+            "type": "string"
           },
           "address": {
             "type": "string"
           },
-          "contact_email": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
             "type": "string"
           },
-          "contact_phone": {
-            "type": "string"
+          "instagram_url": {
+            "type": "string",
+            "format": "uri"
           },
-          "social_links": {
-            "type": "string"
+          "youtube_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "website_url": {
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": [
-          "name"
+          "name",
+          "short_name"
         ]
       },
       "CreateBlogCategoryRequest": {
@@ -3294,6 +4411,128 @@
         "required": [
           "name"
         ]
+      },
+      "CreateDivisionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coordinator_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ]
+      },
+      "UpdateDivisionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coordinator_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateMemberRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "npm": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "instagram_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "period_start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "period_end": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "name",
+          "npm",
+          "period_start",
+          "period_end"
+        ]
+      },
+      "UpdateMemberRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "npm": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "instagram_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "period_start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "period_end": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "photo_media_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       }
     },
     "responses": {
@@ -3383,6 +4622,95 @@
       }
     },
     "schemas": {
+      "Division": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coordinator_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "icon_media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "npm": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "instagram_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "photo_media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "period_start": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "period_end": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Role": {
         "type": "object",
         "properties": {

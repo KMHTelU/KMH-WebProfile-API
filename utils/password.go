@@ -9,7 +9,9 @@ import (
 func HashPassword(password string) (string, error) {
 	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatalf("Error hashing password: %v", err)
+		// Jangan pakai log.Fatalf: itu mematikan seluruh proses server.
+		// bcrypt bisa gagal (mis. password > 72 byte); kembalikan error saja.
+		log.Errorf("Error hashing password: %v", err)
 		return "", err
 	}
 	return string(hashedBytes), nil

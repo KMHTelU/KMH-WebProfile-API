@@ -50,7 +50,7 @@ func GenerateJWT(userID uuid.UUID, accessSecretKey []byte, refreshSecretKey []by
 func ValidateJWT(tokenString string, secretKey []byte) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
-	})
+	}, jwt.WithValidMethods([]string{"HS256"}))
 	if err != nil {
 		return nil, err
 	}

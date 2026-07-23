@@ -16,6 +16,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/yokeTH/gofiber-scalar/scalar/v3"
 )
 
@@ -63,6 +64,9 @@ func main() {
 		ServerHeader: "KMH Tel-U",
 		AppName:      "🔥 KMH Tel-U Profile Web API v" + config.Version,
 	})
+
+	// Recover: cegah satu panic di handler menjatuhkan seluruh server.
+	app.Use(recover.New())
 
 	// CORS: dibutuhkan agar frontend (dev/prod) yang beda origin bisa memanggil API.
 	// Auth memakai Bearer token (bukan cookie), jadi origin "*" aman.

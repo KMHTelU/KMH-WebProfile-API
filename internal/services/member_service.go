@@ -17,14 +17,14 @@ func (s *Service) CreateMemberService(req requests.CreateMemberRequest, c fiber.
 
 	var params generated.InsertMemberParams = generated.InsertMemberParams{
 		ID:           uuid.New(),
-		Name:         sql.NullString{String: req.Name},
-		Npm:          sql.NullString{String: req.Npm},
-		Email:        sql.NullString{String: req.Email},
-		Phone:        sql.NullString{String: req.Phone},
-		InstagramUrl: sql.NullString{String: req.InstagramUrl},
+		Name:         sql.NullString{String: req.Name, Valid: req.Name != ""},
+		Npm:          sql.NullString{String: req.Npm, Valid: req.Npm != ""},
+		Email:        sql.NullString{String: req.Email, Valid: req.Email != ""},
+		Phone:        sql.NullString{String: req.Phone, Valid: req.Phone != ""},
+		InstagramUrl: sql.NullString{String: req.InstagramUrl, Valid: req.InstagramUrl != ""},
 		PeriodStart:  req.PeriodStart,
 		PeriodEnd:    req.PeriodEnd,
-		Bio:          sql.NullString{String: req.Bio},
+		Bio:          sql.NullString{String: req.Bio, Valid: req.Bio != ""},
 	}
 
 	if err := s.Repository.CreateMember(params, c); err != nil {
@@ -32,12 +32,12 @@ func (s *Service) CreateMemberService(req requests.CreateMemberRequest, c fiber.
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Create Member"},
-		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm},
-		EntityID:  uuid.NullUUID{UUID: params.ID},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Create Member", Valid: true},
+		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm, Valid: true},
+		EntityID:  uuid.NullUUID{UUID: params.ID, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -73,26 +73,26 @@ func (s *Service) UpdateMemberService(id uuid.UUID, req requests.UpdateMemberReq
 	}
 	var params generated.UpdateMemberParams = generated.UpdateMemberParams{
 		ID:           id,
-		Name:         sql.NullString{String: req.Name},
-		Email:        sql.NullString{String: req.Email},
-		Phone:        sql.NullString{String: req.Phone},
-		InstagramUrl: sql.NullString{String: req.InstagramUrl},
+		Name:         sql.NullString{String: req.Name, Valid: req.Name != ""},
+		Email:        sql.NullString{String: req.Email, Valid: req.Email != ""},
+		Phone:        sql.NullString{String: req.Phone, Valid: req.Phone != ""},
+		InstagramUrl: sql.NullString{String: req.InstagramUrl, Valid: req.InstagramUrl != ""},
 		PeriodStart:  req.PeriodStart,
 		PeriodEnd:    req.PeriodEnd,
-		Bio:          sql.NullString{String: req.Bio},
-		IsActive:     sql.NullBool{Bool: req.IsActive},
+		Bio:          sql.NullString{String: req.Bio, Valid: req.Bio != ""},
+		IsActive:     sql.NullBool{Bool: req.IsActive, Valid: true},
 	}
 	if err := s.Repository.UpdateMember(params, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update member")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Update Member"},
-		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm},
-		EntityID:  uuid.NullUUID{UUID: params.ID},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Update Member", Valid: true},
+		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm, Valid: true},
+		EntityID:  uuid.NullUUID{UUID: params.ID, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -109,12 +109,12 @@ func (s *Service) DeleteMemberService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Delete Member"},
-		Entity:    sql.NullString{String: "Member"},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Delete Member", Valid: true},
+		Entity:    sql.NullString{String: "Member", Valid: true},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -151,12 +151,12 @@ func (s *Service) UploadMemberPhotoService(id uuid.UUID, c fiber.Ctx) *fiber.Err
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Update Member Photo"},
-		Entity:    sql.NullString{String: "Member with ID: " + id.String()},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Update Member Photo", Valid: true},
+		Entity:    sql.NullString{String: "Member with ID: " + id.String(), Valid: true},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}

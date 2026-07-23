@@ -11,7 +11,7 @@ import (
 func (h *Handler) CreateUser(c fiber.Ctx) error {
 	// Implementation for creating a user
 	var request requests.CreateUserRequest
-	if err := c.Bind().JSON(request); err != nil {
+	if err := c.Bind().JSON(&request); err != nil {
 		errorsMap := utils.MapValidationErrors(err)
 		if errorsMap != nil {
 			return utils.RespondWithValidationError(c, errorsMap)
@@ -64,7 +64,7 @@ func (h *Handler) GetUserByID(c fiber.Ctx) error {
 func (h *Handler) UpdateUser(c fiber.Ctx) error {
 	// Implementation for updating a user
 	var request requests.UpdateUserRequest
-	if err := c.Bind().JSON(request); err != nil {
+	if err := c.Bind().JSON(&request); err != nil {
 		errorsMap := utils.MapValidationErrors(err)
 		if errorsMap != nil {
 			return utils.RespondWithValidationError(c, errorsMap)

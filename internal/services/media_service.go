@@ -42,12 +42,12 @@ func (s *Service) UploadMediaService(file interface{}, request requests.CreateMe
 
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
 		Action:    sql.NullString{String: "Upload Media", Valid: true},
 		Entity:    sql.NullString{String: "Media with ID: " + mediaID.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: mediaID},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		EntityID:  uuid.NullUUID{UUID: mediaID, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return generated.Medium{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -75,9 +75,9 @@ func (s *Service) DeleteMediaService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
 		Action:    sql.NullString{String: "Delete Media", Valid: true},
 		Entity:    sql.NullString{String: "Media with ID: " + id.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
