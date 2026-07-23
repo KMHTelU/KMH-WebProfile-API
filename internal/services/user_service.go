@@ -23,9 +23,9 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 	}
 	var params generated.CreateUserParams = generated.CreateUserParams{
 		ID:           newId,
-		Name:         sql.NullString{String: req.Name},
-		Email:        sql.NullString{String: req.Email},
-		PasswordHash: sql.NullString{String: hashedPassword},
+		Name:         sql.NullString{String: req.Name, Valid: true},
+		Email:        sql.NullString{String: req.Email, Valid: true},
+		PasswordHash: sql.NullString{String: hashedPassword, Valid: true},
 		RoleID:       req.RoleID,
 	}
 
@@ -34,12 +34,12 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Create User"},
-		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String()},
-		EntityID:  uuid.NullUUID{UUID: newId},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Create User", Valid: true},
+		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String(), Valid: true},
+		EntityID:  uuid.NullUUID{UUID: newId, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -85,9 +85,9 @@ func (s *Service) UpdateUserService(id uuid.UUID, req requests.UpdateUserRequest
 	}
 	var params generated.UpdateUserParams = generated.UpdateUserParams{
 		ID:           id,
-		Name:         sql.NullString{String: req.Name},
-		Email:        sql.NullString{String: req.Email},
-		PasswordHash: sql.NullString{String: hashedPassword},
+		Name:         sql.NullString{String: req.Name, Valid: true},
+		Email:        sql.NullString{String: req.Email, Valid: true},
+		PasswordHash: sql.NullString{String: hashedPassword, Valid: true},
 		RoleID:       req.RoleID,
 	}
 	if err := s.Repository.UpdateUser(params, c); err != nil {
@@ -95,12 +95,12 @@ func (s *Service) UpdateUserService(id uuid.UUID, req requests.UpdateUserRequest
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Update User"},
-		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String()},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Update User", Valid: true},
+		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String(), Valid: true},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -117,12 +117,12 @@ func (s *Service) DeleteUserService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID},
-		Action:    sql.NullString{String: "Delete User"},
-		Entity:    sql.NullString{String: "User"},
-		EntityID:  uuid.NullUUID{UUID: id},
-		IpAddress: sql.NullString{String: c.IP()},
-		UserAgent: sql.NullString{String: c.UserAgent()},
+		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
+		Action:    sql.NullString{String: "Delete User", Valid: true},
+		Entity:    sql.NullString{String: "User", Valid: true},
+		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
+		IpAddress: sql.NullString{String: c.IP(), Valid: true},
+		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}

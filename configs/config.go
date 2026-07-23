@@ -30,7 +30,7 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		log.Info("No .env file found, relying on environment variables")
 	}
-	return &Config{
+	cfg := &Config{
 		ServerPort:          GetEnv("SERVER_PORT", "8080"),
 		DBHost:              GetEnv("DB_HOST", "localhost"),
 		DBPort:              GetEnv("DB_PORT", "5432"),
@@ -45,7 +45,16 @@ func LoadConfig() (*Config, error) {
 		CloudinaryCloudName: GetEnv("CLOUDINARY_CLOUD_NAME", ""),
 		CloudinaryAPIKey:    GetEnv("CLOUDINARY_API_KEY", ""),
 		CloudinaryAPISecret: GetEnv("CLOUDINARY_API_SECRET", ""),
-	}, nil
+	}
+
+	// Keamanan: di production, secret JWT default = siapa pun bisa memalsukan token admin.
+	if cfg.Environment == "production" {
+		if cfg.JWTSecret == "your-default-jwt-secret" || cfg.JWTRefreshSecret == "your-default-jwt-refresh-secret" {
+			log.Fatal("JWT_SECRET dan JWT_REFRESH_SECRET wajib diisi (bukan nilai default) di production")
+		}
+	}
+
+	return cfg, nil
 }
 
 func GetEnv(key, defaultValue string) string {

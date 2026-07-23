@@ -49,7 +49,7 @@ func (r *Repository) GetAllUsers(params generated.GetUsersParams, c fiber.Ctx) (
 }
 
 func (r *Repository) GetUserByEmail(email string, c fiber.Ctx) (generated.GetUserByEmailRow, error) {
-	user, err := r.Queries.GetUserByEmail(c, sql.NullString{String: email})
+	user, err := r.Queries.GetUserByEmail(c, sql.NullString{String: email, Valid: true})
 	if err != nil {
 		return generated.GetUserByEmailRow{}, err
 	}

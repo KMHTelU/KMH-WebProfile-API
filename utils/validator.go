@@ -13,11 +13,15 @@ func (v *Validator) Validate(i interface{}) error {
 }
 
 func MapValidationErrors(err error) map[string]string {
+	validationErrors, ok := err.(validator.ValidationErrors)
+	if !ok || len(validationErrors) == 0 {
+		// Bukan error validasi (mis. JSON malformed) => kembalikan nil agar
+		// handler jatuh ke respons "Bad request", bukan "Validation error" kosong.
+		return nil
+	}
 	errorsMap := make(map[string]string)
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
-		for _, e := range validationErrors {
-			errorsMap[e.Field()] = e.Tag()
-		}
+	for _, e := range validationErrors {
+		errorsMap[e.Field()] = e.Tag()
 	}
 	return errorsMap
 }
