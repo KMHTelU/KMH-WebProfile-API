@@ -74,3 +74,15 @@ func (h *Handler) DeleteDivisionHandler(c fiber.Ctx) error {
 	}
 	return utils.RespondWithOK(c, "Division deleted successfully", nil)
 }
+
+func (h *Handler) UploadAndUpdateDivisionIconHandler(c fiber.Ctx) error {
+	id := utils.GetSingleParams(c)
+	if id == uuid.Nil {
+		return utils.RespondWithError(c, fiber.StatusBadRequest, "Invalid ID")
+	}
+	err := h.Service.UpdateDivisionIconService(id, c)
+	if err != nil {
+		return utils.RespondWithError(c, err.Code, err.Message)
+	}
+	return utils.RespondWithOK(c, "Division icon uploaded and updated successfully", nil)
+}
