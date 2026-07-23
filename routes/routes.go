@@ -62,6 +62,22 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 		return r.Handler.CreateContactMessageHandler(c)
 	})
 
+	// Divisions (public read-only)
+	api.Get("/divisions", func(c fiber.Ctx) error {
+		return r.Handler.GetAllDivisionsHandler(c)
+	})
+	api.Get("/divisions/:id", func(c fiber.Ctx) error {
+		return r.Handler.GetDivisionByIDHandler(c)
+	})
+
+	// Members (public read-only)
+	api.Get("/members", func(c fiber.Ctx) error {
+		return r.Handler.GetPaginatedAllMembersHandler(c)
+	})
+	api.Get("/members/:id", func(c fiber.Ctx) error {
+		return r.Handler.GetMemberByIDHandler(c)
+	})
+
 	// Authentication routes
 	api.Post("/login", func(c fiber.Ctx) error {
 		return r.Handler.AuthenticateUser(c)
@@ -119,6 +135,20 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	member.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteMemberHandler(c)
+	})
+
+	division := protected.Group("/divisions")
+	division.Post("", func(c fiber.Ctx) error {
+		return r.Handler.CreateDivisionHandler(c)
+	})
+	division.Put("/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateDivisionHandler(c)
+	})
+	division.Post("/:id/upload", func(c fiber.Ctx) error {
+		return r.Handler.UploadAndUpdateDivisionIconHandler(c)
+	})
+	division.Delete("/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteDivisionHandler(c)
 	})
 
 	orgProfile := protected.Group("/organization-profile")
@@ -208,6 +238,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	contactMessage.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteContactMessageHandler(c)
+	})
+
+	// Media (upload generik → mengembalikan media_id untuk blog/event/gallery)
+	media := protected.Group("/media")
+	media.Post("", func(c fiber.Ctx) error {
+		return r.Handler.UploadMediaHandler(c)
 	})
 
 	role := protected.Group("/roles")

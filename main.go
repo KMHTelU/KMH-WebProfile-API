@@ -15,6 +15,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/yokeTH/gofiber-scalar/scalar/v3"
 )
 
@@ -62,6 +63,14 @@ func main() {
 		ServerHeader: "KMH Tel-U",
 		AppName:      "🔥 KMH Tel-U Profile Web API v" + config.Version,
 	})
+
+	// CORS: dibutuhkan agar frontend (dev/prod) yang beda origin bisa memanggil API.
+	// Auth memakai Bearer token (bukan cookie), jadi origin "*" aman.
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+	}))
 
 	route.SetupRoutes(app)
 

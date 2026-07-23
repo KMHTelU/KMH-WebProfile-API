@@ -44,11 +44,8 @@ func (s *Service) CreateMemberService(req requests.CreateMemberRequest, c fiber.
 	return nil
 }
 
+// GetMemberByIDService bersifat publik (read-only) untuk halaman profil.
 func (s *Service) GetMemberByIDService(id uuid.UUID, c fiber.Ctx) (generated.GetMemberByIDRow, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return generated.GetMemberByIDRow{}, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
-	}
 	member, err := s.Repository.GetMemberByID(id, c)
 	if err != nil {
 		return generated.GetMemberByIDRow{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to get member")
@@ -56,11 +53,8 @@ func (s *Service) GetMemberByIDService(id uuid.UUID, c fiber.Ctx) (generated.Get
 	return member, nil
 }
 
+// GetPaginatedAllMembersService bersifat publik (read-only) untuk halaman profil.
 func (s *Service) GetPaginatedAllMembersService(limit, offset int32, c fiber.Ctx) ([]generated.GetAllMembersRow, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
-	}
 	memberParam := generated.GetAllMembersParams{
 		Limit:  limit,
 		Offset: offset,

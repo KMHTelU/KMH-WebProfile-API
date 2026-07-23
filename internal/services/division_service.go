@@ -40,11 +40,8 @@ func (s *Service) CreateDivisionService(req requests.CreateDivisionRequest, c fi
 	return nil
 }
 
+// GetDivisionByIDService bersifat publik (read-only) untuk halaman profil.
 func (s *Service) GetDivisionByIDService(id uuid.UUID, c fiber.Ctx) (generated.GetDivisionByIDRow, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return generated.GetDivisionByIDRow{}, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
-	}
 	division, err := s.Repository.GetDivisionByID(id, c)
 	if err != nil {
 		return generated.GetDivisionByIDRow{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to get division")
@@ -52,11 +49,8 @@ func (s *Service) GetDivisionByIDService(id uuid.UUID, c fiber.Ctx) (generated.G
 	return division, nil
 }
 
+// GetAllDivisionsService bersifat publik (read-only) untuk halaman profil.
 func (s *Service) GetAllDivisionsService(c fiber.Ctx) ([]generated.GetAllDivisionsRow, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
-	}
 	divisions, err := s.Repository.GetAllDivisions(c)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to get divisions")
