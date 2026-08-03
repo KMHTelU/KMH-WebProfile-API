@@ -6,6 +6,7 @@ package services
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
@@ -14,6 +15,16 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
+
+// marshalJSONList menyimpan slice sebagai JSONB. Slice nil dianggap daftar
+// kosong supaya kolom tidak pernah berisi literal null.
+func marshalJSONList(v any) json.RawMessage {
+	raw, err := json.Marshal(v)
+	if err != nil || string(raw) == "null" {
+		return json.RawMessage("[]")
+	}
+	return raw
+}
 
 func (s *Service) createMember(req requests.CreateMemberRequest, c fiber.Ctx) (uuid.UUID, *fiber.Error) {
 	if existing, err := s.Repository.GetMemberByNIM(req.Nim, c); err == nil {
@@ -116,12 +127,15 @@ func (s *Service) createDivision(req requests.CreateDivisionRequest, c fiber.Ctx
 
 	id := uuid.New()
 	if err := s.Repository.CreateDivision(generated.InsertDivisionParams{
-		ID:            id,
-		Name:          utils.NullString(req.Name),
-		Slug:          utils.NullString(req.Slug),
-		Description:   utils.NullString(req.Description),
-		CoordinatorID: utils.NullUUID(req.CoordinatorID),
-		IsActive:      utils.NullBool(true),
+		ID:               id,
+		Name:             utils.NullString(req.Name),
+		Slug:             utils.NullString(req.Slug),
+		Subtitle:         utils.NullString(req.Subtitle),
+		Description:      utils.NullString(req.Description),
+		Responsibilities: marshalJSONList(req.Responsibilities),
+		Programs:         marshalJSONList(req.Programs),
+		CoordinatorID:    utils.NullUUID(req.CoordinatorID),
+		IsActive:         utils.NullBool(true),
 	}, c); err != nil {
 		return uuid.Nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create division")
 	}
@@ -149,9 +163,23 @@ func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionReques
 	if req.Slug != "" {
 		slug = utils.NullString(req.Slug)
 	}
+	subtitle := existing.Subtitle
+	if req.Subtitle != "" {
+		subtitle = utils.NullString(req.Subtitle)
+	}
 	description := existing.Description
 	if req.Description != "" {
 		description = utils.NullString(req.Description)
+	}
+	// Slice nil berarti field tidak dikirim; slice kosong berarti admin sengaja
+	// mengosongkan daftar, jadi tetap menimpa nilai lama.
+	responsibilities := existing.Responsibilities
+	if req.Responsibilities != nil {
+		responsibilities = marshalJSONList(req.Responsibilities)
+	}
+	programs := existing.Programs
+	if req.Programs != nil {
+		programs = marshalJSONList(req.Programs)
 	}
 	coordinatorID := existing.CoordinatorID
 	if req.CoordinatorID != uuid.Nil {
@@ -163,12 +191,15 @@ func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionReques
 	}
 
 	if err := s.Repository.UpdateDivision(generated.UpdateDivisionParams{
-		ID:            id,
-		Name:          name,
-		Slug:          slug,
-		Description:   description,
-		CoordinatorID: coordinatorID,
-		IsActive:      isActive,
+		ID:               id,
+		Name:             name,
+		Slug:             slug,
+		Subtitle:         subtitle,
+		Description:      description,
+		Responsibilities: responsibilities,
+		Programs:         programs,
+		CoordinatorID:    coordinatorID,
+		IsActive:         isActive,
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update division")
 	}
