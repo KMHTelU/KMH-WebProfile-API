@@ -6,6 +6,7 @@ package generated
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -139,7 +140,7 @@ type Medium struct {
 type Member struct {
 	ID           uuid.UUID      `json:"id"`
 	Name         sql.NullString `json:"name"`
-	Npm          sql.NullString `json:"npm"`
+	Nim          sql.NullString `json:"nim"`
 	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	Email        sql.NullString `json:"email"`
@@ -177,6 +178,15 @@ type OrganizationProfile struct {
 	WebsiteUrl   sql.NullString `json:"website_url"`
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
+}
+
+type PasswordResetToken struct {
+	ID        uuid.UUID    `json:"id"`
+	UserID    uuid.UUID    `json:"user_id"`
+	TokenHash string       `json:"token_hash"`
+	ExpiresAt time.Time    `json:"expires_at"`
+	UsedAt    sql.NullTime `json:"used_at"`
+	CreatedAt sql.NullTime `json:"created_at"`
 }
 
 type Role struct {

@@ -64,45 +64,41 @@ func (q *Queries) InsertGallery(ctx context.Context, arg InsertGalleryParams) (G
 }
 
 const selectAllGalleries = `-- name: SelectAllGalleries :many
-SELECT galleries.id, galleries.title, galleries.description, event_id, is_public, galleries.created_at, events.id, events.title, slug, events.description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at
+SELECT galleries.id, galleries.title, galleries.description, galleries.event_id, galleries.is_public, galleries.created_at, events.title AS event_title, events.slug AS event_slug, events.start_time AS event_start_time
 FROM galleries
-INNER JOIN events ON galleries.event_id = events.id
+LEFT JOIN events ON galleries.event_id = events.id
+WHERE ($1::uuid IS NULL OR galleries.event_id = $1::uuid)
+  AND ($2::boolean IS NULL OR galleries.is_public = $2::boolean)
 ORDER BY galleries.created_at DESC
-LIMIT $1 OFFSET $2
+LIMIT $4 OFFSET $3
 `
 
 type SelectAllGalleriesParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	EventID  uuid.NullUUID `json:"event_id"`
+	IsPublic sql.NullBool  `json:"is_public"`
+	Offset   int32         `json:"offset"`
+	Limit    int32         `json:"limit"`
 }
 
 type SelectAllGalleriesRow struct {
-	ID              uuid.UUID      `json:"id"`
-	Title           sql.NullString `json:"title"`
-	Description     sql.NullString `json:"description"`
-	EventID         uuid.NullUUID  `json:"event_id"`
-	IsPublic        sql.NullBool   `json:"is_public"`
-	CreatedAt       sql.NullTime   `json:"created_at"`
-	ID_2            uuid.UUID      `json:"id_2"`
-	Title_2         sql.NullString `json:"title_2"`
-	Slug            sql.NullString `json:"slug"`
-	Description_2   sql.NullString `json:"description_2"`
-	EventType       sql.NullString `json:"event_type"`
-	StartTime       sql.NullTime   `json:"start_time"`
-	EndTime         sql.NullTime   `json:"end_time"`
-	Location        sql.NullString `json:"location"`
-	GoogleMapsUrl   sql.NullString `json:"google_maps_url"`
-	RegistrationUrl sql.NullString `json:"registration_url"`
-	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
-	Status          sql.NullString `json:"status"`
-	IsPublished     sql.NullBool   `json:"is_published"`
-	CreatedBy       uuid.NullUUID  `json:"created_by"`
-	CreatedAt_2     sql.NullTime   `json:"created_at_2"`
-	UpdatedAt       sql.NullTime   `json:"updated_at"`
+	ID             uuid.UUID      `json:"id"`
+	Title          sql.NullString `json:"title"`
+	Description    sql.NullString `json:"description"`
+	EventID        uuid.NullUUID  `json:"event_id"`
+	IsPublic       sql.NullBool   `json:"is_public"`
+	CreatedAt      sql.NullTime   `json:"created_at"`
+	EventTitle     sql.NullString `json:"event_title"`
+	EventSlug      sql.NullString `json:"event_slug"`
+	EventStartTime sql.NullTime   `json:"event_start_time"`
 }
 
 func (q *Queries) SelectAllGalleries(ctx context.Context, arg SelectAllGalleriesParams) ([]SelectAllGalleriesRow, error) {
-	rows, err := q.query(ctx, q.selectAllGalleriesStmt, selectAllGalleries, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.selectAllGalleriesStmt, selectAllGalleries,
+		arg.EventID,
+		arg.IsPublic,
+		arg.Offset,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -117,22 +113,9 @@ func (q *Queries) SelectAllGalleries(ctx context.Context, arg SelectAllGalleries
 			&i.EventID,
 			&i.IsPublic,
 			&i.CreatedAt,
-			&i.ID_2,
-			&i.Title_2,
-			&i.Slug,
-			&i.Description_2,
-			&i.EventType,
-			&i.StartTime,
-			&i.EndTime,
-			&i.Location,
-			&i.GoogleMapsUrl,
-			&i.RegistrationUrl,
-			&i.CoverMediaID,
-			&i.Status,
-			&i.IsPublished,
-			&i.CreatedBy,
-			&i.CreatedAt_2,
-			&i.UpdatedAt,
+			&i.EventTitle,
+			&i.EventSlug,
+			&i.EventStartTime,
 		); err != nil {
 			return nil, err
 		}
@@ -148,35 +131,22 @@ func (q *Queries) SelectAllGalleries(ctx context.Context, arg SelectAllGalleries
 }
 
 const selectGalleryByID = `-- name: SelectGalleryByID :one
-SELECT galleries.id, galleries.title, galleries.description, event_id, is_public, galleries.created_at, events.id, events.title, slug, events.description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at
+SELECT galleries.id, galleries.title, galleries.description, galleries.event_id, galleries.is_public, galleries.created_at, events.title AS event_title, events.slug AS event_slug, events.start_time AS event_start_time
 FROM galleries
-INNER JOIN events ON galleries.event_id = events.id
+LEFT JOIN events ON galleries.event_id = events.id
 WHERE galleries.id = $1
 `
 
 type SelectGalleryByIDRow struct {
-	ID              uuid.UUID      `json:"id"`
-	Title           sql.NullString `json:"title"`
-	Description     sql.NullString `json:"description"`
-	EventID         uuid.NullUUID  `json:"event_id"`
-	IsPublic        sql.NullBool   `json:"is_public"`
-	CreatedAt       sql.NullTime   `json:"created_at"`
-	ID_2            uuid.UUID      `json:"id_2"`
-	Title_2         sql.NullString `json:"title_2"`
-	Slug            sql.NullString `json:"slug"`
-	Description_2   sql.NullString `json:"description_2"`
-	EventType       sql.NullString `json:"event_type"`
-	StartTime       sql.NullTime   `json:"start_time"`
-	EndTime         sql.NullTime   `json:"end_time"`
-	Location        sql.NullString `json:"location"`
-	GoogleMapsUrl   sql.NullString `json:"google_maps_url"`
-	RegistrationUrl sql.NullString `json:"registration_url"`
-	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
-	Status          sql.NullString `json:"status"`
-	IsPublished     sql.NullBool   `json:"is_published"`
-	CreatedBy       uuid.NullUUID  `json:"created_by"`
-	CreatedAt_2     sql.NullTime   `json:"created_at_2"`
-	UpdatedAt       sql.NullTime   `json:"updated_at"`
+	ID             uuid.UUID      `json:"id"`
+	Title          sql.NullString `json:"title"`
+	Description    sql.NullString `json:"description"`
+	EventID        uuid.NullUUID  `json:"event_id"`
+	IsPublic       sql.NullBool   `json:"is_public"`
+	CreatedAt      sql.NullTime   `json:"created_at"`
+	EventTitle     sql.NullString `json:"event_title"`
+	EventSlug      sql.NullString `json:"event_slug"`
+	EventStartTime sql.NullTime   `json:"event_start_time"`
 }
 
 func (q *Queries) SelectGalleryByID(ctx context.Context, id uuid.UUID) (SelectGalleryByIDRow, error) {
@@ -189,24 +159,61 @@ func (q *Queries) SelectGalleryByID(ctx context.Context, id uuid.UUID) (SelectGa
 		&i.EventID,
 		&i.IsPublic,
 		&i.CreatedAt,
-		&i.ID_2,
-		&i.Title_2,
-		&i.Slug,
-		&i.Description_2,
-		&i.EventType,
-		&i.StartTime,
-		&i.EndTime,
-		&i.Location,
-		&i.GoogleMapsUrl,
-		&i.RegistrationUrl,
-		&i.CoverMediaID,
-		&i.Status,
-		&i.IsPublished,
-		&i.CreatedBy,
-		&i.CreatedAt_2,
-		&i.UpdatedAt,
+		&i.EventTitle,
+		&i.EventSlug,
+		&i.EventStartTime,
 	)
 	return i, err
+}
+
+const selectGalleryCategories = `-- name: SelectGalleryCategories :many
+SELECT
+  events.id         AS event_id,
+  events.title      AS event_title,
+  events.slug       AS event_slug,
+  events.start_time AS event_start_time,
+  COUNT(galleries.id) AS gallery_count
+FROM events
+INNER JOIN galleries ON galleries.event_id = events.id
+GROUP BY events.id, events.title, events.slug, events.start_time
+ORDER BY events.start_time DESC NULLS LAST
+`
+
+type SelectGalleryCategoriesRow struct {
+	EventID        uuid.UUID      `json:"event_id"`
+	EventTitle     sql.NullString `json:"event_title"`
+	EventSlug      sql.NullString `json:"event_slug"`
+	EventStartTime sql.NullTime   `json:"event_start_time"`
+	GalleryCount   int64          `json:"gallery_count"`
+}
+
+func (q *Queries) SelectGalleryCategories(ctx context.Context) ([]SelectGalleryCategoriesRow, error) {
+	rows, err := q.query(ctx, q.selectGalleryCategoriesStmt, selectGalleryCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SelectGalleryCategoriesRow{}
+	for rows.Next() {
+		var i SelectGalleryCategoriesRow
+		if err := rows.Scan(
+			&i.EventID,
+			&i.EventTitle,
+			&i.EventSlug,
+			&i.EventStartTime,
+			&i.GalleryCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateGallery = `-- name: UpdateGallery :one

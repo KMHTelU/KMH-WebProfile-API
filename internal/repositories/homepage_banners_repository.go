@@ -22,6 +22,15 @@ func (r *Repository) GetHomepageBanners(params generated.SelectAllHomepageBanner
 	return rows, nil
 }
 
+func (r *Repository) UpdateHomepageBanner(params generated.UpdateHomepageBannerParams, c fiber.Ctx) error {
+	_, err := r.Queries.UpdateHomepageBanner(c, params)
+	return err
+}
+
+func (r *Repository) GetHomepageBannerByID(id uuid.UUID, c fiber.Ctx) (generated.HomepageBanner, error) {
+	return r.Queries.GetHomepageBannerByID(c, id)
+}
+
 func (r *Repository) DeleteHomepageBanner(id uuid.UUID, c fiber.Ctx) error {
 	err := r.Queries.DeleteHomepageBanner(c, id)
 	if err != nil {

@@ -22,17 +22,22 @@ WHERE id = $1;
 
 -- name: GetDivisionByID :one
 SELECT *
-FROM divisions 
-INNER JOIN media ON divisions.icon_media_id = media.id
-INNER JOIN members ON divisions.coordinator_id = members.id
+FROM divisions
+LEFT JOIN media ON divisions.icon_media_id = media.id
+LEFT JOIN members ON divisions.coordinator_id = members.id
 WHERE divisions.id = $1;
 
 -- name: GetAllDivisions :many
 SELECT *
 FROM divisions
-INNER JOIN media ON divisions.icon_media_id = media.id
-INNER JOIN members ON divisions.coordinator_id = members.id
+LEFT JOIN media ON divisions.icon_media_id = media.id
+LEFT JOIN members ON divisions.coordinator_id = members.id
 ORDER BY divisions.name ASC;
+
+-- name: GetDivisionBySlug :one
+SELECT *
+FROM divisions
+WHERE slug = $1;
 
 -- name: DeleteDivision :exec
 DELETE FROM divisions

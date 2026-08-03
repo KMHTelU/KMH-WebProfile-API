@@ -2,7 +2,7 @@ package requests
 
 type CreateMemberRequest struct {
 	Name         string `json:"name" validate:"required"`
-	Npm          string `json:"npm" validate:"required"`
+	Nim          string `json:"nim" validate:"required"`
 	Bio          string `json:"bio" validate:"omitempty"`
 	Email        string `json:"email" validate:"omitempty,email"`
 	Phone        string `json:"phone" validate:"omitempty"`
@@ -13,7 +13,7 @@ type CreateMemberRequest struct {
 
 type UpdateMemberRequest struct {
 	Name         string `json:"name" validate:"omitempty"`
-	Npm          string `json:"npm" validate:"omitempty"`
+	Nim          string `json:"nim" validate:"omitempty"`
 	Bio          string `json:"bio" validate:"omitempty"`
 	Email        string `json:"email" validate:"omitempty,email"`
 	Phone        string `json:"phone" validate:"omitempty"`

@@ -27,11 +27,15 @@ WHERE id = $1;
 
 -- name: GetEventByID :one
 SELECT * FROM events
-INNER JOIN media ON events.cover_media_id = media.id
+LEFT JOIN media ON events.cover_media_id = media.id
 WHERE events.id = $1;
 
 -- name: ListEvents :many
 SELECT * FROM events
-INNER JOIN media ON events.cover_media_id = media.id
+LEFT JOIN media ON events.cover_media_id = media.id
 ORDER BY events.start_time DESC
 LIMIT $1 OFFSET $2;
+
+-- name: GetEventBySlug :one
+SELECT * FROM events
+WHERE slug = $1;

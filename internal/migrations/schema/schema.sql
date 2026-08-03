@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS divisions (
 CREATE TABLE IF NOT EXISTS members (
   id              UUID PRIMARY KEY,
   name            VARCHAR(120),
-  npm             VARCHAR(30),
+  nim             VARCHAR(30),
   photo_media_id  UUID,
   bio             TEXT,
   email           VARCHAR(150),
@@ -192,6 +192,16 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   message     TEXT,
   is_read     BOOLEAN DEFAULT false,
   created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id          UUID PRIMARY KEY,
+  user_id     UUID NOT NULL,
+  token_hash  TEXT NOT NULL,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS activity_logs (

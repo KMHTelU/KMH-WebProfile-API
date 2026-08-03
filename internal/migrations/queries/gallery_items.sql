@@ -9,6 +9,19 @@ INSERT INTO gallery_items (
 )
 RETURNING *;
 
+-- name: UpdateGalleryItem :one
+UPDATE gallery_items
+SET gallery_id = $2,
+    media_id = $3,
+    sort_order = $4
+WHERE id = $1
+RETURNING *;
+
+-- name: GetGalleryItemByID :one
+SELECT *
+FROM gallery_items
+WHERE id = $1;
+
 -- name: SelectGalleryItemsByGalleryID :many
 SELECT *
 FROM gallery_items

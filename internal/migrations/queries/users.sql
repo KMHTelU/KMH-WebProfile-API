@@ -34,6 +34,12 @@ SET name = $2,
 WHERE users.id = $1
 RETURNING *;
 
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password_hash = $2,
+    updated_at = NOW()
+WHERE users.id = $1;
+
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE users.id = $1;

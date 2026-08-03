@@ -23,9 +23,9 @@ func (q *Queries) DeleteMember(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllMembers = `-- name: GetAllMembers :many
-SELECT members.id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
+SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
 FROM members
-INNER JOIN media ON members.photo_media_id = media.id
+LEFT JOIN media ON members.photo_media_id = media.id
 ORDER BY members.name ASC
 LIMIT $1 OFFSET $2
 `
@@ -38,7 +38,7 @@ type GetAllMembersParams struct {
 type GetAllMembersRow struct {
 	ID           uuid.UUID      `json:"id"`
 	Name         sql.NullString `json:"name"`
-	Npm          sql.NullString `json:"npm"`
+	Nim          sql.NullString `json:"nim"`
 	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	Email        sql.NullString `json:"email"`
@@ -49,7 +49,7 @@ type GetAllMembersRow struct {
 	IsActive     sql.NullBool   `json:"is_active"`
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
-	ID_2         uuid.UUID      `json:"id_2"`
+	ID_2         uuid.NullUUID  `json:"id_2"`
 	FileName     sql.NullString `json:"file_name"`
 	FileType     sql.NullString `json:"file_type"`
 	MimeType     sql.NullString `json:"mime_type"`
@@ -73,7 +73,7 @@ func (q *Queries) GetAllMembers(ctx context.Context, arg GetAllMembersParams) ([
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.Npm,
+			&i.Nim,
 			&i.PhotoMediaID,
 			&i.Bio,
 			&i.Email,
@@ -109,16 +109,16 @@ func (q *Queries) GetAllMembers(ctx context.Context, arg GetAllMembersParams) ([
 }
 
 const getMemberByID = `-- name: GetMemberByID :one
-SELECT members.id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
+SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
 FROM members
-INNER JOIN media ON members.photo_media_id = media.id
+LEFT JOIN media ON members.photo_media_id = media.id
 WHERE members.id = $1
 `
 
 type GetMemberByIDRow struct {
 	ID           uuid.UUID      `json:"id"`
 	Name         sql.NullString `json:"name"`
-	Npm          sql.NullString `json:"npm"`
+	Nim          sql.NullString `json:"nim"`
 	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	Email        sql.NullString `json:"email"`
@@ -129,7 +129,7 @@ type GetMemberByIDRow struct {
 	IsActive     sql.NullBool   `json:"is_active"`
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
-	ID_2         uuid.UUID      `json:"id_2"`
+	ID_2         uuid.NullUUID  `json:"id_2"`
 	FileName     sql.NullString `json:"file_name"`
 	FileType     sql.NullString `json:"file_type"`
 	MimeType     sql.NullString `json:"mime_type"`
@@ -147,7 +147,7 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (GetMemberByI
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Npm,
+		&i.Nim,
 		&i.PhotoMediaID,
 		&i.Bio,
 		&i.Email,
@@ -172,16 +172,43 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (GetMemberByI
 	return i, err
 }
 
+const getMemberByNIM = `-- name: GetMemberByNIM :one
+SELECT id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+FROM members
+WHERE nim = $1
+`
+
+func (q *Queries) GetMemberByNIM(ctx context.Context, nim sql.NullString) (Member, error) {
+	row := q.queryRow(ctx, q.getMemberByNIMStmt, getMemberByNIM, nim)
+	var i Member
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Nim,
+		&i.PhotoMediaID,
+		&i.Bio,
+		&i.Email,
+		&i.Phone,
+		&i.InstagramUrl,
+		&i.PeriodStart,
+		&i.PeriodEnd,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const insertMember = `-- name: InsertMember :one
-INSERT INTO members (id, name, npm, email, phone, bio, instagram_url, period_start, period_end)
+INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, period_start, period_end)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
 `
 
 type InsertMemberParams struct {
 	ID           uuid.UUID      `json:"id"`
 	Name         sql.NullString `json:"name"`
-	Npm          sql.NullString `json:"npm"`
+	Nim          sql.NullString `json:"nim"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	Bio          sql.NullString `json:"bio"`
@@ -194,7 +221,7 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 	row := q.queryRow(ctx, q.insertMemberStmt, insertMember,
 		arg.ID,
 		arg.Name,
-		arg.Npm,
+		arg.Nim,
 		arg.Email,
 		arg.Phone,
 		arg.Bio,
@@ -206,7 +233,7 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Npm,
+		&i.Nim,
 		&i.PhotoMediaID,
 		&i.Bio,
 		&i.Email,
@@ -224,21 +251,23 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 const updateMember = `-- name: UpdateMember :one
 UPDATE members
 SET name = $2,
-    email = $3,
-    phone = $4,
-    bio = $5,
-    instagram_url = $6,
-    period_start = $7,
-    period_end = $8,
-    is_active = $9,
+    nim = $3,
+    email = $4,
+    phone = $5,
+    bio = $6,
+    instagram_url = $7,
+    period_start = $8,
+    period_end = $9,
+    is_active = $10,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
 `
 
 type UpdateMemberParams struct {
 	ID           uuid.UUID      `json:"id"`
 	Name         sql.NullString `json:"name"`
+	Nim          sql.NullString `json:"nim"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	Bio          sql.NullString `json:"bio"`
@@ -252,6 +281,7 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 	row := q.queryRow(ctx, q.updateMemberStmt, updateMember,
 		arg.ID,
 		arg.Name,
+		arg.Nim,
 		arg.Email,
 		arg.Phone,
 		arg.Bio,
@@ -264,7 +294,7 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Npm,
+		&i.Nim,
 		&i.PhotoMediaID,
 		&i.Bio,
 		&i.Email,

@@ -27,6 +27,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.countBlogPostsByTagIDStmt, err = db.PrepareContext(ctx, countBlogPostsByTagID); err != nil {
 		return nil, fmt.Errorf("error preparing query CountBlogPostsByTagID: %w", err)
 	}
+	if q.countRecentPasswordResetTokensStmt, err = db.PrepareContext(ctx, countRecentPasswordResetTokens); err != nil {
+		return nil, fmt.Errorf("error preparing query CountRecentPasswordResetTokens: %w", err)
+	}
 	if q.countTagsByBlogPostIDStmt, err = db.PrepareContext(ctx, countTagsByBlogPostID); err != nil {
 		return nil, fmt.Errorf("error preparing query CountTagsByBlogPostID: %w", err)
 	}
@@ -56,6 +59,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deleteEventStmt, err = db.PrepareContext(ctx, deleteEvent); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteEvent: %w", err)
+	}
+	if q.deleteExpiredPasswordResetTokensStmt, err = db.PrepareContext(ctx, deleteExpiredPasswordResetTokens); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteExpiredPasswordResetTokens: %w", err)
 	}
 	if q.deleteGalleryStmt, err = db.PrepareContext(ctx, deleteGallery); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteGallery: %w", err)
@@ -99,11 +105,32 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getDivisionByIDStmt, err = db.PrepareContext(ctx, getDivisionByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetDivisionByID: %w", err)
 	}
+	if q.getDivisionBySlugStmt, err = db.PrepareContext(ctx, getDivisionBySlug); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDivisionBySlug: %w", err)
+	}
 	if q.getEventByIDStmt, err = db.PrepareContext(ctx, getEventByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetEventByID: %w", err)
 	}
+	if q.getEventBySlugStmt, err = db.PrepareContext(ctx, getEventBySlug); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEventBySlug: %w", err)
+	}
+	if q.getGalleryItemByIDStmt, err = db.PrepareContext(ctx, getGalleryItemByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetGalleryItemByID: %w", err)
+	}
+	if q.getHomepageBannerByIDStmt, err = db.PrepareContext(ctx, getHomepageBannerByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetHomepageBannerByID: %w", err)
+	}
 	if q.getMemberByIDStmt, err = db.PrepareContext(ctx, getMemberByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetMemberByID: %w", err)
+	}
+	if q.getMemberByNIMStmt, err = db.PrepareContext(ctx, getMemberByNIM); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMemberByNIM: %w", err)
+	}
+	if q.getMemberDivisionByIDStmt, err = db.PrepareContext(ctx, getMemberDivisionByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMemberDivisionByID: %w", err)
+	}
+	if q.getMemberDivisionByPairStmt, err = db.PrepareContext(ctx, getMemberDivisionByPair); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMemberDivisionByPair: %w", err)
 	}
 	if q.getMemberDivisionsByDivisionIDStmt, err = db.PrepareContext(ctx, getMemberDivisionsByDivisionID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetMemberDivisionsByDivisionID: %w", err)
@@ -114,8 +141,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getOrganizationProfileStmt, err = db.PrepareContext(ctx, getOrganizationProfile); err != nil {
 		return nil, fmt.Errorf("error preparing query GetOrganizationProfile: %w", err)
 	}
+	if q.getPasswordResetTokenByHashStmt, err = db.PrepareContext(ctx, getPasswordResetTokenByHash); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPasswordResetTokenByHash: %w", err)
+	}
 	if q.getRoleByIDStmt, err = db.PrepareContext(ctx, getRoleByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetRoleByID: %w", err)
+	}
+	if q.getRoleByNameStmt, err = db.PrepareContext(ctx, getRoleByName); err != nil {
+		return nil, fmt.Errorf("error preparing query GetRoleByName: %w", err)
 	}
 	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
@@ -171,8 +204,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.insertOrganizationProfileStmt, err = db.PrepareContext(ctx, insertOrganizationProfile); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertOrganizationProfile: %w", err)
 	}
+	if q.insertPasswordResetTokenStmt, err = db.PrepareContext(ctx, insertPasswordResetToken); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertPasswordResetToken: %w", err)
+	}
 	if q.insertRoleStmt, err = db.PrepareContext(ctx, insertRole); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertRole: %w", err)
+	}
+	if q.invalidateUserPasswordResetTokensStmt, err = db.PrepareContext(ctx, invalidateUserPasswordResetTokens); err != nil {
+		return nil, fmt.Errorf("error preparing query InvalidateUserPasswordResetTokens: %w", err)
 	}
 	if q.listActivityLogsStmt, err = db.PrepareContext(ctx, listActivityLogs); err != nil {
 		return nil, fmt.Errorf("error preparing query ListActivityLogs: %w", err)
@@ -204,6 +243,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.markContactMessageAsReadStmt, err = db.PrepareContext(ctx, markContactMessageAsRead); err != nil {
 		return nil, fmt.Errorf("error preparing query MarkContactMessageAsRead: %w", err)
 	}
+	if q.markPasswordResetTokenUsedStmt, err = db.PrepareContext(ctx, markPasswordResetTokenUsed); err != nil {
+		return nil, fmt.Errorf("error preparing query MarkPasswordResetTokenUsed: %w", err)
+	}
 	if q.selectActivityLogByIDStmt, err = db.PrepareContext(ctx, selectActivityLogByID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectActivityLogByID: %w", err)
 	}
@@ -227,6 +269,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.selectGalleryByIDStmt, err = db.PrepareContext(ctx, selectGalleryByID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectGalleryByID: %w", err)
+	}
+	if q.selectGalleryCategoriesStmt, err = db.PrepareContext(ctx, selectGalleryCategories); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectGalleryCategories: %w", err)
 	}
 	if q.selectGalleryItemsByGalleryIDStmt, err = db.PrepareContext(ctx, selectGalleryItemsByGalleryID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectGalleryItemsByGalleryID: %w", err)
@@ -252,8 +297,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateGalleryStmt, err = db.PrepareContext(ctx, updateGallery); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateGallery: %w", err)
 	}
+	if q.updateGalleryItemStmt, err = db.PrepareContext(ctx, updateGalleryItem); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateGalleryItem: %w", err)
+	}
+	if q.updateHomepageBannerStmt, err = db.PrepareContext(ctx, updateHomepageBanner); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateHomepageBanner: %w", err)
+	}
 	if q.updateMemberStmt, err = db.PrepareContext(ctx, updateMember); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateMember: %w", err)
+	}
+	if q.updateMemberDivisionStmt, err = db.PrepareContext(ctx, updateMemberDivision); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateMemberDivision: %w", err)
 	}
 	if q.updateMemberPhotoStmt, err = db.PrepareContext(ctx, updateMemberPhoto); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateMemberPhoto: %w", err)
@@ -270,6 +324,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
 	}
+	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
+	}
 	return &q, nil
 }
 
@@ -278,6 +335,11 @@ func (q *Queries) Close() error {
 	if q.countBlogPostsByTagIDStmt != nil {
 		if cerr := q.countBlogPostsByTagIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing countBlogPostsByTagIDStmt: %w", cerr)
+		}
+	}
+	if q.countRecentPasswordResetTokensStmt != nil {
+		if cerr := q.countRecentPasswordResetTokensStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing countRecentPasswordResetTokensStmt: %w", cerr)
 		}
 	}
 	if q.countTagsByBlogPostIDStmt != nil {
@@ -328,6 +390,11 @@ func (q *Queries) Close() error {
 	if q.deleteEventStmt != nil {
 		if cerr := q.deleteEventStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteEventStmt: %w", cerr)
+		}
+	}
+	if q.deleteExpiredPasswordResetTokensStmt != nil {
+		if cerr := q.deleteExpiredPasswordResetTokensStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteExpiredPasswordResetTokensStmt: %w", cerr)
 		}
 	}
 	if q.deleteGalleryStmt != nil {
@@ -400,14 +467,49 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getDivisionByIDStmt: %w", cerr)
 		}
 	}
+	if q.getDivisionBySlugStmt != nil {
+		if cerr := q.getDivisionBySlugStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDivisionBySlugStmt: %w", cerr)
+		}
+	}
 	if q.getEventByIDStmt != nil {
 		if cerr := q.getEventByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getEventByIDStmt: %w", cerr)
 		}
 	}
+	if q.getEventBySlugStmt != nil {
+		if cerr := q.getEventBySlugStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEventBySlugStmt: %w", cerr)
+		}
+	}
+	if q.getGalleryItemByIDStmt != nil {
+		if cerr := q.getGalleryItemByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getGalleryItemByIDStmt: %w", cerr)
+		}
+	}
+	if q.getHomepageBannerByIDStmt != nil {
+		if cerr := q.getHomepageBannerByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getHomepageBannerByIDStmt: %w", cerr)
+		}
+	}
 	if q.getMemberByIDStmt != nil {
 		if cerr := q.getMemberByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getMemberByIDStmt: %w", cerr)
+		}
+	}
+	if q.getMemberByNIMStmt != nil {
+		if cerr := q.getMemberByNIMStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMemberByNIMStmt: %w", cerr)
+		}
+	}
+	if q.getMemberDivisionByIDStmt != nil {
+		if cerr := q.getMemberDivisionByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMemberDivisionByIDStmt: %w", cerr)
+		}
+	}
+	if q.getMemberDivisionByPairStmt != nil {
+		if cerr := q.getMemberDivisionByPairStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMemberDivisionByPairStmt: %w", cerr)
 		}
 	}
 	if q.getMemberDivisionsByDivisionIDStmt != nil {
@@ -425,9 +527,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getOrganizationProfileStmt: %w", cerr)
 		}
 	}
+	if q.getPasswordResetTokenByHashStmt != nil {
+		if cerr := q.getPasswordResetTokenByHashStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPasswordResetTokenByHashStmt: %w", cerr)
+		}
+	}
 	if q.getRoleByIDStmt != nil {
 		if cerr := q.getRoleByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getRoleByIDStmt: %w", cerr)
+		}
+	}
+	if q.getRoleByNameStmt != nil {
+		if cerr := q.getRoleByNameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getRoleByNameStmt: %w", cerr)
 		}
 	}
 	if q.getUserByEmailStmt != nil {
@@ -520,9 +632,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing insertOrganizationProfileStmt: %w", cerr)
 		}
 	}
+	if q.insertPasswordResetTokenStmt != nil {
+		if cerr := q.insertPasswordResetTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertPasswordResetTokenStmt: %w", cerr)
+		}
+	}
 	if q.insertRoleStmt != nil {
 		if cerr := q.insertRoleStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertRoleStmt: %w", cerr)
+		}
+	}
+	if q.invalidateUserPasswordResetTokensStmt != nil {
+		if cerr := q.invalidateUserPasswordResetTokensStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing invalidateUserPasswordResetTokensStmt: %w", cerr)
 		}
 	}
 	if q.listActivityLogsStmt != nil {
@@ -575,6 +697,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing markContactMessageAsReadStmt: %w", cerr)
 		}
 	}
+	if q.markPasswordResetTokenUsedStmt != nil {
+		if cerr := q.markPasswordResetTokenUsedStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing markPasswordResetTokenUsedStmt: %w", cerr)
+		}
+	}
 	if q.selectActivityLogByIDStmt != nil {
 		if cerr := q.selectActivityLogByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing selectActivityLogByIDStmt: %w", cerr)
@@ -613,6 +740,11 @@ func (q *Queries) Close() error {
 	if q.selectGalleryByIDStmt != nil {
 		if cerr := q.selectGalleryByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing selectGalleryByIDStmt: %w", cerr)
+		}
+	}
+	if q.selectGalleryCategoriesStmt != nil {
+		if cerr := q.selectGalleryCategoriesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectGalleryCategoriesStmt: %w", cerr)
 		}
 	}
 	if q.selectGalleryItemsByGalleryIDStmt != nil {
@@ -655,9 +787,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateGalleryStmt: %w", cerr)
 		}
 	}
+	if q.updateGalleryItemStmt != nil {
+		if cerr := q.updateGalleryItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateGalleryItemStmt: %w", cerr)
+		}
+	}
+	if q.updateHomepageBannerStmt != nil {
+		if cerr := q.updateHomepageBannerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateHomepageBannerStmt: %w", cerr)
+		}
+	}
 	if q.updateMemberStmt != nil {
 		if cerr := q.updateMemberStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateMemberStmt: %w", cerr)
+		}
+	}
+	if q.updateMemberDivisionStmt != nil {
+		if cerr := q.updateMemberDivisionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateMemberDivisionStmt: %w", cerr)
 		}
 	}
 	if q.updateMemberPhotoStmt != nil {
@@ -683,6 +830,11 @@ func (q *Queries) Close() error {
 	if q.updateUserStmt != nil {
 		if cerr := q.updateUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
+		}
+	}
+	if q.updateUserPasswordStmt != nil {
+		if cerr := q.updateUserPasswordStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserPasswordStmt: %w", cerr)
 		}
 	}
 	return err
@@ -722,177 +874,215 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                                 DBTX
-	tx                                 *sql.Tx
-	countBlogPostsByTagIDStmt          *sql.Stmt
-	countTagsByBlogPostIDStmt          *sql.Stmt
-	createUserStmt                     *sql.Stmt
-	deleteActivityLogStmt              *sql.Stmt
-	deleteBlogCategoryStmt             *sql.Stmt
-	deleteBlogPostStmt                 *sql.Stmt
-	deleteBlogPostTagStmt              *sql.Stmt
-	deleteBlogTagStmt                  *sql.Stmt
-	deleteContactMessageStmt           *sql.Stmt
-	deleteDivisionStmt                 *sql.Stmt
-	deleteEventStmt                    *sql.Stmt
-	deleteGalleryStmt                  *sql.Stmt
-	deleteGalleryItemStmt              *sql.Stmt
-	deleteHomepageBannerStmt           *sql.Stmt
-	deleteMediaStmt                    *sql.Stmt
-	deleteMemberStmt                   *sql.Stmt
-	deleteMemberDivisionStmt           *sql.Stmt
-	deleteOrganizationProfileStmt      *sql.Stmt
-	deleteRoleStmt                     *sql.Stmt
-	deleteUserStmt                     *sql.Stmt
-	getAllDivisionsStmt                *sql.Stmt
-	getAllMembersStmt                  *sql.Stmt
-	getAllRolesStmt                    *sql.Stmt
-	getBlogCategoryByIDStmt            *sql.Stmt
-	getDivisionByIDStmt                *sql.Stmt
-	getEventByIDStmt                   *sql.Stmt
-	getMemberByIDStmt                  *sql.Stmt
-	getMemberDivisionsByDivisionIDStmt *sql.Stmt
-	getMemberDivisionsByMemberIDStmt   *sql.Stmt
-	getOrganizationProfileStmt         *sql.Stmt
-	getRoleByIDStmt                    *sql.Stmt
-	getUserByEmailStmt                 *sql.Stmt
-	getUserByIDStmt                    *sql.Stmt
-	getUsersStmt                       *sql.Stmt
-	insertActivityLogStmt              *sql.Stmt
-	insertBlogCategoryStmt             *sql.Stmt
-	insertBlogPostStmt                 *sql.Stmt
-	insertBlogPostTagStmt              *sql.Stmt
-	insertBlogTagStmt                  *sql.Stmt
-	insertContactMessageStmt           *sql.Stmt
-	insertDivisionStmt                 *sql.Stmt
-	insertEventStmt                    *sql.Stmt
-	insertGalleryStmt                  *sql.Stmt
-	insertGalleryItemStmt              *sql.Stmt
-	insertHomepageBannerStmt           *sql.Stmt
-	insertMediaStmt                    *sql.Stmt
-	insertMemberStmt                   *sql.Stmt
-	insertMemberDivisionStmt           *sql.Stmt
-	insertOrganizationProfileStmt      *sql.Stmt
-	insertRoleStmt                     *sql.Stmt
-	listActivityLogsStmt               *sql.Stmt
-	listBlogCategoriesStmt             *sql.Stmt
-	listBlogPostsStmt                  *sql.Stmt
-	listBlogPostsByCategoryStmt        *sql.Stmt
-	listBlogPostsByTagIDStmt           *sql.Stmt
-	listBlogTagsStmt                   *sql.Stmt
-	listContactMessagesStmt            *sql.Stmt
-	listEventsStmt                     *sql.Stmt
-	listTagsByBlogPostIDStmt           *sql.Stmt
-	markContactMessageAsReadStmt       *sql.Stmt
-	selectActivityLogByIDStmt          *sql.Stmt
-	selectActivityLogsByUserIDStmt     *sql.Stmt
-	selectAllGalleriesStmt             *sql.Stmt
-	selectAllHomepageBannersStmt       *sql.Stmt
-	selectBlogPostByIDStmt             *sql.Stmt
-	selectBlogTagByIDStmt              *sql.Stmt
-	selectContactMessageByIDStmt       *sql.Stmt
-	selectGalleryByIDStmt              *sql.Stmt
-	selectGalleryItemsByGalleryIDStmt  *sql.Stmt
-	updateBlogCategoryStmt             *sql.Stmt
-	updateBlogPostStmt                 *sql.Stmt
-	updateBlogTagStmt                  *sql.Stmt
-	updateDivisionStmt                 *sql.Stmt
-	updateDivisionIconStmt             *sql.Stmt
-	updateEventStmt                    *sql.Stmt
-	updateGalleryStmt                  *sql.Stmt
-	updateMemberStmt                   *sql.Stmt
-	updateMemberPhotoStmt              *sql.Stmt
-	updateOrganizationProfileStmt      *sql.Stmt
-	updateOrganizationProfileLogoStmt  *sql.Stmt
-	updateRoleStmt                     *sql.Stmt
-	updateUserStmt                     *sql.Stmt
+	db                                    DBTX
+	tx                                    *sql.Tx
+	countBlogPostsByTagIDStmt             *sql.Stmt
+	countRecentPasswordResetTokensStmt    *sql.Stmt
+	countTagsByBlogPostIDStmt             *sql.Stmt
+	createUserStmt                        *sql.Stmt
+	deleteActivityLogStmt                 *sql.Stmt
+	deleteBlogCategoryStmt                *sql.Stmt
+	deleteBlogPostStmt                    *sql.Stmt
+	deleteBlogPostTagStmt                 *sql.Stmt
+	deleteBlogTagStmt                     *sql.Stmt
+	deleteContactMessageStmt              *sql.Stmt
+	deleteDivisionStmt                    *sql.Stmt
+	deleteEventStmt                       *sql.Stmt
+	deleteExpiredPasswordResetTokensStmt  *sql.Stmt
+	deleteGalleryStmt                     *sql.Stmt
+	deleteGalleryItemStmt                 *sql.Stmt
+	deleteHomepageBannerStmt              *sql.Stmt
+	deleteMediaStmt                       *sql.Stmt
+	deleteMemberStmt                      *sql.Stmt
+	deleteMemberDivisionStmt              *sql.Stmt
+	deleteOrganizationProfileStmt         *sql.Stmt
+	deleteRoleStmt                        *sql.Stmt
+	deleteUserStmt                        *sql.Stmt
+	getAllDivisionsStmt                   *sql.Stmt
+	getAllMembersStmt                     *sql.Stmt
+	getAllRolesStmt                       *sql.Stmt
+	getBlogCategoryByIDStmt               *sql.Stmt
+	getDivisionByIDStmt                   *sql.Stmt
+	getDivisionBySlugStmt                 *sql.Stmt
+	getEventByIDStmt                      *sql.Stmt
+	getEventBySlugStmt                    *sql.Stmt
+	getGalleryItemByIDStmt                *sql.Stmt
+	getHomepageBannerByIDStmt             *sql.Stmt
+	getMemberByIDStmt                     *sql.Stmt
+	getMemberByNIMStmt                    *sql.Stmt
+	getMemberDivisionByIDStmt             *sql.Stmt
+	getMemberDivisionByPairStmt           *sql.Stmt
+	getMemberDivisionsByDivisionIDStmt    *sql.Stmt
+	getMemberDivisionsByMemberIDStmt      *sql.Stmt
+	getOrganizationProfileStmt            *sql.Stmt
+	getPasswordResetTokenByHashStmt       *sql.Stmt
+	getRoleByIDStmt                       *sql.Stmt
+	getRoleByNameStmt                     *sql.Stmt
+	getUserByEmailStmt                    *sql.Stmt
+	getUserByIDStmt                       *sql.Stmt
+	getUsersStmt                          *sql.Stmt
+	insertActivityLogStmt                 *sql.Stmt
+	insertBlogCategoryStmt                *sql.Stmt
+	insertBlogPostStmt                    *sql.Stmt
+	insertBlogPostTagStmt                 *sql.Stmt
+	insertBlogTagStmt                     *sql.Stmt
+	insertContactMessageStmt              *sql.Stmt
+	insertDivisionStmt                    *sql.Stmt
+	insertEventStmt                       *sql.Stmt
+	insertGalleryStmt                     *sql.Stmt
+	insertGalleryItemStmt                 *sql.Stmt
+	insertHomepageBannerStmt              *sql.Stmt
+	insertMediaStmt                       *sql.Stmt
+	insertMemberStmt                      *sql.Stmt
+	insertMemberDivisionStmt              *sql.Stmt
+	insertOrganizationProfileStmt         *sql.Stmt
+	insertPasswordResetTokenStmt          *sql.Stmt
+	insertRoleStmt                        *sql.Stmt
+	invalidateUserPasswordResetTokensStmt *sql.Stmt
+	listActivityLogsStmt                  *sql.Stmt
+	listBlogCategoriesStmt                *sql.Stmt
+	listBlogPostsStmt                     *sql.Stmt
+	listBlogPostsByCategoryStmt           *sql.Stmt
+	listBlogPostsByTagIDStmt              *sql.Stmt
+	listBlogTagsStmt                      *sql.Stmt
+	listContactMessagesStmt               *sql.Stmt
+	listEventsStmt                        *sql.Stmt
+	listTagsByBlogPostIDStmt              *sql.Stmt
+	markContactMessageAsReadStmt          *sql.Stmt
+	markPasswordResetTokenUsedStmt        *sql.Stmt
+	selectActivityLogByIDStmt             *sql.Stmt
+	selectActivityLogsByUserIDStmt        *sql.Stmt
+	selectAllGalleriesStmt                *sql.Stmt
+	selectAllHomepageBannersStmt          *sql.Stmt
+	selectBlogPostByIDStmt                *sql.Stmt
+	selectBlogTagByIDStmt                 *sql.Stmt
+	selectContactMessageByIDStmt          *sql.Stmt
+	selectGalleryByIDStmt                 *sql.Stmt
+	selectGalleryCategoriesStmt           *sql.Stmt
+	selectGalleryItemsByGalleryIDStmt     *sql.Stmt
+	updateBlogCategoryStmt                *sql.Stmt
+	updateBlogPostStmt                    *sql.Stmt
+	updateBlogTagStmt                     *sql.Stmt
+	updateDivisionStmt                    *sql.Stmt
+	updateDivisionIconStmt                *sql.Stmt
+	updateEventStmt                       *sql.Stmt
+	updateGalleryStmt                     *sql.Stmt
+	updateGalleryItemStmt                 *sql.Stmt
+	updateHomepageBannerStmt              *sql.Stmt
+	updateMemberStmt                      *sql.Stmt
+	updateMemberDivisionStmt              *sql.Stmt
+	updateMemberPhotoStmt                 *sql.Stmt
+	updateOrganizationProfileStmt         *sql.Stmt
+	updateOrganizationProfileLogoStmt     *sql.Stmt
+	updateRoleStmt                        *sql.Stmt
+	updateUserStmt                        *sql.Stmt
+	updateUserPasswordStmt                *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                                 tx,
-		tx:                                 tx,
-		countBlogPostsByTagIDStmt:          q.countBlogPostsByTagIDStmt,
-		countTagsByBlogPostIDStmt:          q.countTagsByBlogPostIDStmt,
-		createUserStmt:                     q.createUserStmt,
-		deleteActivityLogStmt:              q.deleteActivityLogStmt,
-		deleteBlogCategoryStmt:             q.deleteBlogCategoryStmt,
-		deleteBlogPostStmt:                 q.deleteBlogPostStmt,
-		deleteBlogPostTagStmt:              q.deleteBlogPostTagStmt,
-		deleteBlogTagStmt:                  q.deleteBlogTagStmt,
-		deleteContactMessageStmt:           q.deleteContactMessageStmt,
-		deleteDivisionStmt:                 q.deleteDivisionStmt,
-		deleteEventStmt:                    q.deleteEventStmt,
-		deleteGalleryStmt:                  q.deleteGalleryStmt,
-		deleteGalleryItemStmt:              q.deleteGalleryItemStmt,
-		deleteHomepageBannerStmt:           q.deleteHomepageBannerStmt,
-		deleteMediaStmt:                    q.deleteMediaStmt,
-		deleteMemberStmt:                   q.deleteMemberStmt,
-		deleteMemberDivisionStmt:           q.deleteMemberDivisionStmt,
-		deleteOrganizationProfileStmt:      q.deleteOrganizationProfileStmt,
-		deleteRoleStmt:                     q.deleteRoleStmt,
-		deleteUserStmt:                     q.deleteUserStmt,
-		getAllDivisionsStmt:                q.getAllDivisionsStmt,
-		getAllMembersStmt:                  q.getAllMembersStmt,
-		getAllRolesStmt:                    q.getAllRolesStmt,
-		getBlogCategoryByIDStmt:            q.getBlogCategoryByIDStmt,
-		getDivisionByIDStmt:                q.getDivisionByIDStmt,
-		getEventByIDStmt:                   q.getEventByIDStmt,
-		getMemberByIDStmt:                  q.getMemberByIDStmt,
-		getMemberDivisionsByDivisionIDStmt: q.getMemberDivisionsByDivisionIDStmt,
-		getMemberDivisionsByMemberIDStmt:   q.getMemberDivisionsByMemberIDStmt,
-		getOrganizationProfileStmt:         q.getOrganizationProfileStmt,
-		getRoleByIDStmt:                    q.getRoleByIDStmt,
-		getUserByEmailStmt:                 q.getUserByEmailStmt,
-		getUserByIDStmt:                    q.getUserByIDStmt,
-		getUsersStmt:                       q.getUsersStmt,
-		insertActivityLogStmt:              q.insertActivityLogStmt,
-		insertBlogCategoryStmt:             q.insertBlogCategoryStmt,
-		insertBlogPostStmt:                 q.insertBlogPostStmt,
-		insertBlogPostTagStmt:              q.insertBlogPostTagStmt,
-		insertBlogTagStmt:                  q.insertBlogTagStmt,
-		insertContactMessageStmt:           q.insertContactMessageStmt,
-		insertDivisionStmt:                 q.insertDivisionStmt,
-		insertEventStmt:                    q.insertEventStmt,
-		insertGalleryStmt:                  q.insertGalleryStmt,
-		insertGalleryItemStmt:              q.insertGalleryItemStmt,
-		insertHomepageBannerStmt:           q.insertHomepageBannerStmt,
-		insertMediaStmt:                    q.insertMediaStmt,
-		insertMemberStmt:                   q.insertMemberStmt,
-		insertMemberDivisionStmt:           q.insertMemberDivisionStmt,
-		insertOrganizationProfileStmt:      q.insertOrganizationProfileStmt,
-		insertRoleStmt:                     q.insertRoleStmt,
-		listActivityLogsStmt:               q.listActivityLogsStmt,
-		listBlogCategoriesStmt:             q.listBlogCategoriesStmt,
-		listBlogPostsStmt:                  q.listBlogPostsStmt,
-		listBlogPostsByCategoryStmt:        q.listBlogPostsByCategoryStmt,
-		listBlogPostsByTagIDStmt:           q.listBlogPostsByTagIDStmt,
-		listBlogTagsStmt:                   q.listBlogTagsStmt,
-		listContactMessagesStmt:            q.listContactMessagesStmt,
-		listEventsStmt:                     q.listEventsStmt,
-		listTagsByBlogPostIDStmt:           q.listTagsByBlogPostIDStmt,
-		markContactMessageAsReadStmt:       q.markContactMessageAsReadStmt,
-		selectActivityLogByIDStmt:          q.selectActivityLogByIDStmt,
-		selectActivityLogsByUserIDStmt:     q.selectActivityLogsByUserIDStmt,
-		selectAllGalleriesStmt:             q.selectAllGalleriesStmt,
-		selectAllHomepageBannersStmt:       q.selectAllHomepageBannersStmt,
-		selectBlogPostByIDStmt:             q.selectBlogPostByIDStmt,
-		selectBlogTagByIDStmt:              q.selectBlogTagByIDStmt,
-		selectContactMessageByIDStmt:       q.selectContactMessageByIDStmt,
-		selectGalleryByIDStmt:              q.selectGalleryByIDStmt,
-		selectGalleryItemsByGalleryIDStmt:  q.selectGalleryItemsByGalleryIDStmt,
-		updateBlogCategoryStmt:             q.updateBlogCategoryStmt,
-		updateBlogPostStmt:                 q.updateBlogPostStmt,
-		updateBlogTagStmt:                  q.updateBlogTagStmt,
-		updateDivisionStmt:                 q.updateDivisionStmt,
-		updateDivisionIconStmt:             q.updateDivisionIconStmt,
-		updateEventStmt:                    q.updateEventStmt,
-		updateGalleryStmt:                  q.updateGalleryStmt,
-		updateMemberStmt:                   q.updateMemberStmt,
-		updateMemberPhotoStmt:              q.updateMemberPhotoStmt,
-		updateOrganizationProfileStmt:      q.updateOrganizationProfileStmt,
-		updateOrganizationProfileLogoStmt:  q.updateOrganizationProfileLogoStmt,
-		updateRoleStmt:                     q.updateRoleStmt,
-		updateUserStmt:                     q.updateUserStmt,
+		db:                                    tx,
+		tx:                                    tx,
+		countBlogPostsByTagIDStmt:             q.countBlogPostsByTagIDStmt,
+		countRecentPasswordResetTokensStmt:    q.countRecentPasswordResetTokensStmt,
+		countTagsByBlogPostIDStmt:             q.countTagsByBlogPostIDStmt,
+		createUserStmt:                        q.createUserStmt,
+		deleteActivityLogStmt:                 q.deleteActivityLogStmt,
+		deleteBlogCategoryStmt:                q.deleteBlogCategoryStmt,
+		deleteBlogPostStmt:                    q.deleteBlogPostStmt,
+		deleteBlogPostTagStmt:                 q.deleteBlogPostTagStmt,
+		deleteBlogTagStmt:                     q.deleteBlogTagStmt,
+		deleteContactMessageStmt:              q.deleteContactMessageStmt,
+		deleteDivisionStmt:                    q.deleteDivisionStmt,
+		deleteEventStmt:                       q.deleteEventStmt,
+		deleteExpiredPasswordResetTokensStmt:  q.deleteExpiredPasswordResetTokensStmt,
+		deleteGalleryStmt:                     q.deleteGalleryStmt,
+		deleteGalleryItemStmt:                 q.deleteGalleryItemStmt,
+		deleteHomepageBannerStmt:              q.deleteHomepageBannerStmt,
+		deleteMediaStmt:                       q.deleteMediaStmt,
+		deleteMemberStmt:                      q.deleteMemberStmt,
+		deleteMemberDivisionStmt:              q.deleteMemberDivisionStmt,
+		deleteOrganizationProfileStmt:         q.deleteOrganizationProfileStmt,
+		deleteRoleStmt:                        q.deleteRoleStmt,
+		deleteUserStmt:                        q.deleteUserStmt,
+		getAllDivisionsStmt:                   q.getAllDivisionsStmt,
+		getAllMembersStmt:                     q.getAllMembersStmt,
+		getAllRolesStmt:                       q.getAllRolesStmt,
+		getBlogCategoryByIDStmt:               q.getBlogCategoryByIDStmt,
+		getDivisionByIDStmt:                   q.getDivisionByIDStmt,
+		getDivisionBySlugStmt:                 q.getDivisionBySlugStmt,
+		getEventByIDStmt:                      q.getEventByIDStmt,
+		getEventBySlugStmt:                    q.getEventBySlugStmt,
+		getGalleryItemByIDStmt:                q.getGalleryItemByIDStmt,
+		getHomepageBannerByIDStmt:             q.getHomepageBannerByIDStmt,
+		getMemberByIDStmt:                     q.getMemberByIDStmt,
+		getMemberByNIMStmt:                    q.getMemberByNIMStmt,
+		getMemberDivisionByIDStmt:             q.getMemberDivisionByIDStmt,
+		getMemberDivisionByPairStmt:           q.getMemberDivisionByPairStmt,
+		getMemberDivisionsByDivisionIDStmt:    q.getMemberDivisionsByDivisionIDStmt,
+		getMemberDivisionsByMemberIDStmt:      q.getMemberDivisionsByMemberIDStmt,
+		getOrganizationProfileStmt:            q.getOrganizationProfileStmt,
+		getPasswordResetTokenByHashStmt:       q.getPasswordResetTokenByHashStmt,
+		getRoleByIDStmt:                       q.getRoleByIDStmt,
+		getRoleByNameStmt:                     q.getRoleByNameStmt,
+		getUserByEmailStmt:                    q.getUserByEmailStmt,
+		getUserByIDStmt:                       q.getUserByIDStmt,
+		getUsersStmt:                          q.getUsersStmt,
+		insertActivityLogStmt:                 q.insertActivityLogStmt,
+		insertBlogCategoryStmt:                q.insertBlogCategoryStmt,
+		insertBlogPostStmt:                    q.insertBlogPostStmt,
+		insertBlogPostTagStmt:                 q.insertBlogPostTagStmt,
+		insertBlogTagStmt:                     q.insertBlogTagStmt,
+		insertContactMessageStmt:              q.insertContactMessageStmt,
+		insertDivisionStmt:                    q.insertDivisionStmt,
+		insertEventStmt:                       q.insertEventStmt,
+		insertGalleryStmt:                     q.insertGalleryStmt,
+		insertGalleryItemStmt:                 q.insertGalleryItemStmt,
+		insertHomepageBannerStmt:              q.insertHomepageBannerStmt,
+		insertMediaStmt:                       q.insertMediaStmt,
+		insertMemberStmt:                      q.insertMemberStmt,
+		insertMemberDivisionStmt:              q.insertMemberDivisionStmt,
+		insertOrganizationProfileStmt:         q.insertOrganizationProfileStmt,
+		insertPasswordResetTokenStmt:          q.insertPasswordResetTokenStmt,
+		insertRoleStmt:                        q.insertRoleStmt,
+		invalidateUserPasswordResetTokensStmt: q.invalidateUserPasswordResetTokensStmt,
+		listActivityLogsStmt:                  q.listActivityLogsStmt,
+		listBlogCategoriesStmt:                q.listBlogCategoriesStmt,
+		listBlogPostsStmt:                     q.listBlogPostsStmt,
+		listBlogPostsByCategoryStmt:           q.listBlogPostsByCategoryStmt,
+		listBlogPostsByTagIDStmt:              q.listBlogPostsByTagIDStmt,
+		listBlogTagsStmt:                      q.listBlogTagsStmt,
+		listContactMessagesStmt:               q.listContactMessagesStmt,
+		listEventsStmt:                        q.listEventsStmt,
+		listTagsByBlogPostIDStmt:              q.listTagsByBlogPostIDStmt,
+		markContactMessageAsReadStmt:          q.markContactMessageAsReadStmt,
+		markPasswordResetTokenUsedStmt:        q.markPasswordResetTokenUsedStmt,
+		selectActivityLogByIDStmt:             q.selectActivityLogByIDStmt,
+		selectActivityLogsByUserIDStmt:        q.selectActivityLogsByUserIDStmt,
+		selectAllGalleriesStmt:                q.selectAllGalleriesStmt,
+		selectAllHomepageBannersStmt:          q.selectAllHomepageBannersStmt,
+		selectBlogPostByIDStmt:                q.selectBlogPostByIDStmt,
+		selectBlogTagByIDStmt:                 q.selectBlogTagByIDStmt,
+		selectContactMessageByIDStmt:          q.selectContactMessageByIDStmt,
+		selectGalleryByIDStmt:                 q.selectGalleryByIDStmt,
+		selectGalleryCategoriesStmt:           q.selectGalleryCategoriesStmt,
+		selectGalleryItemsByGalleryIDStmt:     q.selectGalleryItemsByGalleryIDStmt,
+		updateBlogCategoryStmt:                q.updateBlogCategoryStmt,
+		updateBlogPostStmt:                    q.updateBlogPostStmt,
+		updateBlogTagStmt:                     q.updateBlogTagStmt,
+		updateDivisionStmt:                    q.updateDivisionStmt,
+		updateDivisionIconStmt:                q.updateDivisionIconStmt,
+		updateEventStmt:                       q.updateEventStmt,
+		updateGalleryStmt:                     q.updateGalleryStmt,
+		updateGalleryItemStmt:                 q.updateGalleryItemStmt,
+		updateHomepageBannerStmt:              q.updateHomepageBannerStmt,
+		updateMemberStmt:                      q.updateMemberStmt,
+		updateMemberDivisionStmt:              q.updateMemberDivisionStmt,
+		updateMemberPhotoStmt:                 q.updateMemberPhotoStmt,
+		updateOrganizationProfileStmt:         q.updateOrganizationProfileStmt,
+		updateOrganizationProfileLogoStmt:     q.updateOrganizationProfileLogoStmt,
+		updateRoleStmt:                        q.updateRoleStmt,
+		updateUserStmt:                        q.updateUserStmt,
+		updateUserPasswordStmt:                q.updateUserPasswordStmt,
 	}
 }

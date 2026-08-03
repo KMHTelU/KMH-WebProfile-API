@@ -64,6 +64,19 @@ func (q *Queries) GetRoleByID(ctx context.Context, id uuid.UUID) (Role, error) {
 	return i, err
 }
 
+const getRoleByName = `-- name: GetRoleByName :one
+SELECT id, name, description
+FROM roles
+WHERE name = $1
+`
+
+func (q *Queries) GetRoleByName(ctx context.Context, name sql.NullString) (Role, error) {
+	row := q.queryRow(ctx, q.getRoleByNameStmt, getRoleByName, name)
+	var i Role
+	err := row.Scan(&i.ID, &i.Name, &i.Description)
+	return i, err
+}
+
 const insertRole = `-- name: InsertRole :one
 INSERT INTO roles (id, name, description)
 VALUES ($1, $2, $3)

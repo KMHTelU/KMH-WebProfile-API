@@ -23,10 +23,10 @@ func (q *Queries) DeleteDivision(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllDivisions = `-- name: GetAllDivisions :many
-SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
-INNER JOIN media ON divisions.icon_media_id = media.id
-INNER JOIN members ON divisions.coordinator_id = members.id
+LEFT JOIN media ON divisions.icon_media_id = media.id
+LEFT JOIN members ON divisions.coordinator_id = members.id
 ORDER BY divisions.name ASC
 `
 
@@ -40,7 +40,7 @@ type GetAllDivisionsRow struct {
 	IsActive      sql.NullBool   `json:"is_active"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
-	ID_2          uuid.UUID      `json:"id_2"`
+	ID_2          uuid.NullUUID  `json:"id_2"`
 	FileName      sql.NullString `json:"file_name"`
 	FileType      sql.NullString `json:"file_type"`
 	MimeType      sql.NullString `json:"mime_type"`
@@ -50,9 +50,9 @@ type GetAllDivisionsRow struct {
 	Caption       sql.NullString `json:"caption"`
 	UploadedBy    uuid.NullUUID  `json:"uploaded_by"`
 	CreatedAt_2   sql.NullTime   `json:"created_at_2"`
-	ID_3          uuid.UUID      `json:"id_3"`
+	ID_3          uuid.NullUUID  `json:"id_3"`
 	Name_2        sql.NullString `json:"name_2"`
-	Npm           sql.NullString `json:"npm"`
+	Nim           sql.NullString `json:"nim"`
 	PhotoMediaID  uuid.NullUUID  `json:"photo_media_id"`
 	Bio           sql.NullString `json:"bio"`
 	Email         sql.NullString `json:"email"`
@@ -96,7 +96,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 			&i.CreatedAt_2,
 			&i.ID_3,
 			&i.Name_2,
-			&i.Npm,
+			&i.Nim,
 			&i.PhotoMediaID,
 			&i.Bio,
 			&i.Email,
@@ -122,10 +122,10 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 }
 
 const getDivisionByID = `-- name: GetDivisionByID :one
-SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
-FROM divisions 
-INNER JOIN media ON divisions.icon_media_id = media.id
-INNER JOIN members ON divisions.coordinator_id = members.id
+SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+FROM divisions
+LEFT JOIN media ON divisions.icon_media_id = media.id
+LEFT JOIN members ON divisions.coordinator_id = members.id
 WHERE divisions.id = $1
 `
 
@@ -139,7 +139,7 @@ type GetDivisionByIDRow struct {
 	IsActive      sql.NullBool   `json:"is_active"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
-	ID_2          uuid.UUID      `json:"id_2"`
+	ID_2          uuid.NullUUID  `json:"id_2"`
 	FileName      sql.NullString `json:"file_name"`
 	FileType      sql.NullString `json:"file_type"`
 	MimeType      sql.NullString `json:"mime_type"`
@@ -149,9 +149,9 @@ type GetDivisionByIDRow struct {
 	Caption       sql.NullString `json:"caption"`
 	UploadedBy    uuid.NullUUID  `json:"uploaded_by"`
 	CreatedAt_2   sql.NullTime   `json:"created_at_2"`
-	ID_3          uuid.UUID      `json:"id_3"`
+	ID_3          uuid.NullUUID  `json:"id_3"`
 	Name_2        sql.NullString `json:"name_2"`
-	Npm           sql.NullString `json:"npm"`
+	Nim           sql.NullString `json:"nim"`
 	PhotoMediaID  uuid.NullUUID  `json:"photo_media_id"`
 	Bio           sql.NullString `json:"bio"`
 	Email         sql.NullString `json:"email"`
@@ -189,7 +189,7 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 		&i.CreatedAt_2,
 		&i.ID_3,
 		&i.Name_2,
-		&i.Npm,
+		&i.Nim,
 		&i.PhotoMediaID,
 		&i.Bio,
 		&i.Email,
@@ -200,6 +200,29 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 		&i.IsActive_2,
 		&i.CreatedAt_3,
 		&i.UpdatedAt_2,
+	)
+	return i, err
+}
+
+const getDivisionBySlug = `-- name: GetDivisionBySlug :one
+SELECT id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
+FROM divisions
+WHERE slug = $1
+`
+
+func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (Division, error) {
+	row := q.queryRow(ctx, q.getDivisionBySlugStmt, getDivisionBySlug, slug)
+	var i Division
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Slug,
+		&i.Description,
+		&i.IconMediaID,
+		&i.CoordinatorID,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

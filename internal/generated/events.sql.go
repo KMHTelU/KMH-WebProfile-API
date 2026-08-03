@@ -24,7 +24,7 @@ func (q *Queries) DeleteEvent(ctx context.Context, id uuid.UUID) error {
 
 const getEventByID = `-- name: GetEventByID :one
 SELECT events.id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at FROM events
-INNER JOIN media ON events.cover_media_id = media.id
+LEFT JOIN media ON events.cover_media_id = media.id
 WHERE events.id = $1
 `
 
@@ -45,7 +45,7 @@ type GetEventByIDRow struct {
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 	CreatedAt       sql.NullTime   `json:"created_at"`
 	UpdatedAt       sql.NullTime   `json:"updated_at"`
-	ID_2            uuid.UUID      `json:"id_2"`
+	ID_2            uuid.NullUUID  `json:"id_2"`
 	FileName        sql.NullString `json:"file_name"`
 	FileType        sql.NullString `json:"file_type"`
 	MimeType        sql.NullString `json:"mime_type"`
@@ -87,6 +87,35 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (GetEventByIDR
 		&i.Caption,
 		&i.UploadedBy,
 		&i.CreatedAt_2,
+	)
+	return i, err
+}
+
+const getEventBySlug = `-- name: GetEventBySlug :one
+SELECT id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, created_at, updated_at FROM events
+WHERE slug = $1
+`
+
+func (q *Queries) GetEventBySlug(ctx context.Context, slug sql.NullString) (Event, error) {
+	row := q.queryRow(ctx, q.getEventBySlugStmt, getEventBySlug, slug)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.EventType,
+		&i.StartTime,
+		&i.EndTime,
+		&i.Location,
+		&i.GoogleMapsUrl,
+		&i.RegistrationUrl,
+		&i.CoverMediaID,
+		&i.Status,
+		&i.IsPublished,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -155,7 +184,7 @@ func (q *Queries) InsertEvent(ctx context.Context, arg InsertEventParams) (Event
 
 const listEvents = `-- name: ListEvents :many
 SELECT events.id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at FROM events
-INNER JOIN media ON events.cover_media_id = media.id
+LEFT JOIN media ON events.cover_media_id = media.id
 ORDER BY events.start_time DESC
 LIMIT $1 OFFSET $2
 `
@@ -182,7 +211,7 @@ type ListEventsRow struct {
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 	CreatedAt       sql.NullTime   `json:"created_at"`
 	UpdatedAt       sql.NullTime   `json:"updated_at"`
-	ID_2            uuid.UUID      `json:"id_2"`
+	ID_2            uuid.NullUUID  `json:"id_2"`
 	FileName        sql.NullString `json:"file_name"`
 	FileType        sql.NullString `json:"file_type"`
 	MimeType        sql.NullString `json:"mime_type"`

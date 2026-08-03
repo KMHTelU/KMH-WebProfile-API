@@ -1,39 +1,32 @@
 package services
 
 import (
-	"database/sql"
-
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/requests"
+	"github.com/KMHTelU/KMH-WebProfile-API/utils"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
 
 func (s *Service) CreateDivisionService(req requests.CreateDivisionRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
-	newId := uuid.New()
-	var params generated.InsertDivisionParams = generated.InsertDivisionParams{
-		ID:            newId,
-		Name:          sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Slug:          sql.NullString{String: req.Slug, Valid: req.Slug != ""},
-		Description:   sql.NullString{String: req.Description, Valid: req.Description != ""},
-		CoordinatorID: uuid.NullUUID{UUID: req.CoordinatorID, Valid: req.CoordinatorID != uuid.Nil},
+
+	id, ferr := s.createDivision(req, c)
+	if ferr != nil {
+		return ferr
 	}
-	err = s.Repository.CreateDivision(params, c)
-	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create division")
-	}
+
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Create Division", Valid: true},
-		Entity:    sql.NullString{String: "Division with Slug: " + req.Slug, Valid: true},
-		EntityID:  uuid.NullUUID{UUID: newId, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Create Division"),
+		Entity:    utils.NullString("Division with Slug: " + req.Slug),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -59,29 +52,23 @@ func (s *Service) GetAllDivisionsService(c fiber.Ctx) ([]generated.GetAllDivisio
 }
 
 func (s *Service) UpdateDivisionService(id uuid.UUID, req requests.UpdateDivisionRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
-	var params generated.UpdateDivisionParams = generated.UpdateDivisionParams{
-		ID:            id,
-		Name:          sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Slug:          sql.NullString{String: req.Slug, Valid: req.Slug != ""},
-		Description:   sql.NullString{String: req.Description, Valid: req.Description != ""},
-		CoordinatorID: uuid.NullUUID{UUID: req.CoordinatorID, Valid: req.CoordinatorID != uuid.Nil},
-		IsActive:      sql.NullBool{Bool: req.IsActive, Valid: true},
+
+	if ferr := s.updateDivision(id, req, c); ferr != nil {
+		return ferr
 	}
-	if err := s.Repository.UpdateDivision(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update division")
-	}
+
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Update Division", Valid: true},
-		Entity:    sql.NullString{String: "Division with Slug: " + req.Slug, Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Update Division"),
+		Entity:    utils.NullString("Division with Slug: " + req.Slug),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -89,21 +76,21 @@ func (s *Service) UpdateDivisionService(id uuid.UUID, req requests.UpdateDivisio
 }
 
 func (s *Service) DeleteDivisionService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
 	if err := s.Repository.DeleteDivision(id, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete division")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Delete Division", Valid: true},
-		Entity:    sql.NullString{String: "Division", Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Delete Division"),
+		Entity:    utils.NullString("Division"),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -111,9 +98,9 @@ func (s *Service) DeleteDivisionService(id uuid.UUID, c fiber.Ctx) *fiber.Error 
 }
 
 func (s *Service) UpdateDivisionIconService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
 
 	icon, err := c.FormFile("icon")
@@ -134,18 +121,18 @@ func (s *Service) UpdateDivisionIconService(id uuid.UUID, c fiber.Ctx) *fiber.Er
 	}
 	if err := s.Repository.UpdateDivisionIcon(generated.UpdateDivisionIconParams{
 		ID:          id,
-		IconMediaID: uuid.NullUUID{UUID: media.ID, Valid: true},
+		IconMediaID: utils.NullUUID(media.ID),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update division icon")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Update Division Icon", Valid: true},
-		Entity:    sql.NullString{String: "Division with ID: " + id.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Update Division Icon"),
+		Entity:    utils.NullString("Division with ID: " + id.String()),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}

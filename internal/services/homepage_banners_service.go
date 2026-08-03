@@ -35,20 +35,18 @@ func (s *Service) CreateHomepageBannerService(request requests.HomepageBannerReq
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to upload media for homepage banner")
 	}
 
-	bannerID := uuid.New()
-	params := generated.InsertHomepageBannerParams{
-		ID:        bannerID,
-		Title:     sql.NullString{String: request.Title, Valid: true},
-		Subtitle:  sql.NullString{String: request.Subtitle, Valid: true},
-		MediaID:   uuid.NullUUID{UUID: media.ID, Valid: true},
-		CtaText:   sql.NullString{String: request.CtaText, Valid: true},
-		CtaUrl:    sql.NullString{String: request.CtaUrl, Valid: true},
-		IsActive:  sql.NullBool{Bool: request.IsActive, Valid: true},
-		StartDate: sql.NullTime{Time: request.StartDate, Valid: true},
-		EndDate:   sql.NullTime{Time: request.EndDate, Valid: true},
-	}
-	if err := s.Repository.InsertHomepageBanner(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create homepage banner")
+	bannerID, ferr := s.createHomepageBanner(requests.HomepageBannerJSONRequest{
+		Title:     request.Title,
+		Subtitle:  request.Subtitle,
+		MediaID:   media.ID,
+		CtaText:   request.CtaText,
+		CtaUrl:    request.CtaUrl,
+		IsActive:  request.IsActive,
+		StartDate: request.StartDate,
+		EndDate:   request.EndDate,
+	}, c)
+	if ferr != nil {
+		return ferr
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
