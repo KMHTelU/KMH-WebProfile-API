@@ -1,15 +1,18 @@
 -- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, coordinator_id, is_active)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO divisions (id, name, slug, subtitle, description, responsibilities, programs, coordinator_id, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
 -- name: UpdateDivision :one
 UPDATE divisions
 SET name = $2,
     slug = $3,
-    description = $4,
-    coordinator_id = $5,
-    is_active = $6,
+    subtitle = $4,
+    description = $5,
+    responsibilities = $6,
+    programs = $7,
+    coordinator_id = $8,
+    is_active = $9,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;

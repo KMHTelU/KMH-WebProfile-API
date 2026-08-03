@@ -8,6 +8,7 @@ package generated
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
@@ -136,27 +137,30 @@ func (q *Queries) GetMemberDivisionsByDivisionID(ctx context.Context, divisionID
 }
 
 const getMemberDivisionsByMemberID = `-- name: GetMemberDivisionsByMemberID :many
-SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, divisions.id, name, slug, description, icon_media_id, coordinator_id, is_active, divisions.created_at, updated_at
+SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, divisions.id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, divisions.created_at, updated_at
 FROM member_divisions
 INNER JOIN divisions ON member_divisions.division_id = divisions.id
 WHERE member_id = $1
 `
 
 type GetMemberDivisionsByMemberIDRow struct {
-	ID            uuid.UUID      `json:"id"`
-	MemberID      uuid.NullUUID  `json:"member_id"`
-	DivisionID    uuid.NullUUID  `json:"division_id"`
-	RoleTitle     sql.NullString `json:"role_title"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
-	ID_2          uuid.UUID      `json:"id_2"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
-	CreatedAt_2   sql.NullTime   `json:"created_at_2"`
-	UpdatedAt     sql.NullTime   `json:"updated_at"`
+	ID               uuid.UUID       `json:"id"`
+	MemberID         uuid.NullUUID   `json:"member_id"`
+	DivisionID       uuid.NullUUID   `json:"division_id"`
+	RoleTitle        sql.NullString  `json:"role_title"`
+	CreatedAt        sql.NullTime    `json:"created_at"`
+	ID_2             uuid.UUID       `json:"id_2"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
+	CreatedAt_2      sql.NullTime    `json:"created_at_2"`
+	UpdatedAt        sql.NullTime    `json:"updated_at"`
 }
 
 func (q *Queries) GetMemberDivisionsByMemberID(ctx context.Context, memberID uuid.NullUUID) ([]GetMemberDivisionsByMemberIDRow, error) {
@@ -177,7 +181,10 @@ func (q *Queries) GetMemberDivisionsByMemberID(ctx context.Context, memberID uui
 			&i.ID_2,
 			&i.Name,
 			&i.Slug,
+			&i.Subtitle,
 			&i.Description,
+			&i.Responsibilities,
+			&i.Programs,
 			&i.IconMediaID,
 			&i.CoordinatorID,
 			&i.IsActive,

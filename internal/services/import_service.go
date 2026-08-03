@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/importer"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/requests"
@@ -174,6 +175,35 @@ func (s *Service) importMemberRow(row importer.Row, dryRun bool, seen seenKeys, 
 	return id, nil
 }
 
+// splitListColumn memecah isi kolom daftar yang butirnya dipisah titik koma.
+func splitListColumn(value string) []string {
+	items := []string{}
+	for _, part := range strings.Split(value, ";") {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			items = append(items, trimmed)
+		}
+	}
+	return items
+}
+
+// parseProgramsColumn membaca kolom programs dengan format
+// "Nama | Deskripsi; Nama | Deskripsi". Deskripsi boleh dikosongkan.
+func parseProgramsColumn(value string) ([]requests.DivisionProgram, error) {
+	programs := []requests.DivisionProgram{}
+	for _, item := range splitListColumn(value) {
+		name, description, _ := strings.Cut(item, "|")
+		name = strings.TrimSpace(name)
+		if name == "" {
+			return nil, fmt.Errorf("kolom programs: nama program tidak boleh kosong, gunakan format Nama | Deskripsi")
+		}
+		programs = append(programs, requests.DivisionProgram{
+			Name:        name,
+			Description: strings.TrimSpace(description),
+		})
+	}
+	return programs, nil
+}
+
 func (s *Service) importDivisionRow(row importer.Row, dryRun bool, seen seenKeys, c fiber.Ctx) (uuid.UUID, error) {
 	name := row.String("name")
 	slug := row.String("slug")
@@ -200,11 +230,19 @@ func (s *Service) importDivisionRow(row importer.Row, dryRun bool, seen seenKeys
 		coordinatorID = coordinator.ID
 	}
 
+	programs, err := parseProgramsColumn(row.String("programs"))
+	if err != nil {
+		return uuid.Nil, err
+	}
+
 	req := requests.CreateDivisionRequest{
-		Name:          name,
-		Slug:          slug,
-		Description:   row.String("description"),
-		CoordinatorID: coordinatorID,
+		Name:             name,
+		Slug:             slug,
+		Subtitle:         row.String("subtitle"),
+		Description:      row.String("description"),
+		Responsibilities: splitListColumn(row.String("responsibilities")),
+		Programs:         programs,
+		CoordinatorID:    coordinatorID,
 	}
 	if dryRun {
 		return uuid.Nil, nil

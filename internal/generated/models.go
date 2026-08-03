@@ -6,6 +6,7 @@ package generated
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -65,15 +66,18 @@ type ContactMessage struct {
 }
 
 type Division struct {
-	ID            uuid.UUID      `json:"id"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
-	UpdatedAt     sql.NullTime   `json:"updated_at"`
+	ID               uuid.UUID       `json:"id"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
+	CreatedAt        sql.NullTime    `json:"created_at"`
+	UpdatedAt        sql.NullTime    `json:"updated_at"`
 }
 
 type Event struct {

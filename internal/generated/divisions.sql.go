@@ -8,6 +8,7 @@ package generated
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
@@ -23,7 +24,7 @@ func (q *Queries) DeleteDivision(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllDivisions = `-- name: GetAllDivisions :many
-SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -31,38 +32,41 @@ ORDER BY divisions.name ASC
 `
 
 type GetAllDivisionsRow struct {
-	ID            uuid.UUID      `json:"id"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
-	UpdatedAt     sql.NullTime   `json:"updated_at"`
-	ID_2          uuid.NullUUID  `json:"id_2"`
-	FileName      sql.NullString `json:"file_name"`
-	FileType      sql.NullString `json:"file_type"`
-	MimeType      sql.NullString `json:"mime_type"`
-	FileSize      sql.NullInt64  `json:"file_size"`
-	Url           sql.NullString `json:"url"`
-	AltText       sql.NullString `json:"alt_text"`
-	Caption       sql.NullString `json:"caption"`
-	UploadedBy    uuid.NullUUID  `json:"uploaded_by"`
-	CreatedAt_2   sql.NullTime   `json:"created_at_2"`
-	ID_3          uuid.NullUUID  `json:"id_3"`
-	Name_2        sql.NullString `json:"name_2"`
-	Nim           sql.NullString `json:"nim"`
-	PhotoMediaID  uuid.NullUUID  `json:"photo_media_id"`
-	Bio           sql.NullString `json:"bio"`
-	Email         sql.NullString `json:"email"`
-	Phone         sql.NullString `json:"phone"`
-	InstagramUrl  sql.NullString `json:"instagram_url"`
-	PeriodStart   interface{}    `json:"period_start"`
-	PeriodEnd     interface{}    `json:"period_end"`
-	IsActive_2    sql.NullBool   `json:"is_active_2"`
-	CreatedAt_3   sql.NullTime   `json:"created_at_3"`
-	UpdatedAt_2   sql.NullTime   `json:"updated_at_2"`
+	ID               uuid.UUID       `json:"id"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
+	CreatedAt        sql.NullTime    `json:"created_at"`
+	UpdatedAt        sql.NullTime    `json:"updated_at"`
+	ID_2             uuid.NullUUID   `json:"id_2"`
+	FileName         sql.NullString  `json:"file_name"`
+	FileType         sql.NullString  `json:"file_type"`
+	MimeType         sql.NullString  `json:"mime_type"`
+	FileSize         sql.NullInt64   `json:"file_size"`
+	Url              sql.NullString  `json:"url"`
+	AltText          sql.NullString  `json:"alt_text"`
+	Caption          sql.NullString  `json:"caption"`
+	UploadedBy       uuid.NullUUID   `json:"uploaded_by"`
+	CreatedAt_2      sql.NullTime    `json:"created_at_2"`
+	ID_3             uuid.NullUUID   `json:"id_3"`
+	Name_2           sql.NullString  `json:"name_2"`
+	Nim              sql.NullString  `json:"nim"`
+	PhotoMediaID     uuid.NullUUID   `json:"photo_media_id"`
+	Bio              sql.NullString  `json:"bio"`
+	Email            sql.NullString  `json:"email"`
+	Phone            sql.NullString  `json:"phone"`
+	InstagramUrl     sql.NullString  `json:"instagram_url"`
+	PeriodStart      interface{}     `json:"period_start"`
+	PeriodEnd        interface{}     `json:"period_end"`
+	IsActive_2       sql.NullBool    `json:"is_active_2"`
+	CreatedAt_3      sql.NullTime    `json:"created_at_3"`
+	UpdatedAt_2      sql.NullTime    `json:"updated_at_2"`
 }
 
 func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, error) {
@@ -78,7 +82,10 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 			&i.ID,
 			&i.Name,
 			&i.Slug,
+			&i.Subtitle,
 			&i.Description,
+			&i.Responsibilities,
+			&i.Programs,
 			&i.IconMediaID,
 			&i.CoordinatorID,
 			&i.IsActive,
@@ -122,7 +129,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 }
 
 const getDivisionByID = `-- name: GetDivisionByID :one
-SELECT divisions.id, divisions.name, slug, description, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -130,38 +137,41 @@ WHERE divisions.id = $1
 `
 
 type GetDivisionByIDRow struct {
-	ID            uuid.UUID      `json:"id"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	IconMediaID   uuid.NullUUID  `json:"icon_media_id"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
-	UpdatedAt     sql.NullTime   `json:"updated_at"`
-	ID_2          uuid.NullUUID  `json:"id_2"`
-	FileName      sql.NullString `json:"file_name"`
-	FileType      sql.NullString `json:"file_type"`
-	MimeType      sql.NullString `json:"mime_type"`
-	FileSize      sql.NullInt64  `json:"file_size"`
-	Url           sql.NullString `json:"url"`
-	AltText       sql.NullString `json:"alt_text"`
-	Caption       sql.NullString `json:"caption"`
-	UploadedBy    uuid.NullUUID  `json:"uploaded_by"`
-	CreatedAt_2   sql.NullTime   `json:"created_at_2"`
-	ID_3          uuid.NullUUID  `json:"id_3"`
-	Name_2        sql.NullString `json:"name_2"`
-	Nim           sql.NullString `json:"nim"`
-	PhotoMediaID  uuid.NullUUID  `json:"photo_media_id"`
-	Bio           sql.NullString `json:"bio"`
-	Email         sql.NullString `json:"email"`
-	Phone         sql.NullString `json:"phone"`
-	InstagramUrl  sql.NullString `json:"instagram_url"`
-	PeriodStart   interface{}    `json:"period_start"`
-	PeriodEnd     interface{}    `json:"period_end"`
-	IsActive_2    sql.NullBool   `json:"is_active_2"`
-	CreatedAt_3   sql.NullTime   `json:"created_at_3"`
-	UpdatedAt_2   sql.NullTime   `json:"updated_at_2"`
+	ID               uuid.UUID       `json:"id"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
+	CreatedAt        sql.NullTime    `json:"created_at"`
+	UpdatedAt        sql.NullTime    `json:"updated_at"`
+	ID_2             uuid.NullUUID   `json:"id_2"`
+	FileName         sql.NullString  `json:"file_name"`
+	FileType         sql.NullString  `json:"file_type"`
+	MimeType         sql.NullString  `json:"mime_type"`
+	FileSize         sql.NullInt64   `json:"file_size"`
+	Url              sql.NullString  `json:"url"`
+	AltText          sql.NullString  `json:"alt_text"`
+	Caption          sql.NullString  `json:"caption"`
+	UploadedBy       uuid.NullUUID   `json:"uploaded_by"`
+	CreatedAt_2      sql.NullTime    `json:"created_at_2"`
+	ID_3             uuid.NullUUID   `json:"id_3"`
+	Name_2           sql.NullString  `json:"name_2"`
+	Nim              sql.NullString  `json:"nim"`
+	PhotoMediaID     uuid.NullUUID   `json:"photo_media_id"`
+	Bio              sql.NullString  `json:"bio"`
+	Email            sql.NullString  `json:"email"`
+	Phone            sql.NullString  `json:"phone"`
+	InstagramUrl     sql.NullString  `json:"instagram_url"`
+	PeriodStart      interface{}     `json:"period_start"`
+	PeriodEnd        interface{}     `json:"period_end"`
+	IsActive_2       sql.NullBool    `json:"is_active_2"`
+	CreatedAt_3      sql.NullTime    `json:"created_at_3"`
+	UpdatedAt_2      sql.NullTime    `json:"updated_at_2"`
 }
 
 func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisionByIDRow, error) {
@@ -171,7 +181,10 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 		&i.ID,
 		&i.Name,
 		&i.Slug,
+		&i.Subtitle,
 		&i.Description,
+		&i.Responsibilities,
+		&i.Programs,
 		&i.IconMediaID,
 		&i.CoordinatorID,
 		&i.IsActive,
@@ -205,7 +218,7 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 }
 
 const getDivisionBySlug = `-- name: GetDivisionBySlug :one
-SELECT id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
+SELECT id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 FROM divisions
 WHERE slug = $1
 `
@@ -217,7 +230,10 @@ func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (D
 		&i.ID,
 		&i.Name,
 		&i.Slug,
+		&i.Subtitle,
 		&i.Description,
+		&i.Responsibilities,
+		&i.Programs,
 		&i.IconMediaID,
 		&i.CoordinatorID,
 		&i.IsActive,
@@ -228,18 +244,21 @@ func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (D
 }
 
 const insertDivision = `-- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, coordinator_id, is_active)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
+INSERT INTO divisions (id, name, slug, subtitle, description, responsibilities, programs, coordinator_id, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
 type InsertDivisionParams struct {
-	ID            uuid.UUID      `json:"id"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
+	ID               uuid.UUID       `json:"id"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
 }
 
 func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) (Division, error) {
@@ -247,7 +266,10 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		arg.ID,
 		arg.Name,
 		arg.Slug,
+		arg.Subtitle,
 		arg.Description,
+		arg.Responsibilities,
+		arg.Programs,
 		arg.CoordinatorID,
 		arg.IsActive,
 	)
@@ -256,7 +278,10 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		&i.ID,
 		&i.Name,
 		&i.Slug,
+		&i.Subtitle,
 		&i.Description,
+		&i.Responsibilities,
+		&i.Programs,
 		&i.IconMediaID,
 		&i.CoordinatorID,
 		&i.IsActive,
@@ -270,21 +295,27 @@ const updateDivision = `-- name: UpdateDivision :one
 UPDATE divisions
 SET name = $2,
     slug = $3,
-    description = $4,
-    coordinator_id = $5,
-    is_active = $6,
+    subtitle = $4,
+    description = $5,
+    responsibilities = $6,
+    programs = $7,
+    coordinator_id = $8,
+    is_active = $9,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
+RETURNING id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
 type UpdateDivisionParams struct {
-	ID            uuid.UUID      `json:"id"`
-	Name          sql.NullString `json:"name"`
-	Slug          sql.NullString `json:"slug"`
-	Description   sql.NullString `json:"description"`
-	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
-	IsActive      sql.NullBool   `json:"is_active"`
+	ID               uuid.UUID       `json:"id"`
+	Name             sql.NullString  `json:"name"`
+	Slug             sql.NullString  `json:"slug"`
+	Subtitle         sql.NullString  `json:"subtitle"`
+	Description      sql.NullString  `json:"description"`
+	Responsibilities json.RawMessage `json:"responsibilities"`
+	Programs         json.RawMessage `json:"programs"`
+	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
+	IsActive         sql.NullBool    `json:"is_active"`
 }
 
 func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) (Division, error) {
@@ -292,7 +323,10 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		arg.ID,
 		arg.Name,
 		arg.Slug,
+		arg.Subtitle,
 		arg.Description,
+		arg.Responsibilities,
+		arg.Programs,
 		arg.CoordinatorID,
 		arg.IsActive,
 	)
@@ -301,7 +335,10 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		&i.ID,
 		&i.Name,
 		&i.Slug,
+		&i.Subtitle,
 		&i.Description,
+		&i.Responsibilities,
+		&i.Programs,
 		&i.IconMediaID,
 		&i.CoordinatorID,
 		&i.IsActive,
