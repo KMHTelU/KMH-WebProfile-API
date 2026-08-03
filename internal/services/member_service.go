@@ -1,43 +1,32 @@
 package services
 
 import (
-	"database/sql"
-
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/requests"
+	"github.com/KMHTelU/KMH-WebProfile-API/utils"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
 
 func (s *Service) CreateMemberService(req requests.CreateMemberRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
 
-	var params generated.InsertMemberParams = generated.InsertMemberParams{
-		ID:           uuid.New(),
-		Name:         sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Npm:          sql.NullString{String: req.Npm, Valid: req.Npm != ""},
-		Email:        sql.NullString{String: req.Email, Valid: req.Email != ""},
-		Phone:        sql.NullString{String: req.Phone, Valid: req.Phone != ""},
-		InstagramUrl: sql.NullString{String: req.InstagramUrl, Valid: req.InstagramUrl != ""},
-		PeriodStart:  req.PeriodStart,
-		PeriodEnd:    req.PeriodEnd,
-		Bio:          sql.NullString{String: req.Bio, Valid: req.Bio != ""},
+	id, ferr := s.createMember(req, c)
+	if ferr != nil {
+		return ferr
 	}
 
-	if err := s.Repository.CreateMember(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create member")
-	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Create Member", Valid: true},
-		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm, Valid: true},
-		EntityID:  uuid.NullUUID{UUID: params.ID, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Create Member"),
+		Entity:    utils.NullString("Member with NIM: " + req.Nim),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -67,32 +56,23 @@ func (s *Service) GetPaginatedAllMembersService(limit, offset int32, c fiber.Ctx
 }
 
 func (s *Service) UpdateMemberService(id uuid.UUID, req requests.UpdateMemberRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
-	var params generated.UpdateMemberParams = generated.UpdateMemberParams{
-		ID:           id,
-		Name:         sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Email:        sql.NullString{String: req.Email, Valid: req.Email != ""},
-		Phone:        sql.NullString{String: req.Phone, Valid: req.Phone != ""},
-		InstagramUrl: sql.NullString{String: req.InstagramUrl, Valid: req.InstagramUrl != ""},
-		PeriodStart:  req.PeriodStart,
-		PeriodEnd:    req.PeriodEnd,
-		Bio:          sql.NullString{String: req.Bio, Valid: req.Bio != ""},
-		IsActive:     sql.NullBool{Bool: req.IsActive, Valid: true},
+
+	if ferr := s.updateMember(id, req, c); ferr != nil {
+		return ferr
 	}
-	if err := s.Repository.UpdateMember(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update member")
-	}
+
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Update Member", Valid: true},
-		Entity:    sql.NullString{String: "Member with NPM: " + req.Npm, Valid: true},
-		EntityID:  uuid.NullUUID{UUID: params.ID, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Update Member"),
+		Entity:    utils.NullString("Member with NIM: " + req.Nim),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -100,21 +80,21 @@ func (s *Service) UpdateMemberService(id uuid.UUID, req requests.UpdateMemberReq
 }
 
 func (s *Service) DeleteMemberService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
 	if err := s.Repository.DeleteMember(id, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete member")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Delete Member", Valid: true},
-		Entity:    sql.NullString{String: "Member", Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Delete Member"),
+		Entity:    utils.NullString("Member"),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -122,9 +102,9 @@ func (s *Service) DeleteMemberService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 }
 
 func (s *Service) UploadMemberPhotoService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	claim, ferr := s.requireAuth(c)
+	if ferr != nil {
+		return ferr
 	}
 	photo, err := c.FormFile("photo")
 	if err != nil {
@@ -145,18 +125,18 @@ func (s *Service) UploadMemberPhotoService(id uuid.UUID, c fiber.Ctx) *fiber.Err
 
 	if err := s.Repository.UpdateMemberPhoto(generated.UpdateMemberPhotoParams{
 		ID:           id,
-		PhotoMediaID: uuid.NullUUID{UUID: media.ID, Valid: true},
+		PhotoMediaID: utils.NullUUID(media.ID),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update member photo")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Update Member Photo", Valid: true},
-		Entity:    sql.NullString{String: "Member with ID: " + id.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Update Member Photo"),
+		Entity:    utils.NullString("Member with ID: " + id.String()),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}

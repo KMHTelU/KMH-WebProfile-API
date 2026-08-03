@@ -8,6 +8,11 @@ SELECT id, name, description
 FROM roles
 ORDER BY name ASC;
 
+-- name: GetRoleByName :one
+SELECT id, name, description
+FROM roles
+WHERE name = $1;
+
 -- name: InsertRole :one
 INSERT INTO roles (id, name, description)
 VALUES ($1, $2, $3)

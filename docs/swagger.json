@@ -3114,6 +3114,23 @@
               "type": "integer",
               "default": 0
             }
+          },
+          {
+            "name": "event_id",
+            "in": "query",
+            "description": "Only return galleries belonging to this event. Take the value from GET /galleries/categories.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "is_public",
+            "in": "query",
+            "description": "Only return galleries with this visibility. Omit to return both public and private galleries.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -3967,6 +3984,2320 @@
           }
         ]
       }
+    },
+    "/protected/members/bulk": {
+      "post": {
+        "tags": [
+          "Members",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Members",
+        "description": "Creates many members in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateMembersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create members processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create members processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Members",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Members",
+        "description": "Updates many members in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateMembersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update members processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update members processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/divisions/bulk": {
+      "post": {
+        "tags": [
+          "Divisions",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Divisions",
+        "description": "Creates many divisions in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateDivisionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create divisions processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create divisions processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Divisions",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Divisions",
+        "description": "Updates many divisions in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateDivisionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update divisions processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update divisions processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/member-divisions/bulk": {
+      "post": {
+        "tags": [
+          "Member Divisions",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Member Divisions",
+        "description": "Creates many member divisions in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateMemberDivisionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create member divisions processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create member divisions processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Member Divisions",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Member Divisions",
+        "description": "Updates many member divisions in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateMemberDivisionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update member divisions processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update member divisions processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/events/bulk": {
+      "post": {
+        "tags": [
+          "Events",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Events",
+        "description": "Creates many events in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateEventsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create events processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create events processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Events",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Events",
+        "description": "Updates many events in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateEventsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update events processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update events processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/galleries/bulk": {
+      "post": {
+        "tags": [
+          "Galleries",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Galleries",
+        "description": "Creates many galleries in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateGalleriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create galleries processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create galleries processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Galleries",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Galleries",
+        "description": "Updates many galleries in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateGalleriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update galleries processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update galleries processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/gallery-items/bulk": {
+      "post": {
+        "tags": [
+          "Galleries",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Gallery Items",
+        "description": "Creates many gallery items in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateGalleryItemsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create gallery items processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create gallery items processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Galleries",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Gallery Items",
+        "description": "Updates many gallery items in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateGalleryItemsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update gallery items processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update gallery items processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/homepage-banners/bulk": {
+      "post": {
+        "tags": [
+          "Homepage Banners",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Homepage Banners",
+        "description": "Creates many homepage banners in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateHomepageBannersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create homepage banners processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create homepage banners processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Homepage Banners",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Homepage Banners",
+        "description": "Updates many homepage banners in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateHomepageBannersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update homepage banners processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update homepage banners processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/roles/bulk": {
+      "post": {
+        "tags": [
+          "Roles",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Create Roles",
+        "description": "Creates many roles in a single request. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkCreateRolesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create roles processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk create roles processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Roles",
+          "Bulk Operations"
+        ],
+        "summary": "Bulk Update Roles",
+        "description": "Updates many roles in a single request. Each item must carry the id of the record to update. Items are processed one by one and a failing item does not stop the others, so the response can be 207 with a mix of successes and failures. Maximum 500 items per request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/BulkUpdateRolesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All items were processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update roles processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some items succeeded and some failed. Inspect data.results for the failing entries; the successful ones are already saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk update roles processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every item failed, or the payload itself is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Request Password Reset",
+        "description": "Sends an email containing a reset link to the address, if an active account uses it. The response is always the same whether or not the email is registered, so this endpoint cannot be used to discover which addresses have accounts. The link points to {FRONTEND_URL}/reset-password?token=... and the token is valid for 60 minutes. Requesting a new link invalidates any previous one. Limited to 3 requests per account per hour.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request accepted. This is returned even when the email is not registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "If the email is registered, a password reset link has been sent"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many password reset requests for this account, try again later"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset Password With Token",
+        "description": "Sets a new password using the token from the reset email. The token can only be used once and expires 60 minutes after it was issued. A confirmation email is sent afterwards.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/ResetPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The token is invalid, already used, or expired; or the new password fails validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/auth/change-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Change Own Password",
+        "description": "Changes the password of the currently authenticated user. The current password must be supplied and the new one must differ from it. Any pending password reset links for the account are invalidated, and a confirmation email is sent. Existing access tokens stay valid until they expire.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Password changed successfully"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The current password is wrong, or the new password fails validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/galleries/categories": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "List Gallery Categories",
+        "description": "Lists the events that have at least one gallery, along with how many galleries each one has. Galleries are grouped by event rather than by a separate category table, so this is the list the frontend uses to build the gallery filter. Feed the event_id from here into GET /galleries?event_id=...",
+        "responses": {
+          "200": {
+            "description": "A JSON array of gallery categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GalleryCategory"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/members/{id}/divisions": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "List Divisions Of A Member",
+        "description": "Lists every division the member is assigned to, together with the role held in each.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of divisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MemberDivision"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Member ID"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/divisions/{id}/members": {
+      "get": {
+        "tags": [
+          "Public APIs"
+        ],
+        "summary": "List Members Of A Division",
+        "description": "Lists every member assigned to the division, together with the role each one holds.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MemberDivision"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Division ID"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/member-divisions": {
+      "post": {
+        "tags": [
+          "Member Divisions"
+        ],
+        "summary": "Assign Member To Division",
+        "description": "Assigns a member to a division. A member can hold at most one entry per division.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/CreateMemberDivisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Member assigned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member assigned to division successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "The member is already assigned to this division"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/member-divisions/{id}": {
+      "put": {
+        "tags": [
+          "Member Divisions"
+        ],
+        "summary": "Update Member Division",
+        "description": "Updates an existing assignment, for example to change the role title or move the member to another division.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/requests/UpdateMemberDivisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member division updated successfully"
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/errorResponses/BadRequestResponse"
+                    },
+                    {
+                      "$ref": "#/components/errorResponses/ValidationErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Member division not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Member Divisions"
+        ],
+        "summary": "Delete Member Division",
+        "description": "Removes a member from a division.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member division deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/import/{entity}/template": {
+      "get": {
+        "tags": [
+          "Data Import"
+        ],
+        "summary": "Download Import Template",
+        "description": "Downloads the spreadsheet template for the dataset. The .xlsx version has a Data sheet with the headers and two example rows, plus a Petunjuk sheet explaining every column. Relations are filled in using values a human already knows, such as a member NIM or a division slug, and the server resolves them during import. Identical files are also committed under docs/templates/.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "required": true,
+            "description": "Which dataset to work with.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "members",
+                "divisions",
+                "member-divisions",
+                "events",
+                "roles"
+              ]
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "File format. The csv version carries the headers and examples but no explanation sheet.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "xlsx",
+                "csv"
+              ],
+              "default": "xlsx"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The template file",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unsupported format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "No template exists for this entity"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/import/{entity}/preview": {
+      "post": {
+        "tags": [
+          "Data Import"
+        ],
+        "summary": "Preview Import File",
+        "description": "Validates an uploaded file without saving anything. Every row is checked the same way the real import checks it, including duplicate detection against existing data and against other rows in the same file, so the report shows exactly which rows would fail. Run this before the real import. Because nothing is written, the status is always 200 as long as the file could be read.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "required": true,
+            "description": "Which dataset to work with.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "members",
+                "divisions",
+                "member-divisions",
+                "events",
+                "roles"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An .xlsx or .csv file following the downloaded template. Maximum 5 MB and 500 data rows."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The file was read and every row validated. Nothing was saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Import preview completed, no data was saved"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The file is missing, has an unsupported type, lacks a required column, or contains no data rows"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Import is not available for this entity"
+          },
+          "413": {
+            "description": "The file is larger than 5 MB"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/protected/import/{entity}": {
+      "post": {
+        "tags": [
+          "Data Import"
+        ],
+        "summary": "Import Data File",
+        "description": "Validates and saves the rows of an uploaded file. Rows are processed one by one and a failing row does not stop the others, so a partially valid file returns 207 with the successful rows already saved. Each entry in the report names the row number in the file. Use the preview endpoint first if you want to check the file without saving.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "required": true,
+            "description": "Which dataset to work with.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "members",
+                "divisions",
+                "member-divisions",
+                "events",
+                "roles"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "An .xlsx or .csv file following the downloaded template. Maximum 5 MB and 500 data rows."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Every row was imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Import processed"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "Some rows were imported and some failed. The successful rows are already saved; fix the reported rows and upload them again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Import processed (sebagian item gagal)"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkReport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every row failed, or the file is missing, unsupported, or malformed"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Import is not available for this entity"
+          },
+          "413": {
+            "description": "The file is larger than 5 MB"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -4001,6 +6332,18 @@
     {
       "name": "Organization Profile",
       "description": "APIs related to organization profile management"
+    },
+    {
+      "name": "Member Divisions",
+      "description": "APIs related to assigning members into divisions"
+    },
+    {
+      "name": "Bulk Operations",
+      "description": "Create or update many records in a single request. Returns a per-item report; 207 means some items failed while the rest were saved."
+    },
+    {
+      "name": "Data Import",
+      "description": "Download spreadsheet templates and import data from .xlsx or .csv files"
     }
   ],
   "components": {
@@ -4461,7 +6804,7 @@
           "name": {
             "type": "string"
           },
-          "npm": {
+          "nim": {
             "type": "string"
           },
           "bio": {
@@ -4489,7 +6832,7 @@
         },
         "required": [
           "name",
-          "npm",
+          "nim",
           "period_start",
           "period_end"
         ]
@@ -4500,7 +6843,7 @@
           "name": {
             "type": "string"
           },
-          "npm": {
+          "nim": {
             "type": "string"
           },
           "bio": {
@@ -4531,6 +6874,653 @@
           "photo_media_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@leviathanbolu.my.id"
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The token from the reset link sent by email.",
+            "example": "3f1c...9ab2"
+          },
+          "new_password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "properties": {
+          "old_password": {
+            "type": "string",
+            "format": "password"
+          },
+          "new_password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "description": "Must differ from the current password."
+          }
+        }
+      },
+      "CreateMemberDivisionRequest": {
+        "type": "object",
+        "required": [
+          "member_id",
+          "division_id"
+        ],
+        "properties": {
+          "member_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "division_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role_title": {
+            "type": "string",
+            "example": "Ketua"
+          }
+        }
+      },
+      "UpdateMemberDivisionRequest": {
+        "type": "object",
+        "required": [
+          "member_id",
+          "division_id"
+        ],
+        "properties": {
+          "member_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "division_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role_title": {
+            "type": "string",
+            "example": "Ketua"
+          }
+        }
+      },
+      "UpdateEventRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug",
+          "start_time"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_type": {
+            "type": "string",
+            "example": "internal"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "location": {
+            "type": "string"
+          },
+          "google_maps_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "registration_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "cover_media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "example": "upcoming"
+          },
+          "is_published": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateGalleryRequest": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_public": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateRoleRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateGalleryItemRequest": {
+        "type": "object",
+        "required": [
+          "gallery_id",
+          "media_id"
+        ],
+        "description": "Unlike POST /protected/galleries/{id}/items, the gallery is given in the body because bulk requests have no gallery in the path.",
+        "properties": {
+          "gallery_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateGalleryItemRequest": {
+        "type": "object",
+        "required": [
+          "gallery_id",
+          "media_id"
+        ],
+        "properties": {
+          "gallery_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "HomepageBannerJSONRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "start_date",
+          "end_date"
+        ],
+        "description": "JSON variant used by bulk endpoints. The image is referenced by media_id from a previous upload instead of being sent as a file.",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "media_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "cta_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BulkCreateMembersRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateMemberRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateMembersRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateMemberRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateDivisionsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateDivisionRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateDivisionsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateDivisionRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateMemberDivisionsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateMemberDivisionRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateMemberDivisionsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateMemberDivisionRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateEventsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateEventRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateEventsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateEventRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateGalleriesRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateGalleryRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateGalleriesRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateGalleryRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateGalleryItemsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateGalleryItemRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateGalleryItemsRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateGalleryItemRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateHomepageBannersRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/HomepageBannerJSONRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateHomepageBannersRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/HomepageBannerJSONRequest"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkCreateRolesRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/requests/CreateRoleRequest"
+            }
+          }
+        }
+      },
+      "BulkUpdateRolesRequest": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/components/requests/UpdateRoleRequest"
+                }
+              ]
+            }
           }
         }
       }
@@ -4619,6 +7609,22 @@
             "type": "string"
           }
         }
+      },
+      "NotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "example": "Resource not found"
+          },
+          "data": {
+            "type": "null"
+          }
+        }
       }
     },
     "schemas": {
@@ -4669,7 +7675,7 @@
           "name": {
             "type": "string"
           },
-          "npm": {
+          "nim": {
             "type": "string"
           },
           "email": {
@@ -5056,6 +8062,109 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "MemberDivision": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "member_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "division_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role_title": {
+            "type": "string",
+            "example": "Ketua"
+          }
+        }
+      },
+      "GalleryCategory": {
+        "type": "object",
+        "description": "An event that has at least one gallery. Used by the frontend as the gallery filter options.",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_title": {
+            "type": "string",
+            "example": "Malam Keakraban 2025"
+          },
+          "event_slug": {
+            "type": "string",
+            "example": "makrab-2025"
+          },
+          "event_start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "gallery_count": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          }
+        }
+      },
+      "BulkItemResult": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Zero-based position of the item in the request or file.",
+            "example": 2
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Present only when the item succeeded. Empty on import preview because nothing is saved."
+          },
+          "row": {
+            "type": "integer",
+            "description": "Import only: the row number in the uploaded file, counting the header as row 1.",
+            "example": 4
+          },
+          "error": {
+            "type": "string",
+            "description": "Present only when the item failed.",
+            "example": "NIM 1301213045 sudah terdaftar atas nama Aulia Rahman"
+          }
+        }
+      },
+      "BulkReport": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 3
+          },
+          "succeeded": {
+            "type": "integer",
+            "example": 2
+          },
+          "failed": {
+            "type": "integer",
+            "example": 1
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulkItemResult"
+            }
           }
         }
       }

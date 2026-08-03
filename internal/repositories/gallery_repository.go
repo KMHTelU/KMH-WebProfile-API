@@ -18,6 +18,19 @@ func (r *Repository) ListGalleries(params generated.SelectAllGalleriesParams, c 
 	return r.Queries.SelectAllGalleries(c, params)
 }
 
+func (r *Repository) ListGalleryCategories(c fiber.Ctx) ([]generated.SelectGalleryCategoriesRow, error) {
+	return r.Queries.SelectGalleryCategories(c)
+}
+
+func (r *Repository) GetGalleryItemByID(id uuid.UUID, c fiber.Ctx) (generated.GalleryItem, error) {
+	return r.Queries.GetGalleryItemByID(c, id)
+}
+
+func (r *Repository) UpdateGalleryItem(params generated.UpdateGalleryItemParams, c fiber.Ctx) error {
+	_, err := r.Queries.UpdateGalleryItem(c, params)
+	return err
+}
+
 func (r *Repository) UpdateGallery(params generated.UpdateGalleryParams, c fiber.Ctx) error {
 	_, err := r.Queries.UpdateGallery(c, params)
 	return err

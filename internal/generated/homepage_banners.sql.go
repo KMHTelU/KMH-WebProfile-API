@@ -22,6 +22,30 @@ func (q *Queries) DeleteHomepageBanner(ctx context.Context, id uuid.UUID) error 
 	return err
 }
 
+const getHomepageBannerByID = `-- name: GetHomepageBannerByID :one
+SELECT id, title, subtitle, media_id, cta_text, cta_url, is_active, start_date, end_date, created_at
+FROM homepage_banners
+WHERE id = $1
+`
+
+func (q *Queries) GetHomepageBannerByID(ctx context.Context, id uuid.UUID) (HomepageBanner, error) {
+	row := q.queryRow(ctx, q.getHomepageBannerByIDStmt, getHomepageBannerByID, id)
+	var i HomepageBanner
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Subtitle,
+		&i.MediaID,
+		&i.CtaText,
+		&i.CtaUrl,
+		&i.IsActive,
+		&i.StartDate,
+		&i.EndDate,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const insertHomepageBanner = `-- name: InsertHomepageBanner :one
 INSERT INTO homepage_banners (
   id,
@@ -82,7 +106,7 @@ func (q *Queries) InsertHomepageBanner(ctx context.Context, arg InsertHomepageBa
 const selectAllHomepageBanners = `-- name: SelectAllHomepageBanners :many
 SELECT homepage_banners.id, title, subtitle, media_id, cta_text, cta_url, is_active, start_date, end_date, homepage_banners.created_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
 FROM homepage_banners
-INNER JOIN media ON homepage_banners.media_id = media.id
+LEFT JOIN media ON homepage_banners.media_id = media.id
 ORDER BY start_date DESC
 LIMIT $1 OFFSET $2
 `
@@ -103,7 +127,7 @@ type SelectAllHomepageBannersRow struct {
 	StartDate   sql.NullTime   `json:"start_date"`
 	EndDate     sql.NullTime   `json:"end_date"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
-	ID_2        uuid.UUID      `json:"id_2"`
+	ID_2        uuid.NullUUID  `json:"id_2"`
 	FileName    sql.NullString `json:"file_name"`
 	FileType    sql.NullString `json:"file_type"`
 	MimeType    sql.NullString `json:"mime_type"`
@@ -157,4 +181,58 @@ func (q *Queries) SelectAllHomepageBanners(ctx context.Context, arg SelectAllHom
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateHomepageBanner = `-- name: UpdateHomepageBanner :one
+UPDATE homepage_banners
+SET title = $2,
+    subtitle = $3,
+    media_id = $4,
+    cta_text = $5,
+    cta_url = $6,
+    is_active = $7,
+    start_date = $8,
+    end_date = $9
+WHERE id = $1
+RETURNING id, title, subtitle, media_id, cta_text, cta_url, is_active, start_date, end_date, created_at
+`
+
+type UpdateHomepageBannerParams struct {
+	ID        uuid.UUID      `json:"id"`
+	Title     sql.NullString `json:"title"`
+	Subtitle  sql.NullString `json:"subtitle"`
+	MediaID   uuid.NullUUID  `json:"media_id"`
+	CtaText   sql.NullString `json:"cta_text"`
+	CtaUrl    sql.NullString `json:"cta_url"`
+	IsActive  sql.NullBool   `json:"is_active"`
+	StartDate sql.NullTime   `json:"start_date"`
+	EndDate   sql.NullTime   `json:"end_date"`
+}
+
+func (q *Queries) UpdateHomepageBanner(ctx context.Context, arg UpdateHomepageBannerParams) (HomepageBanner, error) {
+	row := q.queryRow(ctx, q.updateHomepageBannerStmt, updateHomepageBanner,
+		arg.ID,
+		arg.Title,
+		arg.Subtitle,
+		arg.MediaID,
+		arg.CtaText,
+		arg.CtaUrl,
+		arg.IsActive,
+		arg.StartDate,
+		arg.EndDate,
+	)
+	var i HomepageBanner
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Subtitle,
+		&i.MediaID,
+		&i.CtaText,
+		&i.CtaUrl,
+		&i.IsActive,
+		&i.StartDate,
+		&i.EndDate,
+		&i.CreatedAt,
+	)
+	return i, err
 }

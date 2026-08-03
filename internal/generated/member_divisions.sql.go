@@ -22,8 +22,51 @@ func (q *Queries) DeleteMemberDivision(ctx context.Context, id uuid.UUID) error 
 	return err
 }
 
+const getMemberDivisionByID = `-- name: GetMemberDivisionByID :one
+SELECT id, member_id, division_id, role_title, created_at
+FROM member_divisions
+WHERE id = $1
+`
+
+func (q *Queries) GetMemberDivisionByID(ctx context.Context, id uuid.UUID) (MemberDivision, error) {
+	row := q.queryRow(ctx, q.getMemberDivisionByIDStmt, getMemberDivisionByID, id)
+	var i MemberDivision
+	err := row.Scan(
+		&i.ID,
+		&i.MemberID,
+		&i.DivisionID,
+		&i.RoleTitle,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getMemberDivisionByPair = `-- name: GetMemberDivisionByPair :one
+SELECT id, member_id, division_id, role_title, created_at
+FROM member_divisions
+WHERE member_id = $1 AND division_id = $2
+`
+
+type GetMemberDivisionByPairParams struct {
+	MemberID   uuid.NullUUID `json:"member_id"`
+	DivisionID uuid.NullUUID `json:"division_id"`
+}
+
+func (q *Queries) GetMemberDivisionByPair(ctx context.Context, arg GetMemberDivisionByPairParams) (MemberDivision, error) {
+	row := q.queryRow(ctx, q.getMemberDivisionByPairStmt, getMemberDivisionByPair, arg.MemberID, arg.DivisionID)
+	var i MemberDivision
+	err := row.Scan(
+		&i.ID,
+		&i.MemberID,
+		&i.DivisionID,
+		&i.RoleTitle,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getMemberDivisionsByDivisionID = `-- name: GetMemberDivisionsByDivisionID :many
-SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, members.id, name, npm, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at
+SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at
 FROM member_divisions
 INNER JOIN members ON member_divisions.member_id = members.id
 WHERE division_id = $1
@@ -37,7 +80,7 @@ type GetMemberDivisionsByDivisionIDRow struct {
 	CreatedAt    sql.NullTime   `json:"created_at"`
 	ID_2         uuid.UUID      `json:"id_2"`
 	Name         sql.NullString `json:"name"`
-	Npm          sql.NullString `json:"npm"`
+	Nim          sql.NullString `json:"nim"`
 	PhotoMediaID uuid.NullUUID  `json:"photo_media_id"`
 	Bio          sql.NullString `json:"bio"`
 	Email        sql.NullString `json:"email"`
@@ -67,7 +110,7 @@ func (q *Queries) GetMemberDivisionsByDivisionID(ctx context.Context, divisionID
 			&i.CreatedAt,
 			&i.ID_2,
 			&i.Name,
-			&i.Npm,
+			&i.Nim,
 			&i.PhotoMediaID,
 			&i.Bio,
 			&i.Email,
@@ -155,19 +198,59 @@ func (q *Queries) GetMemberDivisionsByMemberID(ctx context.Context, memberID uui
 }
 
 const insertMemberDivision = `-- name: InsertMemberDivision :one
-INSERT INTO member_divisions (member_id, division_id, role_title)
-VALUES ($1, $2, $3)
+INSERT INTO member_divisions (id, member_id, division_id, role_title)
+VALUES ($1, $2, $3, $4)
 RETURNING id, member_id, division_id, role_title, created_at
 `
 
 type InsertMemberDivisionParams struct {
+	ID         uuid.UUID      `json:"id"`
 	MemberID   uuid.NullUUID  `json:"member_id"`
 	DivisionID uuid.NullUUID  `json:"division_id"`
 	RoleTitle  sql.NullString `json:"role_title"`
 }
 
 func (q *Queries) InsertMemberDivision(ctx context.Context, arg InsertMemberDivisionParams) (MemberDivision, error) {
-	row := q.queryRow(ctx, q.insertMemberDivisionStmt, insertMemberDivision, arg.MemberID, arg.DivisionID, arg.RoleTitle)
+	row := q.queryRow(ctx, q.insertMemberDivisionStmt, insertMemberDivision,
+		arg.ID,
+		arg.MemberID,
+		arg.DivisionID,
+		arg.RoleTitle,
+	)
+	var i MemberDivision
+	err := row.Scan(
+		&i.ID,
+		&i.MemberID,
+		&i.DivisionID,
+		&i.RoleTitle,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateMemberDivision = `-- name: UpdateMemberDivision :one
+UPDATE member_divisions
+SET member_id = $2,
+    division_id = $3,
+    role_title = $4
+WHERE id = $1
+RETURNING id, member_id, division_id, role_title, created_at
+`
+
+type UpdateMemberDivisionParams struct {
+	ID         uuid.UUID      `json:"id"`
+	MemberID   uuid.NullUUID  `json:"member_id"`
+	DivisionID uuid.NullUUID  `json:"division_id"`
+	RoleTitle  sql.NullString `json:"role_title"`
+}
+
+func (q *Queries) UpdateMemberDivision(ctx context.Context, arg UpdateMemberDivisionParams) (MemberDivision, error) {
+	row := q.queryRow(ctx, q.updateMemberDivisionStmt, updateMemberDivision,
+		arg.ID,
+		arg.MemberID,
+		arg.DivisionID,
+		arg.RoleTitle,
+	)
 	var i MemberDivision
 	err := row.Scan(
 		&i.ID,

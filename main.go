@@ -7,6 +7,7 @@ import (
 	"github.com/KMHTelU/KMH-WebProfile-API/configs"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/handlers"
+	"github.com/KMHTelU/KMH-WebProfile-API/internal/mailer"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/repositories"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/services"
 	"github.com/KMHTelU/KMH-WebProfile-API/routes"
@@ -46,8 +47,23 @@ func init() {
 		log.Infof("Failed to initialize Cloudinary: %v", err)
 	}
 
+	mailClient := mailer.New(mailer.Config{
+		Host:       config.SMTPHost,
+		Port:       config.SMTPPort,
+		Username:   config.SMTPUsername,
+		Password:   config.SMTPPassword,
+		FromEmail:  config.SMTPFromEmail,
+		FromName:   config.SMTPFromName,
+		Encryption: config.SMTPEncryption,
+		AppName:    config.AppName,
+	})
+
 	repo = repositories.InitializeRepository(db, queries)
-	service = services.InitializeService(repo, cleaner, cld)
+	service = services.InitializeService(repo, cleaner, cld, mailClient, services.PasswordResetConfig{
+		FrontendURL: config.FrontendURL,
+		TokenTTL:    config.PasswordResetTokenTTL,
+		MaxPerHour:  config.PasswordResetMaxPerHour,
+	})
 	handler = handlers.InitializeHandler(service)
 	route = routes.InitializeRoutes(handler)
 }

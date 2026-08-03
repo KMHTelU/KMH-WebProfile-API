@@ -22,6 +22,24 @@ func (q *Queries) DeleteGalleryItem(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getGalleryItemByID = `-- name: GetGalleryItemByID :one
+SELECT id, gallery_id, media_id, sort_order
+FROM gallery_items
+WHERE id = $1
+`
+
+func (q *Queries) GetGalleryItemByID(ctx context.Context, id uuid.UUID) (GalleryItem, error) {
+	row := q.queryRow(ctx, q.getGalleryItemByIDStmt, getGalleryItemByID, id)
+	var i GalleryItem
+	err := row.Scan(
+		&i.ID,
+		&i.GalleryID,
+		&i.MediaID,
+		&i.SortOrder,
+	)
+	return i, err
+}
+
 const insertGalleryItem = `-- name: InsertGalleryItem :one
 INSERT INTO gallery_items (
   id,
@@ -119,4 +137,37 @@ func (q *Queries) SelectGalleryItemsByGalleryID(ctx context.Context, galleryID u
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateGalleryItem = `-- name: UpdateGalleryItem :one
+UPDATE gallery_items
+SET gallery_id = $2,
+    media_id = $3,
+    sort_order = $4
+WHERE id = $1
+RETURNING id, gallery_id, media_id, sort_order
+`
+
+type UpdateGalleryItemParams struct {
+	ID        uuid.UUID     `json:"id"`
+	GalleryID uuid.NullUUID `json:"gallery_id"`
+	MediaID   uuid.NullUUID `json:"media_id"`
+	SortOrder sql.NullInt32 `json:"sort_order"`
+}
+
+func (q *Queries) UpdateGalleryItem(ctx context.Context, arg UpdateGalleryItemParams) (GalleryItem, error) {
+	row := q.queryRow(ctx, q.updateGalleryItemStmt, updateGalleryItem,
+		arg.ID,
+		arg.GalleryID,
+		arg.MediaID,
+		arg.SortOrder,
+	)
+	var i GalleryItem
+	err := row.Scan(
+		&i.ID,
+		&i.GalleryID,
+		&i.MediaID,
+		&i.SortOrder,
+	)
+	return i, err
 }

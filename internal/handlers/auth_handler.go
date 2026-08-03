@@ -43,3 +43,49 @@ func (h *Handler) RefreshToken(c fiber.Ctx) error {
 	}
 	return utils.RespondWithOK(c, "Token refreshed successfully", auth)
 }
+
+func (h *Handler) ForgotPasswordHandler(c fiber.Ctx) error {
+	var request requests.ForgotPasswordRequest
+	if err := c.Bind().JSON(&request); err != nil {
+		errorsMap := utils.MapValidationErrors(err)
+		if errorsMap != nil {
+			return utils.RespondWithValidationError(c, errorsMap)
+		}
+		return utils.RespondWithError(c, fiber.StatusBadRequest, "Bad request")
+	}
+	if err := h.Service.ForgotPasswordService(request, c); err != nil {
+		return utils.RespondWithError(c, err.Code, err.Message)
+	}
+	// Pesan sengaja netral supaya tidak membocorkan email mana yang terdaftar.
+	return utils.RespondWithOK(c, "If the email is registered, a password reset link has been sent", nil)
+}
+
+func (h *Handler) ResetPasswordHandler(c fiber.Ctx) error {
+	var request requests.ResetPasswordRequest
+	if err := c.Bind().JSON(&request); err != nil {
+		errorsMap := utils.MapValidationErrors(err)
+		if errorsMap != nil {
+			return utils.RespondWithValidationError(c, errorsMap)
+		}
+		return utils.RespondWithError(c, fiber.StatusBadRequest, "Bad request")
+	}
+	if err := h.Service.ResetPasswordService(request, c); err != nil {
+		return utils.RespondWithError(c, err.Code, err.Message)
+	}
+	return utils.RespondWithOK(c, "Password reset successfully", nil)
+}
+
+func (h *Handler) ChangePasswordHandler(c fiber.Ctx) error {
+	var request requests.ChangePasswordRequest
+	if err := c.Bind().JSON(&request); err != nil {
+		errorsMap := utils.MapValidationErrors(err)
+		if errorsMap != nil {
+			return utils.RespondWithValidationError(c, errorsMap)
+		}
+		return utils.RespondWithError(c, fiber.StatusBadRequest, "Bad request")
+	}
+	if err := h.Service.ChangePasswordService(request, c); err != nil {
+		return utils.RespondWithError(c, err.Code, err.Message)
+	}
+	return utils.RespondWithOK(c, "Password changed successfully", nil)
+}

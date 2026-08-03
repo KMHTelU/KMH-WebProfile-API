@@ -55,6 +55,11 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	api.Get("/galleries", func(c fiber.Ctx) error {
 		return r.Handler.GetPaginatedGalleriesHandler(c)
 	})
+	// Didaftarkan sebelum /galleries/:id agar "categories" tidak tertangkap
+	// sebagai nilai parameter id.
+	api.Get("/galleries/categories", func(c fiber.Ctx) error {
+		return r.Handler.GetGalleryCategoriesHandler(c)
+	})
 	api.Get("/galleries/:id", func(c fiber.Ctx) error {
 		return r.Handler.GetGalleryByIDHandler(c)
 	})
@@ -69,6 +74,9 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	api.Get("/divisions/:id", func(c fiber.Ctx) error {
 		return r.Handler.GetDivisionByIDHandler(c)
 	})
+	api.Get("/divisions/:id/members", func(c fiber.Ctx) error {
+		return r.Handler.GetMembersByDivisionHandler(c)
+	})
 
 	// Members (public read-only)
 	api.Get("/members", func(c fiber.Ctx) error {
@@ -76,6 +84,9 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	api.Get("/members/:id", func(c fiber.Ctx) error {
 		return r.Handler.GetMemberByIDHandler(c)
+	})
+	api.Get("/members/:id/divisions", func(c fiber.Ctx) error {
+		return r.Handler.GetDivisionsByMemberHandler(c)
 	})
 
 	// Authentication routes
@@ -85,9 +96,19 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	api.Post("/refresh", func(c fiber.Ctx) error {
 		return r.Handler.RefreshToken(c)
 	})
+	api.Post("/forgot-password", func(c fiber.Ctx) error {
+		return r.Handler.ForgotPasswordHandler(c)
+	})
+	api.Post("/reset-password", func(c fiber.Ctx) error {
+		return r.Handler.ResetPasswordHandler(c)
+	})
 
 	// Protected routes
 	protected := api.Group("/protected")
+
+	protected.Post("/auth/change-password", func(c fiber.Ctx) error {
+		return r.Handler.ChangePasswordHandler(c)
+	})
 
 	user := protected.Group("/user")
 	user.Post("", func(c fiber.Ctx) error {
@@ -113,11 +134,24 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	homepageBanner.Get("", func(c fiber.Ctx) error {
 		return r.Handler.GetPaginatedHomepageBannersHandler(c)
 	})
+	// Rute /bulk didaftarkan lebih dahulu agar tidak tertangkap oleh /:id.
+	homepageBanner.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateHomepageBannersHandler(c)
+	})
+	homepageBanner.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateHomepageBannersHandler(c)
+	})
 	homepageBanner.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteHomepageBannerHandler(c)
 	})
 
 	member := protected.Group("/members")
+	member.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateMembersHandler(c)
+	})
+	member.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateMembersHandler(c)
+	})
 	member.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateMemberHandler(c)
 	})
@@ -138,6 +172,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 
 	division := protected.Group("/divisions")
+	division.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateDivisionsHandler(c)
+	})
+	division.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateDivisionsHandler(c)
+	})
 	division.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateDivisionHandler(c)
 	})
@@ -199,6 +239,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 
 	event := protected.Group("/events")
+	event.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateEventsHandler(c)
+	})
+	event.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateEventsHandler(c)
+	})
 	event.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateEventHandler(c)
 	})
@@ -210,6 +256,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 
 	gallery := protected.Group("/galleries")
+	gallery.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateGalleriesHandler(c)
+	})
+	gallery.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateGalleriesHandler(c)
+	})
 	gallery.Post("", func(c fiber.Ctx) error {
 		return r.Handler.CreateGalleryHandler(c)
 	})
@@ -224,6 +276,33 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	gallery.Delete("/:id/items/:itemId", func(c fiber.Ctx) error {
 		return r.Handler.DeleteGalleryItemHandler(c)
+	})
+
+	// Gallery item punya grup tersendiri karena operasi bulk menyertakan
+	// gallery_id di dalam body, bukan di path.
+	galleryItem := protected.Group("/gallery-items")
+	galleryItem.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateGalleryItemsHandler(c)
+	})
+	galleryItem.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateGalleryItemsHandler(c)
+	})
+
+	memberDivision := protected.Group("/member-divisions")
+	memberDivision.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateMemberDivisionsHandler(c)
+	})
+	memberDivision.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateMemberDivisionsHandler(c)
+	})
+	memberDivision.Post("", func(c fiber.Ctx) error {
+		return r.Handler.CreateMemberDivisionHandler(c)
+	})
+	memberDivision.Put("/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateMemberDivisionHandler(c)
+	})
+	memberDivision.Delete("/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteMemberDivisionHandler(c)
 	})
 
 	contactMessage := protected.Group("/contact-messages")
@@ -250,6 +329,12 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	role.Get("", func(c fiber.Ctx) error {
 		return r.Handler.GetAllRolesHandler(c)
 	})
+	role.Post("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkCreateRolesHandler(c)
+	})
+	role.Put("/bulk", func(c fiber.Ctx) error {
+		return r.Handler.BulkUpdateRolesHandler(c)
+	})
 	role.Get("/:id", func(c fiber.Ctx) error {
 		return r.Handler.GetRoleByIDHandler(c)
 	})
@@ -261,5 +346,18 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	role.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteRoleHandler(c)
+	})
+
+	// Import berkas Excel/CSV. Nilai :entity yang didukung adalah members,
+	// divisions, member-divisions, events, dan roles.
+	importGroup := protected.Group("/import")
+	importGroup.Get("/:entity/template", func(c fiber.Ctx) error {
+		return r.Handler.DownloadImportTemplateHandler(c)
+	})
+	importGroup.Post("/:entity/preview", func(c fiber.Ctx) error {
+		return r.Handler.PreviewImportHandler(c)
+	})
+	importGroup.Post("/:entity", func(c fiber.Ctx) error {
+		return r.Handler.ImportHandler(c)
 	})
 }

@@ -1,8 +1,6 @@
 package services
 
 import (
-	"database/sql"
-
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/requests"
 	"github.com/gofiber/fiber/v3"
@@ -10,70 +8,47 @@ import (
 )
 
 func (s *Service) CreateRoleService(req requests.CreateRoleRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	if _, ferr := s.requireAuth(c); ferr != nil {
+		return ferr
 	}
-
-	params := generated.InsertRoleParams{
-		ID:          uuid.New(),
-		Name:        sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
+	if _, ferr := s.createRole(req, c); ferr != nil {
+		return ferr
 	}
-
-	if _, err := s.Repository.CreateRole(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create role")
-	}
-
 	return nil
 }
 
 func (s *Service) GetRoleByIDService(id uuid.UUID, c fiber.Ctx) (generated.Role, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return generated.Role{}, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	if _, ferr := s.requireAuth(c); ferr != nil {
+		return generated.Role{}, ferr
 	}
-	role, err1 := s.Repository.GetRoleByID(id, c)
-	if err1 != nil {
+	role, err := s.Repository.GetRoleByID(id, c)
+	if err != nil {
 		return generated.Role{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to get role")
 	}
 	return role, nil
 }
 
 func (s *Service) GetAllRolesService(c fiber.Ctx) ([]generated.Role, *fiber.Error) {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	if _, ferr := s.requireAuth(c); ferr != nil {
+		return nil, ferr
 	}
-	roles, err1 := s.Repository.GetAllRoles(c)
-	if err1 != nil {
+	roles, err := s.Repository.GetAllRoles(c)
+	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to get roles")
 	}
 	return roles, nil
 }
 
 func (s *Service) UpdateRoleService(id uuid.UUID, req requests.UpdateRoleRequest, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	if _, ferr := s.requireAuth(c); ferr != nil {
+		return ferr
 	}
-
-	params := generated.UpdateRoleParams{
-		ID:          id,
-		Name:        sql.NullString{String: req.Name, Valid: req.Name != ""},
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
-	}
-
-	if err := s.Repository.UpdateRole(params, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update role")
-	}
-	return nil
+	return s.updateRole(id, req, c)
 }
 
 func (s *Service) DeleteRoleService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
-	claim, err := s.TokenCleaner.GetCleanToken(c)
-	if err != nil || claim == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	if _, ferr := s.requireAuth(c); ferr != nil {
+		return ferr
 	}
 
 	if err := s.Repository.DeleteRole(id, c); err != nil {
