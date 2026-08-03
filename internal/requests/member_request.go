@@ -20,6 +20,6 @@ type UpdateMemberRequest struct {
 	InstagramUrl string `json:"instagram_url" validate:"omitempty,url"`
 	PeriodStart  int32  `json:"period_start" validate:"omitempty"`
 	PeriodEnd    int32  `json:"period_end" validate:"omitempty"`
-	IsActive     bool   `json:"is_active" validate:"omitempty"`
+	IsActive     *bool  `json:"is_active" validate:"omitempty"`
 	PhotoMediaID string `json:"photo_media_id" validate:"omitempty,uuid4"`
 }

@@ -13,7 +13,7 @@ func RespondWithOK(c fiber.Ctx, message string, data interface{}) error {
 	return c.Status(fiber.StatusOK).JSON(APIResponse{
 		Status:  "success",
 		Message: message,
-		Data:    data,
+		Data:    SanitizeForJSON(data),
 	})
 }
 
@@ -21,7 +21,7 @@ func RespondWithCreated(c fiber.Ctx, message string, data interface{}) error {
 	return c.Status(fiber.StatusCreated).JSON(APIResponse{
 		Status:  "created",
 		Message: message,
-		Data:    data,
+		Data:    SanitizeForJSON(data),
 	})
 }
 

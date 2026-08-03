@@ -33,17 +33,20 @@ func (h *Handler) GetAllUsers(c fiber.Ctx) error {
 	if err != nil {
 		return utils.RespondWithError(c, err.Code, err.Message)
 	}
-	var datas []entities.User
+	datas := make([]entities.User, 0, len(users))
 	for _, user := range users {
-		var role entities.Role
-		role.ID = user.RoleID
-		role.Name = user.Name_2.String
 		datas = append(datas, entities.User{
-			ID:       user.ID,
-			Name:     user.Name.String,
-			Email:    user.Email.String,
-			RoleID:   user.RoleID,
-			UserRole: role,
+			ID:     user.ID,
+			Name:   user.Name.String,
+			Email:  user.Email.String,
+			RoleID: user.RoleID,
+			UserRole: entities.Role{
+				ID:          user.ID_2,
+				Name:        user.Name_2.String,
+				Description: user.Description.String,
+			},
+			IsActive:    utils.BoolPtr(user.IsActive),
+			LastLoginAt: utils.TimePtr(user.LastLoginAt),
 		})
 	}
 	return utils.RespondWithOK(c, "Users retrieved successfully", datas)
@@ -58,7 +61,19 @@ func (h *Handler) GetUserByID(c fiber.Ctx) error {
 	if err != nil {
 		return utils.RespondWithError(c, err.Code, err.Message)
 	}
-	return utils.RespondWithOK(c, "User retrieved successfully", user)
+	return utils.RespondWithOK(c, "User retrieved successfully", entities.User{
+		ID:     user.ID,
+		Name:   user.Name.String,
+		Email:  user.Email.String,
+		RoleID: user.RoleID,
+		UserRole: entities.Role{
+			ID:          user.ID_2,
+			Name:        user.Name_2.String,
+			Description: user.Description.String,
+		},
+		IsActive:    utils.BoolPtr(user.IsActive),
+		LastLoginAt: utils.TimePtr(user.LastLoginAt),
+	})
 }
 
 func (h *Handler) UpdateUser(c fiber.Ctx) error {

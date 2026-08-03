@@ -831,7 +831,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Division (Public) retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Division"
                     }
@@ -975,7 +987,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Division updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1024,7 +1048,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Division deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1095,7 +1131,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Upload Division Icon successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1150,7 +1198,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Members (Public) retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -1193,7 +1253,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member (Public) retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Member"
                     }
@@ -1250,7 +1322,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Members retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -1298,7 +1382,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1363,7 +1459,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Member"
                     }
@@ -1419,7 +1527,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1468,7 +1588,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1539,7 +1671,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Upload Member Photo successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1657,7 +1801,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "created"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Org Profile created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1742,7 +1898,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Upload Org Profile Logo successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -1929,7 +2097,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Org Profile retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/OrganizationProfile"
                     }
@@ -1974,7 +2155,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Org Profile updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2038,7 +2232,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Org Profile deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2090,7 +2296,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Categories retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -2138,7 +2357,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/BlogCategory"
                     }
@@ -2173,7 +2405,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2233,7 +2478,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2291,7 +2549,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2348,7 +2619,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tags retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -2396,7 +2680,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tag retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/BlogTag"
                     }
@@ -2431,7 +2728,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tag created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2491,7 +2801,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tag updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2549,7 +2872,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tag deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2606,7 +2942,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Posts retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -2654,7 +3003,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Post retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/BlogPost"
                     }
@@ -2689,7 +3051,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Post created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2749,7 +3124,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Post updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2807,7 +3195,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Post deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -2864,7 +3265,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Events retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -2912,7 +3326,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Event retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Event"
                     }
@@ -2947,7 +3374,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Event created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3007,7 +3447,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Event updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3065,7 +3518,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Event deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3139,7 +3605,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Galleries retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -3187,7 +3666,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gallery retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Gallery"
                     }
@@ -3222,7 +3714,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gallery created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3282,7 +3787,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gallery updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3340,7 +3858,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gallery deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3390,7 +3921,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Add Item successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3459,7 +4003,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Item deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3499,7 +4056,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3561,7 +4131,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Messages retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -3614,7 +4197,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/ContactMessage"
                     }
@@ -3662,7 +4258,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3712,7 +4321,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Mark Read successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3752,7 +4374,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Roles retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -3793,7 +4428,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Role created successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3853,7 +4501,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Role retrieved successfully"
+                    },
                     "data": {
                       "$ref": "#/components/schemas/Role"
                     }
@@ -3901,7 +4562,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Role updated successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -3959,7 +4633,20 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Role deleted successfully"
+                    },
                     "data": {
                       "type": "null"
                     }
@@ -4018,7 +4705,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -4208,7 +4895,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -4398,7 +5085,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -4588,7 +5275,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -4778,7 +5465,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -4968,7 +5655,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -5158,7 +5845,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -5348,7 +6035,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -5722,7 +6409,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gallery Categories retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -5765,7 +6464,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Divisions Of A Member retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -5811,7 +6522,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Members Of A Division retrieved successfully"
+                    },
                     "data": {
                       "type": "array",
                       "items": {
@@ -5864,7 +6587,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -5948,7 +6671,32 @@
         },
         "responses": {
           "200": {
-            "description": "Member division updated successfully"
+            "description": "Member Division updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member Division updated successfully"
+                    },
+                    "data": {
+                      "type": "null",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Validation error",
@@ -6002,7 +6750,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Member division deleted successfully"
+            "description": "Member Division deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Member Division deleted successfully"
+                    },
+                    "data": {
+                      "type": "null",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid ID"
@@ -6244,7 +7017,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "example": "success"
+                      "example": "created"
                     },
                     "message": {
                       "type": "string",
@@ -8166,6 +8939,25 @@
               "$ref": "#/components/schemas/BulkItemResult"
             }
           }
+        }
+      },
+      "APIResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {},
+          "error": {}
         }
       }
     },

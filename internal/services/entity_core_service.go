@@ -5,6 +5,7 @@ package services
 // supaya pemetaan field beserta pemeriksaan duplikat hanya ditulis sekali.
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/KMHTelU/KMH-WebProfile-API/internal/generated"
@@ -31,6 +32,7 @@ func (s *Service) createMember(req requests.CreateMemberRequest, c fiber.Ctx) (u
 		InstagramUrl: utils.NullString(req.InstagramUrl),
 		PeriodStart:  req.PeriodStart,
 		PeriodEnd:    req.PeriodEnd,
+		IsActive:     utils.NullBool(true),
 	}, c); err != nil {
 		return uuid.Nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create member")
 	}
@@ -38,26 +40,68 @@ func (s *Service) createMember(req requests.CreateMemberRequest, c fiber.Ctx) (u
 }
 
 func (s *Service) updateMember(id uuid.UUID, req requests.UpdateMemberRequest, c fiber.Ctx) *fiber.Error {
+	existing, err := s.Repository.GetMemberByID(id, c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "Member not found")
+	}
+
 	// NIM boleh tetap sama untuk anggota yang bersangkutan, tetapi tidak boleh
 	// menabrak NIM anggota lain.
 	if req.Nim != "" {
-		if existing, err := s.Repository.GetMemberByNIM(req.Nim, c); err == nil && existing.ID != id {
+		if other, err := s.Repository.GetMemberByNIM(req.Nim, c); err == nil && other.ID != id {
 			return fiber.NewError(fiber.StatusConflict,
 				fmt.Sprintf("NIM %s sudah dipakai anggota lain", req.Nim))
 		}
 	}
 
+	name := existing.Name
+	if req.Name != "" {
+		name = utils.NullString(req.Name)
+	}
+	nim := existing.Nim
+	if req.Nim != "" {
+		nim = utils.NullString(req.Nim)
+	}
+	email := existing.Email
+	if req.Email != "" {
+		email = utils.NullString(req.Email)
+	}
+	phone := existing.Phone
+	if req.Phone != "" {
+		phone = utils.NullString(req.Phone)
+	}
+	bio := existing.Bio
+	if req.Bio != "" {
+		bio = utils.NullString(req.Bio)
+	}
+	instagram := existing.InstagramUrl
+	if req.InstagramUrl != "" {
+		instagram = utils.NullString(req.InstagramUrl)
+	}
+	periodStart := existing.PeriodStart
+	if req.PeriodStart != 0 {
+		periodStart = req.PeriodStart
+	}
+	periodEnd := existing.PeriodEnd
+	if req.PeriodEnd != 0 {
+		periodEnd = req.PeriodEnd
+	}
+	isActive := existing.IsActive
+	if req.IsActive != nil {
+		isActive = sql.NullBool{Bool: *req.IsActive, Valid: true}
+	}
+
 	if err := s.Repository.UpdateMember(generated.UpdateMemberParams{
 		ID:           id,
-		Name:         utils.NullString(req.Name),
-		Nim:          utils.NullString(req.Nim),
-		Email:        utils.NullString(req.Email),
-		Phone:        utils.NullString(req.Phone),
-		Bio:          utils.NullString(req.Bio),
-		InstagramUrl: utils.NullString(req.InstagramUrl),
-		PeriodStart:  req.PeriodStart,
-		PeriodEnd:    req.PeriodEnd,
-		IsActive:     utils.NullBool(req.IsActive),
+		Name:         name,
+		Nim:          nim,
+		Email:        email,
+		Phone:        phone,
+		Bio:          bio,
+		InstagramUrl: instagram,
+		PeriodStart:  periodStart,
+		PeriodEnd:    periodEnd,
+		IsActive:     isActive,
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update member")
 	}
@@ -77,6 +121,7 @@ func (s *Service) createDivision(req requests.CreateDivisionRequest, c fiber.Ctx
 		Slug:          utils.NullString(req.Slug),
 		Description:   utils.NullString(req.Description),
 		CoordinatorID: utils.NullUUID(req.CoordinatorID),
+		IsActive:      utils.NullBool(true),
 	}, c); err != nil {
 		return uuid.Nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create division")
 	}
@@ -84,20 +129,46 @@ func (s *Service) createDivision(req requests.CreateDivisionRequest, c fiber.Ctx
 }
 
 func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionRequest, c fiber.Ctx) *fiber.Error {
+	existing, err := s.Repository.GetDivisionByID(id, c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "Division not found")
+	}
+
 	if req.Slug != "" {
-		if existing, err := s.Repository.GetDivisionBySlug(req.Slug, c); err == nil && existing.ID != id {
+		if other, err := s.Repository.GetDivisionBySlug(req.Slug, c); err == nil && other.ID != id {
 			return fiber.NewError(fiber.StatusConflict,
 				fmt.Sprintf("Slug divisi %s sudah dipakai divisi lain", req.Slug))
 		}
 	}
 
+	name := existing.Name
+	if req.Name != "" {
+		name = utils.NullString(req.Name)
+	}
+	slug := existing.Slug
+	if req.Slug != "" {
+		slug = utils.NullString(req.Slug)
+	}
+	description := existing.Description
+	if req.Description != "" {
+		description = utils.NullString(req.Description)
+	}
+	coordinatorID := existing.CoordinatorID
+	if req.CoordinatorID != uuid.Nil {
+		coordinatorID = utils.NullUUID(req.CoordinatorID)
+	}
+	isActive := existing.IsActive
+	if req.IsActive != nil {
+		isActive = sql.NullBool{Bool: *req.IsActive, Valid: true}
+	}
+
 	if err := s.Repository.UpdateDivision(generated.UpdateDivisionParams{
 		ID:            id,
-		Name:          utils.NullString(req.Name),
-		Slug:          utils.NullString(req.Slug),
-		Description:   utils.NullString(req.Description),
-		CoordinatorID: utils.NullUUID(req.CoordinatorID),
-		IsActive:      utils.NullBool(req.IsActive),
+		Name:          name,
+		Slug:          slug,
+		Description:   description,
+		CoordinatorID: coordinatorID,
+		IsActive:      isActive,
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update division")
 	}

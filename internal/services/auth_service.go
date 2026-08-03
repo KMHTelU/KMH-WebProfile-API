@@ -9,16 +9,25 @@ import (
 )
 
 func (s *Service) AuthenticateUserService(request requests.AuthenticateUserRequest, c fiber.Ctx) (entities.Auth, *fiber.Error) {
-	// Implementation for authenticating a user
 	user, err := s.Repository.GetUserByEmail(request.Email, c)
 	if err != nil {
 		log.Errorf("Error retrieving user by email: %v", err)
 		return entities.Auth{}, fiber.NewError(fiber.StatusBadRequest, "Invalid email or password")
 	}
 
+	if user.IsActive.Valid && !user.IsActive.Bool {
+		return entities.Auth{}, fiber.NewError(fiber.StatusBadRequest, "Invalid email or password")
+	}
+
 	if !utils.CheckPassword(user.PasswordHash.String, request.Password) {
 		log.Errorf("Invalid password for user: %v", user.ID)
 		return entities.Auth{}, fiber.NewError(fiber.StatusBadRequest, "Invalid email or password")
+	}
+
+	lastLoginAt, err := s.Repository.UpdateUserLastLogin(user.ID, c)
+	if err != nil {
+		log.Errorf("Error updating last_login_at for user %v: %v", user.ID, err)
+		return entities.Auth{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to complete login")
 	}
 
 	accessToken, refreshToken, expiresAt, err := utils.GenerateJWT(user.ID, s.TokenCleaner.AccessSecretKey, s.TokenCleaner.RefreshSecretKey)
@@ -36,8 +45,8 @@ func (s *Service) AuthenticateUserService(request requests.AuthenticateUserReque
 			Name:        user.Name_2.String,
 			Description: user.Description.String,
 		},
-		IsActive:    user.IsActive.Bool,
-		LastLoginAt: user.LastLoginAt.Time,
+		IsActive:    utils.BoolPtr(user.IsActive),
+		LastLoginAt: utils.TimePtr(lastLoginAt),
 	}
 
 	auth := entities.Auth{

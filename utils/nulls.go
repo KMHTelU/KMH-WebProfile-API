@@ -30,3 +30,21 @@ func NullInt32(value int32) sql.NullInt32 {
 func NullUUID(value uuid.UUID) uuid.NullUUID {
 	return uuid.NullUUID{UUID: value, Valid: value != uuid.Nil}
 }
+
+// BoolPtr dan TimePtr mengubah nilai nullable sqlc menjadi pointer agar NULL
+// di basis data menjadi null di JSON, bukan false / 0001-01-01.
+func BoolPtr(value sql.NullBool) *bool {
+	if !value.Valid {
+		return nil
+	}
+	v := value.Bool
+	return &v
+}
+
+func TimePtr(value sql.NullTime) *time.Time {
+	if !value.Valid {
+		return nil
+	}
+	v := value.Time
+	return &v
+}

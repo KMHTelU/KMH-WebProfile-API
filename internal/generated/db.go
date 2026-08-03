@@ -324,6 +324,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
 	}
+	if q.updateUserLastLoginStmt, err = db.PrepareContext(ctx, updateUserLastLogin); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserLastLogin: %w", err)
+	}
 	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
 	}
@@ -832,6 +835,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
 		}
 	}
+	if q.updateUserLastLoginStmt != nil {
+		if cerr := q.updateUserLastLoginStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserLastLoginStmt: %w", cerr)
+		}
+	}
 	if q.updateUserPasswordStmt != nil {
 		if cerr := q.updateUserPasswordStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateUserPasswordStmt: %w", cerr)
@@ -976,6 +984,7 @@ type Queries struct {
 	updateOrganizationProfileLogoStmt     *sql.Stmt
 	updateRoleStmt                        *sql.Stmt
 	updateUserStmt                        *sql.Stmt
+	updateUserLastLoginStmt               *sql.Stmt
 	updateUserPasswordStmt                *sql.Stmt
 }
 
@@ -1083,6 +1092,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateOrganizationProfileLogoStmt:     q.updateOrganizationProfileLogoStmt,
 		updateRoleStmt:                        q.updateRoleStmt,
 		updateUserStmt:                        q.updateUserStmt,
+		updateUserLastLoginStmt:               q.updateUserLastLoginStmt,
 		updateUserPasswordStmt:                q.updateUserPasswordStmt,
 	}
 }

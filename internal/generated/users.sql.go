@@ -259,6 +259,21 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	return i, err
 }
 
+const updateUserLastLogin = `-- name: UpdateUserLastLogin :one
+UPDATE users
+SET last_login_at = NOW(),
+    updated_at = NOW()
+WHERE users.id = $1
+RETURNING last_login_at
+`
+
+func (q *Queries) UpdateUserLastLogin(ctx context.Context, id uuid.UUID) (sql.NullTime, error) {
+	row := q.queryRow(ctx, q.updateUserLastLoginStmt, updateUserLastLogin, id)
+	var last_login_at sql.NullTime
+	err := row.Scan(&last_login_at)
+	return last_login_at, err
+}
+
 const updateUserPassword = `-- name: UpdateUserPassword :exec
 UPDATE users
 SET password_hash = $2,

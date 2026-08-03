@@ -85,24 +85,25 @@ func (r *BulkReport) AddRowFailure(index, row int, message string) {
 // seluruhnya berhasil memakai successStatus, sebagian berhasil memakai
 // 207 Multi-Status, dan seluruhnya gagal memakai 400.
 func RespondWithBulkReport(c fiber.Ctx, message string, report *BulkReport, successStatus int) error {
+	data := SanitizeForJSON(report)
 	switch {
 	case report.Failed == 0:
 		return c.Status(successStatus).JSON(APIResponse{
 			Status:  "success",
 			Message: message,
-			Data:    report,
+			Data:    data,
 		})
 	case report.Succeeded == 0:
 		return c.Status(fiber.StatusBadRequest).JSON(APIResponse{
 			Status:  "error",
 			Message: message + " (semua item gagal)",
-			Data:    report,
+			Data:    data,
 		})
 	default:
 		return c.Status(fiber.StatusMultiStatus).JSON(APIResponse{
 			Status:  "partial",
 			Message: message + " (sebagian item gagal)",
-			Data:    report,
+			Data:    data,
 		})
 	}
 }

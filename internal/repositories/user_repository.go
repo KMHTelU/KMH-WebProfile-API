@@ -55,3 +55,7 @@ func (r *Repository) GetUserByEmail(email string, c fiber.Ctx) (generated.GetUse
 	}
 	return user, nil
 }
+
+func (r *Repository) UpdateUserLastLogin(id uuid.UUID, c fiber.Ctx) (sql.NullTime, error) {
+	return r.Queries.UpdateUserLastLogin(c, id)
+}

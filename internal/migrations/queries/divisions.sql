@@ -1,6 +1,6 @@
 -- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, coordinator_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO divisions (id, name, slug, description, coordinator_id, is_active)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 
 -- name: UpdateDivision :one
