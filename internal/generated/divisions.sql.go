@@ -228,8 +228,8 @@ func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (D
 }
 
 const insertDivision = `-- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, description, coordinator_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO divisions (id, name, slug, description, coordinator_id, is_active)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id, name, slug, description, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
@@ -239,6 +239,7 @@ type InsertDivisionParams struct {
 	Slug          sql.NullString `json:"slug"`
 	Description   sql.NullString `json:"description"`
 	CoordinatorID uuid.NullUUID  `json:"coordinator_id"`
+	IsActive      sql.NullBool   `json:"is_active"`
 }
 
 func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) (Division, error) {
@@ -248,6 +249,7 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		arg.Slug,
 		arg.Description,
 		arg.CoordinatorID,
+		arg.IsActive,
 	)
 	var i Division
 	err := row.Scan(

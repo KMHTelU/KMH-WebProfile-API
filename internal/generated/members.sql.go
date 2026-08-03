@@ -200,8 +200,8 @@ func (q *Queries) GetMemberByNIM(ctx context.Context, nim sql.NullString) (Membe
 }
 
 const insertMember = `-- name: InsertMember :one
-INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, period_start, period_end)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, period_start, period_end, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
 `
 
@@ -215,6 +215,7 @@ type InsertMemberParams struct {
 	InstagramUrl sql.NullString `json:"instagram_url"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
+	IsActive     sql.NullBool   `json:"is_active"`
 }
 
 func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Member, error) {
@@ -228,6 +229,7 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 		arg.InstagramUrl,
 		arg.PeriodStart,
 		arg.PeriodEnd,
+		arg.IsActive,
 	)
 	var i Member
 	err := row.Scan(

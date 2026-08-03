@@ -14,5 +14,5 @@ type UpdateDivisionRequest struct {
 	Slug          string    `json:"slug" validate:"omitempty"`
 	Description   string    `json:"description" validate:"omitempty"`
 	CoordinatorID uuid.UUID `json:"coordinator_id" validate:"omitempty,uuid4"`
-	IsActive      bool      `json:"is_active" validate:"omitempty"`
+	IsActive      *bool     `json:"is_active" validate:"omitempty"`
 }

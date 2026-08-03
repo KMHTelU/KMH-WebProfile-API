@@ -40,6 +40,13 @@ SET password_hash = $2,
     updated_at = NOW()
 WHERE users.id = $1;
 
+-- name: UpdateUserLastLogin :one
+UPDATE users
+SET last_login_at = NOW(),
+    updated_at = NOW()
+WHERE users.id = $1
+RETURNING last_login_at;
+
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE users.id = $1;

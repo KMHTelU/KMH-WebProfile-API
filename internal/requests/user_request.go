@@ -10,9 +10,10 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	Name     string    `json:"name" validate:"omitempty"`
-	Email    string    `json:"email" validate:"omitempty,email"`
-	Password string    `json:"password" validate:"omitempty,min=8"`
-	IsActive bool      `json:"is_active" validate:"omitempty"`
-	RoleID   uuid.UUID `json:"role_id" validate:"omitempty"`
+	Name     string     `json:"name" validate:"omitempty"`
+	Email    string     `json:"email" validate:"omitempty,email"`
+	Password string     `json:"password" validate:"omitempty,min=8"`
+	// Pointer agar false yang dikirim sengaja berbeda dari field yang dihilangkan.
+	IsActive *bool      `json:"is_active" validate:"omitempty"`
+	RoleID   uuid.UUID  `json:"role_id" validate:"omitempty"`
 }

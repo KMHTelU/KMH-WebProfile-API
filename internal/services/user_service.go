@@ -16,17 +16,20 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
 
-	newId := uuid.New()
+	newID := uuid.New()
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
 	}
-	var params generated.CreateUserParams = generated.CreateUserParams{
-		ID:           newId,
-		Name:         sql.NullString{String: req.Name, Valid: true},
-		Email:        sql.NullString{String: req.Email, Valid: true},
-		PasswordHash: sql.NullString{String: hashedPassword, Valid: true},
+
+	params := generated.CreateUserParams{
+		ID:           newID,
+		Name:         utils.NullString(req.Name),
+		Email:        utils.NullString(req.Email),
+		PasswordHash: utils.NullString(hashedPassword),
 		RoleID:       req.RoleID,
+		// User baru dianggap aktif; tanpa ini kolom is_active tetap NULL.
+		IsActive: utils.NullBool(true),
 	}
 
 	if err := s.Repository.InsertUser(params, c); err != nil {
@@ -34,12 +37,12 @@ func (s *Service) CreateUserService(req requests.CreateUserRequest, c fiber.Ctx)
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Create User", Valid: true},
-		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: newId, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Create User"),
+		Entity:    utils.NullString("User with RoleID: " + req.RoleID.String()),
+		EntityID:  utils.NullUUID(newID),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -51,11 +54,10 @@ func (s *Service) GetAllUsersService(limit, offset int32, c fiber.Ctx) ([]genera
 	if err != nil || claim == nil {
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
-	userParam := generated.GetUsersParams{
+	users, err := s.Repository.GetAllUsers(generated.GetUsersParams{
 		Limit:  limit,
 		Offset: offset,
-	}
-	users, err := s.Repository.GetAllUsers(userParam, c)
+	}, c)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to get users")
 	}
@@ -79,28 +81,55 @@ func (s *Service) UpdateUserService(id uuid.UUID, req requests.UpdateUserRequest
 	if err != nil || claim == nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
-	hashedPassword, err := utils.HashPassword(req.Password)
+
+	existing, err := s.Repository.GetUserByID(id, c)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
+		return fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
-	var params generated.UpdateUserParams = generated.UpdateUserParams{
+
+	params := generated.UpdateUserParams{
 		ID:           id,
-		Name:         sql.NullString{String: req.Name, Valid: true},
-		Email:        sql.NullString{String: req.Email, Valid: true},
-		PasswordHash: sql.NullString{String: hashedPassword, Valid: true},
-		RoleID:       req.RoleID,
+		Name:         existing.Name,
+		Email:        existing.Email,
+		PasswordHash: existing.PasswordHash,
+		RoleID:       existing.RoleID,
+		IsActive:     existing.IsActive,
+		// last_login_at tidak boleh direset saat update profil.
+		LastLoginAt: existing.LastLoginAt,
 	}
+
+	if req.Name != "" {
+		params.Name = utils.NullString(req.Name)
+	}
+	if req.Email != "" {
+		params.Email = utils.NullString(req.Email)
+	}
+	if req.RoleID != uuid.Nil {
+		params.RoleID = req.RoleID
+	}
+	if req.IsActive != nil {
+		params.IsActive = sql.NullBool{Bool: *req.IsActive, Valid: true}
+	}
+
+	if req.Password != "" {
+		hashedPassword, err := utils.HashPassword(req.Password)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
+		}
+		params.PasswordHash = utils.NullString(hashedPassword)
+	}
+
 	if err := s.Repository.UpdateUser(params, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update user")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Update User", Valid: true},
-		Entity:    sql.NullString{String: "User with RoleID: " + req.RoleID.String(), Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Update User"),
+		Entity:    utils.NullString("User with RoleID: " + params.RoleID.String()),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
@@ -117,12 +146,12 @@ func (s *Service) DeleteUserService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
-		UserID:    uuid.NullUUID{UUID: claim.UserID, Valid: true},
-		Action:    sql.NullString{String: "Delete User", Valid: true},
-		Entity:    sql.NullString{String: "User", Valid: true},
-		EntityID:  uuid.NullUUID{UUID: id, Valid: true},
-		IpAddress: sql.NullString{String: c.IP(), Valid: true},
-		UserAgent: sql.NullString{String: c.UserAgent(), Valid: true},
+		UserID:    utils.NullUUID(claim.UserID),
+		Action:    utils.NullString("Delete User"),
+		Entity:    utils.NullString("User"),
+		EntityID:  utils.NullUUID(id),
+		IpAddress: utils.NullString(c.IP()),
+		UserAgent: utils.NullString(c.UserAgent()),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create log")
 	}
