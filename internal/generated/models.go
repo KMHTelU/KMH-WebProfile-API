@@ -116,6 +116,58 @@ type GalleryItem struct {
 	SortOrder sql.NullInt32 `json:"sort_order"`
 }
 
+type HofAchievement struct {
+	ID           uuid.UUID    `json:"id"`
+	PersonID     uuid.UUID    `json:"person_id"`
+	Title        string       `json:"title"`
+	Category     string       `json:"category"`
+	Year         int32        `json:"year"`
+	Organization string       `json:"organization"`
+	Result       string       `json:"result"`
+	Description  string       `json:"description"`
+	CreatedAt    sql.NullTime `json:"created_at"`
+	UpdatedAt    sql.NullTime `json:"updated_at"`
+}
+
+type HofGeneration struct {
+	ID          uuid.UUID       `json:"id"`
+	Name        string          `json:"name"`
+	YearStart   int32           `json:"year_start"`
+	YearEnd     int32           `json:"year_end"`
+	Description string          `json:"description"`
+	Milestones  json.RawMessage `json:"milestones"`
+	Accent      string          `json:"accent"`
+	SortOrder   int32           `json:"sort_order"`
+	CreatedAt   sql.NullTime    `json:"created_at"`
+	UpdatedAt   sql.NullTime    `json:"updated_at"`
+}
+
+type HofPerson struct {
+	ID            uuid.UUID       `json:"id"`
+	GenerationID  uuid.UUID       `json:"generation_id"`
+	Name          string          `json:"name"`
+	Role          string          `json:"role"`
+	StudyProgram  string          `json:"study_program"`
+	Biography     string          `json:"biography"`
+	Contributions string          `json:"contributions"`
+	Legacy        string          `json:"legacy"`
+	Quote         string          `json:"quote"`
+	Fields        json.RawMessage `json:"fields"`
+	PhotoMediaID  uuid.NullUUID   `json:"photo_media_id"`
+	SortOrder     int32           `json:"sort_order"`
+	CreatedAt     sql.NullTime    `json:"created_at"`
+	UpdatedAt     sql.NullTime    `json:"updated_at"`
+}
+
+type HofTimelineEvent struct {
+	ID          uuid.UUID    `json:"id"`
+	YearLabel   string       `json:"year_label"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	SortOrder   int32        `json:"sort_order"`
+	CreatedAt   sql.NullTime `json:"created_at"`
+}
+
 type HomepageBanner struct {
 	ID        uuid.UUID      `json:"id"`
 	Title     sql.NullString `json:"title"`
