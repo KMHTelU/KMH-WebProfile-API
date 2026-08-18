@@ -22,6 +22,16 @@ func (q *Queries) DeleteGalleryItem(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const deleteGalleryItemsByGalleryID = `-- name: DeleteGalleryItemsByGalleryID :exec
+DELETE FROM gallery_items
+WHERE gallery_id = $1
+`
+
+func (q *Queries) DeleteGalleryItemsByGalleryID(ctx context.Context, galleryID uuid.NullUUID) error {
+	_, err := q.exec(ctx, q.deleteGalleryItemsByGalleryIDStmt, deleteGalleryItemsByGalleryID, galleryID)
+	return err
+}
+
 const getGalleryItemByID = `-- name: GetGalleryItemByID :one
 SELECT id, gallery_id, media_id, sort_order
 FROM gallery_items

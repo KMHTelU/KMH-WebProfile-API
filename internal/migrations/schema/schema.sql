@@ -95,10 +95,12 @@ CREATE TABLE IF NOT EXISTS events (
   cover_media_id    UUID,
   status            VARCHAR(30), -- upcoming | ongoing | finished
   is_published      BOOLEAN DEFAULT false,
+  division_id       UUID, -- divisi penyelenggara/penanggung jawab event
   created_by        UUID,
   created_at        TIMESTAMPTZ DEFAULT NOW(),
   updated_at        TIMESTAMPTZ DEFAULT NOW(),
   FOREIGN KEY (cover_media_id) REFERENCES media(id),
+  FOREIGN KEY (division_id) REFERENCES divisions(id),
   FOREIGN KEY (created_by) REFERENCES users(id)
 );
 

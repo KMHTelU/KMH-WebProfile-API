@@ -32,3 +32,7 @@ ORDER BY sort_order ASC;
 -- name: DeleteGalleryItem :exec
 DELETE FROM gallery_items
 WHERE id = $1;
+
+-- name: DeleteGalleryItemsByGalleryID :exec
+DELETE FROM gallery_items
+WHERE gallery_id = $1;

@@ -104,17 +104,19 @@ func (s *Service) DeleteHomepageBannerService(id uuid.UUID, c fiber.Ctx) *fiber.
 		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
 
-	rows, err := s.Repository.GetHomepageBanners(generated.SelectAllHomepageBannersParams{
-		Limit:  1,
-		Offset: 0,
-	}, c)
+	banner, err := s.Repository.GetHomepageBannerByID(id, c)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to retrieve homepage banners")
+		return fiber.NewError(fiber.StatusNotFound, "Homepage banner not found")
 	}
 
-	row := rows[0]
-	if row.MediaID.Valid {
-		if err := s.DeleteMediaService(row.MediaID.UUID, c); err != nil {
+	// Banner harus dihapus lebih dulu sebelum media-nya karena homepage_banners
+	// punya foreign key ke media; urutan sebaliknya akan melanggar constraint.
+	if err := s.Repository.DeleteHomepageBanner(id, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete homepage banner")
+	}
+
+	if banner.MediaID.Valid {
+		if err := s.DeleteMediaService(banner.MediaID.UUID, c); err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete associated media")
 		}
 	}

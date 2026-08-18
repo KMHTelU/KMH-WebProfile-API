@@ -94,6 +94,7 @@ type Event struct {
 	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
 	Status          sql.NullString `json:"status"`
 	IsPublished     sql.NullBool   `json:"is_published"`
+	DivisionID      uuid.NullUUID  `json:"division_id"`
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 	CreatedAt       sql.NullTime   `json:"created_at"`
 	UpdatedAt       sql.NullTime   `json:"updated_at"`
