@@ -28,6 +28,11 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	api.Get("/organization-profile/:id", func(c fiber.Ctx) error {
 		return r.Handler.GetOrganizationProfileHandler(c)
 	})
+	// Struktur organisasi (divisi + koordinator + pengurus inti) untuk
+	// komponen organization tree di halaman publik.
+	api.Get("/organization-tree", func(c fiber.Ctx) error {
+		return r.Handler.GetOrganizationTreeHandler(c)
+	})
 	api.Get("/blog-categories", func(c fiber.Ctx) error {
 		return r.Handler.GetPaginatedBlogCategoriesHandler(c)
 	})

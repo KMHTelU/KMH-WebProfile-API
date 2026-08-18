@@ -279,6 +279,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.selectGalleryItemsByGalleryIDStmt, err = db.PrepareContext(ctx, selectGalleryItemsByGalleryID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectGalleryItemsByGalleryID: %w", err)
 	}
+	if q.selectOrgTreeAssignmentsStmt, err = db.PrepareContext(ctx, selectOrgTreeAssignments); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectOrgTreeAssignments: %w", err)
+	}
+	if q.selectOrgTreeDivisionsStmt, err = db.PrepareContext(ctx, selectOrgTreeDivisions); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectOrgTreeDivisions: %w", err)
+	}
 	if q.updateBlogCategoryStmt, err = db.PrepareContext(ctx, updateBlogCategory); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateBlogCategory: %w", err)
 	}
@@ -763,6 +769,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing selectGalleryItemsByGalleryIDStmt: %w", cerr)
 		}
 	}
+	if q.selectOrgTreeAssignmentsStmt != nil {
+		if cerr := q.selectOrgTreeAssignmentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectOrgTreeAssignmentsStmt: %w", cerr)
+		}
+	}
+	if q.selectOrgTreeDivisionsStmt != nil {
+		if cerr := q.selectOrgTreeDivisionsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectOrgTreeDivisionsStmt: %w", cerr)
+		}
+	}
 	if q.updateBlogCategoryStmt != nil {
 		if cerr := q.updateBlogCategoryStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateBlogCategoryStmt: %w", cerr)
@@ -977,6 +993,8 @@ type Queries struct {
 	selectGalleryByIDStmt                 *sql.Stmt
 	selectGalleryCategoriesStmt           *sql.Stmt
 	selectGalleryItemsByGalleryIDStmt     *sql.Stmt
+	selectOrgTreeAssignmentsStmt          *sql.Stmt
+	selectOrgTreeDivisionsStmt            *sql.Stmt
 	updateBlogCategoryStmt                *sql.Stmt
 	updateBlogPostStmt                    *sql.Stmt
 	updateBlogTagStmt                     *sql.Stmt
@@ -1086,6 +1104,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		selectGalleryByIDStmt:                 q.selectGalleryByIDStmt,
 		selectGalleryCategoriesStmt:           q.selectGalleryCategoriesStmt,
 		selectGalleryItemsByGalleryIDStmt:     q.selectGalleryItemsByGalleryIDStmt,
+		selectOrgTreeAssignmentsStmt:          q.selectOrgTreeAssignmentsStmt,
+		selectOrgTreeDivisionsStmt:            q.selectOrgTreeDivisionsStmt,
 		updateBlogCategoryStmt:                q.updateBlogCategoryStmt,
 		updateBlogPostStmt:                    q.updateBlogPostStmt,
 		updateBlogTagStmt:                     q.updateBlogTagStmt,
