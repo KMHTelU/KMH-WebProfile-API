@@ -33,6 +33,10 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	api.Get("/organization-tree", func(c fiber.Ctx) error {
 		return r.Handler.GetOrganizationTreeHandler(c)
 	})
+	// Arsip Hall of Fame lengkap untuk museum 3D (satu request).
+	api.Get("/hall-of-fame", func(c fiber.Ctx) error {
+		return r.Handler.GetHallOfFameHandler(c)
+	})
 	api.Get("/blog-categories", func(c fiber.Ctx) error {
 		return r.Handler.GetPaginatedBlogCategoriesHandler(c)
 	})
@@ -351,6 +355,45 @@ func (r *Routes) SetupRoutes(app *fiber.App) {
 	})
 	role.Delete("/:id", func(c fiber.Ctx) error {
 		return r.Handler.DeleteRoleHandler(c)
+	})
+
+	// CRUD arsip Hall of Fame (admin).
+	hof := protected.Group("/hall-of-fame")
+	hof.Post("/generations", func(c fiber.Ctx) error {
+		return r.Handler.CreateHofGenerationHandler(c)
+	})
+	hof.Put("/generations/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateHofGenerationHandler(c)
+	})
+	hof.Delete("/generations/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteHofGenerationHandler(c)
+	})
+	hof.Post("/people", func(c fiber.Ctx) error {
+		return r.Handler.CreateHofPersonHandler(c)
+	})
+	hof.Put("/people/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateHofPersonHandler(c)
+	})
+	hof.Delete("/people/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteHofPersonHandler(c)
+	})
+	hof.Post("/achievements", func(c fiber.Ctx) error {
+		return r.Handler.CreateHofAchievementHandler(c)
+	})
+	hof.Put("/achievements/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateHofAchievementHandler(c)
+	})
+	hof.Delete("/achievements/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteHofAchievementHandler(c)
+	})
+	hof.Post("/timeline", func(c fiber.Ctx) error {
+		return r.Handler.CreateHofTimelineEventHandler(c)
+	})
+	hof.Put("/timeline/:id", func(c fiber.Ctx) error {
+		return r.Handler.UpdateHofTimelineEventHandler(c)
+	})
+	hof.Delete("/timeline/:id", func(c fiber.Ctx) error {
+		return r.Handler.DeleteHofTimelineEventHandler(c)
 	})
 
 	// Import berkas Excel/CSV. Nilai :entity yang didukung adalah members,

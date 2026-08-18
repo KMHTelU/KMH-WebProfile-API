@@ -72,6 +72,18 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteGalleryItemsByGalleryIDStmt, err = db.PrepareContext(ctx, deleteGalleryItemsByGalleryID); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteGalleryItemsByGalleryID: %w", err)
 	}
+	if q.deleteHofAchievementStmt, err = db.PrepareContext(ctx, deleteHofAchievement); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteHofAchievement: %w", err)
+	}
+	if q.deleteHofGenerationStmt, err = db.PrepareContext(ctx, deleteHofGeneration); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteHofGeneration: %w", err)
+	}
+	if q.deleteHofPersonStmt, err = db.PrepareContext(ctx, deleteHofPerson); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteHofPerson: %w", err)
+	}
+	if q.deleteHofTimelineEventStmt, err = db.PrepareContext(ctx, deleteHofTimelineEvent); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteHofTimelineEvent: %w", err)
+	}
 	if q.deleteHomepageBannerStmt, err = db.PrepareContext(ctx, deleteHomepageBanner); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteHomepageBanner: %w", err)
 	}
@@ -192,6 +204,18 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.insertGalleryItemStmt, err = db.PrepareContext(ctx, insertGalleryItem); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertGalleryItem: %w", err)
 	}
+	if q.insertHofAchievementStmt, err = db.PrepareContext(ctx, insertHofAchievement); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertHofAchievement: %w", err)
+	}
+	if q.insertHofGenerationStmt, err = db.PrepareContext(ctx, insertHofGeneration); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertHofGeneration: %w", err)
+	}
+	if q.insertHofPersonStmt, err = db.PrepareContext(ctx, insertHofPerson); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertHofPerson: %w", err)
+	}
+	if q.insertHofTimelineEventStmt, err = db.PrepareContext(ctx, insertHofTimelineEvent); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertHofTimelineEvent: %w", err)
+	}
 	if q.insertHomepageBannerStmt, err = db.PrepareContext(ctx, insertHomepageBanner); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertHomepageBanner: %w", err)
 	}
@@ -279,6 +303,18 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.selectGalleryItemsByGalleryIDStmt, err = db.PrepareContext(ctx, selectGalleryItemsByGalleryID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectGalleryItemsByGalleryID: %w", err)
 	}
+	if q.selectHofAchievementsStmt, err = db.PrepareContext(ctx, selectHofAchievements); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectHofAchievements: %w", err)
+	}
+	if q.selectHofGenerationsStmt, err = db.PrepareContext(ctx, selectHofGenerations); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectHofGenerations: %w", err)
+	}
+	if q.selectHofPeopleStmt, err = db.PrepareContext(ctx, selectHofPeople); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectHofPeople: %w", err)
+	}
+	if q.selectHofTimelineEventsStmt, err = db.PrepareContext(ctx, selectHofTimelineEvents); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectHofTimelineEvents: %w", err)
+	}
 	if q.selectOrgTreeAssignmentsStmt, err = db.PrepareContext(ctx, selectOrgTreeAssignments); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectOrgTreeAssignments: %w", err)
 	}
@@ -308,6 +344,18 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateGalleryItemStmt, err = db.PrepareContext(ctx, updateGalleryItem); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateGalleryItem: %w", err)
+	}
+	if q.updateHofAchievementStmt, err = db.PrepareContext(ctx, updateHofAchievement); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateHofAchievement: %w", err)
+	}
+	if q.updateHofGenerationStmt, err = db.PrepareContext(ctx, updateHofGeneration); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateHofGeneration: %w", err)
+	}
+	if q.updateHofPersonStmt, err = db.PrepareContext(ctx, updateHofPerson); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateHofPerson: %w", err)
+	}
+	if q.updateHofTimelineEventStmt, err = db.PrepareContext(ctx, updateHofTimelineEvent); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateHofTimelineEvent: %w", err)
 	}
 	if q.updateHomepageBannerStmt, err = db.PrepareContext(ctx, updateHomepageBanner); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateHomepageBanner: %w", err)
@@ -422,6 +470,26 @@ func (q *Queries) Close() error {
 	if q.deleteGalleryItemsByGalleryIDStmt != nil {
 		if cerr := q.deleteGalleryItemsByGalleryIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteGalleryItemsByGalleryIDStmt: %w", cerr)
+		}
+	}
+	if q.deleteHofAchievementStmt != nil {
+		if cerr := q.deleteHofAchievementStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteHofAchievementStmt: %w", cerr)
+		}
+	}
+	if q.deleteHofGenerationStmt != nil {
+		if cerr := q.deleteHofGenerationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteHofGenerationStmt: %w", cerr)
+		}
+	}
+	if q.deleteHofPersonStmt != nil {
+		if cerr := q.deleteHofPersonStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteHofPersonStmt: %w", cerr)
+		}
+	}
+	if q.deleteHofTimelineEventStmt != nil {
+		if cerr := q.deleteHofTimelineEventStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteHofTimelineEventStmt: %w", cerr)
 		}
 	}
 	if q.deleteHomepageBannerStmt != nil {
@@ -624,6 +692,26 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing insertGalleryItemStmt: %w", cerr)
 		}
 	}
+	if q.insertHofAchievementStmt != nil {
+		if cerr := q.insertHofAchievementStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertHofAchievementStmt: %w", cerr)
+		}
+	}
+	if q.insertHofGenerationStmt != nil {
+		if cerr := q.insertHofGenerationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertHofGenerationStmt: %w", cerr)
+		}
+	}
+	if q.insertHofPersonStmt != nil {
+		if cerr := q.insertHofPersonStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertHofPersonStmt: %w", cerr)
+		}
+	}
+	if q.insertHofTimelineEventStmt != nil {
+		if cerr := q.insertHofTimelineEventStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertHofTimelineEventStmt: %w", cerr)
+		}
+	}
 	if q.insertHomepageBannerStmt != nil {
 		if cerr := q.insertHomepageBannerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertHomepageBannerStmt: %w", cerr)
@@ -769,6 +857,26 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing selectGalleryItemsByGalleryIDStmt: %w", cerr)
 		}
 	}
+	if q.selectHofAchievementsStmt != nil {
+		if cerr := q.selectHofAchievementsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectHofAchievementsStmt: %w", cerr)
+		}
+	}
+	if q.selectHofGenerationsStmt != nil {
+		if cerr := q.selectHofGenerationsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectHofGenerationsStmt: %w", cerr)
+		}
+	}
+	if q.selectHofPeopleStmt != nil {
+		if cerr := q.selectHofPeopleStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectHofPeopleStmt: %w", cerr)
+		}
+	}
+	if q.selectHofTimelineEventsStmt != nil {
+		if cerr := q.selectHofTimelineEventsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectHofTimelineEventsStmt: %w", cerr)
+		}
+	}
 	if q.selectOrgTreeAssignmentsStmt != nil {
 		if cerr := q.selectOrgTreeAssignmentsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing selectOrgTreeAssignmentsStmt: %w", cerr)
@@ -817,6 +925,26 @@ func (q *Queries) Close() error {
 	if q.updateGalleryItemStmt != nil {
 		if cerr := q.updateGalleryItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateGalleryItemStmt: %w", cerr)
+		}
+	}
+	if q.updateHofAchievementStmt != nil {
+		if cerr := q.updateHofAchievementStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateHofAchievementStmt: %w", cerr)
+		}
+	}
+	if q.updateHofGenerationStmt != nil {
+		if cerr := q.updateHofGenerationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateHofGenerationStmt: %w", cerr)
+		}
+	}
+	if q.updateHofPersonStmt != nil {
+		if cerr := q.updateHofPersonStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateHofPersonStmt: %w", cerr)
+		}
+	}
+	if q.updateHofTimelineEventStmt != nil {
+		if cerr := q.updateHofTimelineEventStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateHofTimelineEventStmt: %w", cerr)
 		}
 	}
 	if q.updateHomepageBannerStmt != nil {
@@ -924,6 +1052,10 @@ type Queries struct {
 	deleteGalleryStmt                     *sql.Stmt
 	deleteGalleryItemStmt                 *sql.Stmt
 	deleteGalleryItemsByGalleryIDStmt     *sql.Stmt
+	deleteHofAchievementStmt              *sql.Stmt
+	deleteHofGenerationStmt               *sql.Stmt
+	deleteHofPersonStmt                   *sql.Stmt
+	deleteHofTimelineEventStmt            *sql.Stmt
 	deleteHomepageBannerStmt              *sql.Stmt
 	deleteMediaStmt                       *sql.Stmt
 	deleteMemberStmt                      *sql.Stmt
@@ -964,6 +1096,10 @@ type Queries struct {
 	insertEventStmt                       *sql.Stmt
 	insertGalleryStmt                     *sql.Stmt
 	insertGalleryItemStmt                 *sql.Stmt
+	insertHofAchievementStmt              *sql.Stmt
+	insertHofGenerationStmt               *sql.Stmt
+	insertHofPersonStmt                   *sql.Stmt
+	insertHofTimelineEventStmt            *sql.Stmt
 	insertHomepageBannerStmt              *sql.Stmt
 	insertMediaStmt                       *sql.Stmt
 	insertMemberStmt                      *sql.Stmt
@@ -993,6 +1129,10 @@ type Queries struct {
 	selectGalleryByIDStmt                 *sql.Stmt
 	selectGalleryCategoriesStmt           *sql.Stmt
 	selectGalleryItemsByGalleryIDStmt     *sql.Stmt
+	selectHofAchievementsStmt             *sql.Stmt
+	selectHofGenerationsStmt              *sql.Stmt
+	selectHofPeopleStmt                   *sql.Stmt
+	selectHofTimelineEventsStmt           *sql.Stmt
 	selectOrgTreeAssignmentsStmt          *sql.Stmt
 	selectOrgTreeDivisionsStmt            *sql.Stmt
 	updateBlogCategoryStmt                *sql.Stmt
@@ -1003,6 +1143,10 @@ type Queries struct {
 	updateEventStmt                       *sql.Stmt
 	updateGalleryStmt                     *sql.Stmt
 	updateGalleryItemStmt                 *sql.Stmt
+	updateHofAchievementStmt              *sql.Stmt
+	updateHofGenerationStmt               *sql.Stmt
+	updateHofPersonStmt                   *sql.Stmt
+	updateHofTimelineEventStmt            *sql.Stmt
 	updateHomepageBannerStmt              *sql.Stmt
 	updateMemberStmt                      *sql.Stmt
 	updateMemberDivisionStmt              *sql.Stmt
@@ -1035,6 +1179,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteGalleryStmt:                     q.deleteGalleryStmt,
 		deleteGalleryItemStmt:                 q.deleteGalleryItemStmt,
 		deleteGalleryItemsByGalleryIDStmt:     q.deleteGalleryItemsByGalleryIDStmt,
+		deleteHofAchievementStmt:              q.deleteHofAchievementStmt,
+		deleteHofGenerationStmt:               q.deleteHofGenerationStmt,
+		deleteHofPersonStmt:                   q.deleteHofPersonStmt,
+		deleteHofTimelineEventStmt:            q.deleteHofTimelineEventStmt,
 		deleteHomepageBannerStmt:              q.deleteHomepageBannerStmt,
 		deleteMediaStmt:                       q.deleteMediaStmt,
 		deleteMemberStmt:                      q.deleteMemberStmt,
@@ -1075,6 +1223,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		insertEventStmt:                       q.insertEventStmt,
 		insertGalleryStmt:                     q.insertGalleryStmt,
 		insertGalleryItemStmt:                 q.insertGalleryItemStmt,
+		insertHofAchievementStmt:              q.insertHofAchievementStmt,
+		insertHofGenerationStmt:               q.insertHofGenerationStmt,
+		insertHofPersonStmt:                   q.insertHofPersonStmt,
+		insertHofTimelineEventStmt:            q.insertHofTimelineEventStmt,
 		insertHomepageBannerStmt:              q.insertHomepageBannerStmt,
 		insertMediaStmt:                       q.insertMediaStmt,
 		insertMemberStmt:                      q.insertMemberStmt,
@@ -1104,6 +1256,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		selectGalleryByIDStmt:                 q.selectGalleryByIDStmt,
 		selectGalleryCategoriesStmt:           q.selectGalleryCategoriesStmt,
 		selectGalleryItemsByGalleryIDStmt:     q.selectGalleryItemsByGalleryIDStmt,
+		selectHofAchievementsStmt:             q.selectHofAchievementsStmt,
+		selectHofGenerationsStmt:              q.selectHofGenerationsStmt,
+		selectHofPeopleStmt:                   q.selectHofPeopleStmt,
+		selectHofTimelineEventsStmt:           q.selectHofTimelineEventsStmt,
 		selectOrgTreeAssignmentsStmt:          q.selectOrgTreeAssignmentsStmt,
 		selectOrgTreeDivisionsStmt:            q.selectOrgTreeDivisionsStmt,
 		updateBlogCategoryStmt:                q.updateBlogCategoryStmt,
@@ -1114,6 +1270,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateEventStmt:                       q.updateEventStmt,
 		updateGalleryStmt:                     q.updateGalleryStmt,
 		updateGalleryItemStmt:                 q.updateGalleryItemStmt,
+		updateHofAchievementStmt:              q.updateHofAchievementStmt,
+		updateHofGenerationStmt:               q.updateHofGenerationStmt,
+		updateHofPersonStmt:                   q.updateHofPersonStmt,
+		updateHofTimelineEventStmt:            q.updateHofTimelineEventStmt,
 		updateHomepageBannerStmt:              q.updateHomepageBannerStmt,
 		updateMemberStmt:                      q.updateMemberStmt,
 		updateMemberDivisionStmt:              q.updateMemberDivisionStmt,
