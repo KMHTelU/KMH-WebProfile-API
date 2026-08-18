@@ -27,6 +27,7 @@ SELECT
   member_divisions.created_at,
   divisions.id   AS division_id,
   divisions.slug AS division_slug,
+  divisions.name AS division_name,
   members.id     AS member_id,
   members.name   AS member_name,
   members.nim    AS member_nim,
