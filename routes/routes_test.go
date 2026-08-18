@@ -83,6 +83,7 @@ func TestNewRoutesAreRegistered(t *testing.T) {
 			"/api/galleries/categories",
 			"/api/members/:id/divisions",
 			"/api/divisions/:id/members",
+			"/api/organization-tree",
 			"/api/protected/import/:entity/template",
 		},
 		fiber.MethodPost: {
