@@ -11,14 +11,32 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-// Divisi dengan slug berikut dianggap "pengurus inti" (BPH): anggotanya mengisi
-// bagian atas tree (Ketua, Wakil, Sekretaris, Bendahara) dan divisinya sendiri
-// tidak ditampilkan sebagai kotak divisi.
-var orgTreeCoreSlugs = map[string]bool{
-	"inti":            true,
-	"pengurus-inti":   true,
-	"bph":             true,
-	"pengurus-harian": true,
+// isCoreDivision menentukan apakah sebuah divisi adalah "pengurus inti" (BPH):
+// anggotanya mengisi bagian atas tree (Ketua, Wakil, Sekretaris, Bendahara)
+// dan divisinya sendiri tidak ditampilkan sebagai kotak divisi.
+//
+// Deteksinya toleran: cocok pada SLUG maupun NAMA, dengan tanda hubung/garis
+// bawah dinormalisasi jadi spasi — jadi "Pengurus Inti", "pengurus_inti",
+// "BPH", "Badan Pengurus Harian", maupun "inti" semuanya dikenali.
+func isCoreDivision(slug, name string) bool {
+	normalize := func(v string) string {
+		v = strings.ToLower(strings.TrimSpace(v))
+		v = strings.ReplaceAll(v, "-", " ")
+		v = strings.ReplaceAll(v, "_", " ")
+		return strings.Join(strings.Fields(v), " ")
+	}
+	s := normalize(slug)
+	n := normalize(name)
+
+	if s == "inti" || n == "inti" || s == "bph" || n == "bph" {
+		return true
+	}
+	for _, keyword := range []string{"pengurus inti", "pengurus harian", "badan pengurus harian"} {
+		if strings.Contains(s, keyword) || strings.Contains(n, keyword) {
+			return true
+		}
+	}
+	return false
 }
 
 type OrgTreePerson struct {
@@ -70,7 +88,7 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 			PhotoUrl:  row.PhotoUrl.String,
 			RoleTitle: row.RoleTitle.String,
 		}
-		if orgTreeCoreSlugs[strings.ToLower(row.DivisionSlug.String)] {
+		if isCoreDivision(row.DivisionSlug.String, row.DivisionName.String) {
 			resp.Leadership = append(resp.Leadership, person)
 			continue
 		}
@@ -84,7 +102,7 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 	}
 
 	for _, row := range divisionRows {
-		if orgTreeCoreSlugs[strings.ToLower(row.Slug.String)] {
+		if isCoreDivision(row.Slug.String, row.Name.String) {
 			continue
 		}
 
