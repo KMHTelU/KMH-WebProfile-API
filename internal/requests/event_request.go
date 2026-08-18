@@ -19,6 +19,9 @@ type CreateEventRequest struct {
 	CoverMediaID    uuid.UUID `json:"cover_media_id"`
 	Status          string    `json:"status"`
 	IsPublished     bool      `json:"is_published"`
+	// DivisionID menautkan event dengan divisi penyelenggara/penanggung jawab.
+	// Boleh kosong (uuid.Nil) jika event tidak dimiliki divisi tertentu.
+	DivisionID uuid.UUID `json:"division_id"`
 }
 
 type UpdateEventRequest struct {
@@ -34,4 +37,5 @@ type UpdateEventRequest struct {
 	CoverMediaID    uuid.UUID `json:"cover_media_id"`
 	Status          string    `json:"status"`
 	IsPublished     bool      `json:"is_published"`
+	DivisionID      uuid.UUID `json:"division_id"`
 }

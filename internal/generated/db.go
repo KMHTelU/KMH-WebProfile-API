@@ -69,6 +69,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteGalleryItemStmt, err = db.PrepareContext(ctx, deleteGalleryItem); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteGalleryItem: %w", err)
 	}
+	if q.deleteGalleryItemsByGalleryIDStmt, err = db.PrepareContext(ctx, deleteGalleryItemsByGalleryID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteGalleryItemsByGalleryID: %w", err)
+	}
 	if q.deleteHomepageBannerStmt, err = db.PrepareContext(ctx, deleteHomepageBanner); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteHomepageBanner: %w", err)
 	}
@@ -408,6 +411,11 @@ func (q *Queries) Close() error {
 	if q.deleteGalleryItemStmt != nil {
 		if cerr := q.deleteGalleryItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteGalleryItemStmt: %w", cerr)
+		}
+	}
+	if q.deleteGalleryItemsByGalleryIDStmt != nil {
+		if cerr := q.deleteGalleryItemsByGalleryIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteGalleryItemsByGalleryIDStmt: %w", cerr)
 		}
 	}
 	if q.deleteHomepageBannerStmt != nil {
@@ -899,6 +907,7 @@ type Queries struct {
 	deleteExpiredPasswordResetTokensStmt  *sql.Stmt
 	deleteGalleryStmt                     *sql.Stmt
 	deleteGalleryItemStmt                 *sql.Stmt
+	deleteGalleryItemsByGalleryIDStmt     *sql.Stmt
 	deleteHomepageBannerStmt              *sql.Stmt
 	deleteMediaStmt                       *sql.Stmt
 	deleteMemberStmt                      *sql.Stmt
@@ -1007,6 +1016,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteExpiredPasswordResetTokensStmt:  q.deleteExpiredPasswordResetTokensStmt,
 		deleteGalleryStmt:                     q.deleteGalleryStmt,
 		deleteGalleryItemStmt:                 q.deleteGalleryItemStmt,
+		deleteGalleryItemsByGalleryIDStmt:     q.deleteGalleryItemsByGalleryIDStmt,
 		deleteHomepageBannerStmt:              q.deleteHomepageBannerStmt,
 		deleteMediaStmt:                       q.deleteMediaStmt,
 		deleteMemberStmt:                      q.deleteMemberStmt,

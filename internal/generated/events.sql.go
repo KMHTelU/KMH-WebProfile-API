@@ -23,8 +23,10 @@ func (q *Queries) DeleteEvent(ctx context.Context, id uuid.UUID) error {
 }
 
 const getEventByID = `-- name: GetEventByID :one
-SELECT events.id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at FROM events
+SELECT events.id, events.title, events.slug, events.description, events.event_type, events.start_time, events.end_time, events.location, events.google_maps_url, events.registration_url, events.cover_media_id, events.status, events.is_published, events.division_id, events.created_by, events.created_at, events.updated_at, media.id, media.file_name, media.file_type, media.mime_type, media.file_size, media.url, media.alt_text, media.caption, media.uploaded_by, media.created_at, divisions.name AS division_name, divisions.slug AS division_slug
+FROM events
 LEFT JOIN media ON events.cover_media_id = media.id
+LEFT JOIN divisions ON events.division_id = divisions.id
 WHERE events.id = $1
 `
 
@@ -42,6 +44,7 @@ type GetEventByIDRow struct {
 	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
 	Status          sql.NullString `json:"status"`
 	IsPublished     sql.NullBool   `json:"is_published"`
+	DivisionID      uuid.NullUUID  `json:"division_id"`
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 	CreatedAt       sql.NullTime   `json:"created_at"`
 	UpdatedAt       sql.NullTime   `json:"updated_at"`
@@ -55,6 +58,8 @@ type GetEventByIDRow struct {
 	Caption         sql.NullString `json:"caption"`
 	UploadedBy      uuid.NullUUID  `json:"uploaded_by"`
 	CreatedAt_2     sql.NullTime   `json:"created_at_2"`
+	DivisionName    sql.NullString `json:"division_name"`
+	DivisionSlug    sql.NullString `json:"division_slug"`
 }
 
 func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (GetEventByIDRow, error) {
@@ -74,6 +79,7 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (GetEventByIDR
 		&i.CoverMediaID,
 		&i.Status,
 		&i.IsPublished,
+		&i.DivisionID,
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -87,12 +93,14 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (GetEventByIDR
 		&i.Caption,
 		&i.UploadedBy,
 		&i.CreatedAt_2,
+		&i.DivisionName,
+		&i.DivisionSlug,
 	)
 	return i, err
 }
 
 const getEventBySlug = `-- name: GetEventBySlug :one
-SELECT id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, created_at, updated_at FROM events
+SELECT id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, division_id, created_by, created_at, updated_at FROM events
 WHERE slug = $1
 `
 
@@ -113,6 +121,7 @@ func (q *Queries) GetEventBySlug(ctx context.Context, slug sql.NullString) (Even
 		&i.CoverMediaID,
 		&i.Status,
 		&i.IsPublished,
+		&i.DivisionID,
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -121,9 +130,9 @@ func (q *Queries) GetEventBySlug(ctx context.Context, slug sql.NullString) (Even
 }
 
 const insertEvent = `-- name: InsertEvent :one
-INSERT INTO events (id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, created_at, updated_at
+INSERT INTO events (id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, division_id, created_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+RETURNING id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, division_id, created_by, created_at, updated_at
 `
 
 type InsertEventParams struct {
@@ -140,6 +149,7 @@ type InsertEventParams struct {
 	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
 	Status          sql.NullString `json:"status"`
 	IsPublished     sql.NullBool   `json:"is_published"`
+	DivisionID      uuid.NullUUID  `json:"division_id"`
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 }
 
@@ -158,6 +168,7 @@ func (q *Queries) InsertEvent(ctx context.Context, arg InsertEventParams) (Event
 		arg.CoverMediaID,
 		arg.Status,
 		arg.IsPublished,
+		arg.DivisionID,
 		arg.CreatedBy,
 	)
 	var i Event
@@ -175,6 +186,7 @@ func (q *Queries) InsertEvent(ctx context.Context, arg InsertEventParams) (Event
 		&i.CoverMediaID,
 		&i.Status,
 		&i.IsPublished,
+		&i.DivisionID,
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -183,8 +195,10 @@ func (q *Queries) InsertEvent(ctx context.Context, arg InsertEventParams) (Event
 }
 
 const listEvents = `-- name: ListEvents :many
-SELECT events.id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, events.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at FROM events
+SELECT events.id, events.title, events.slug, events.description, events.event_type, events.start_time, events.end_time, events.location, events.google_maps_url, events.registration_url, events.cover_media_id, events.status, events.is_published, events.division_id, events.created_by, events.created_at, events.updated_at, media.id, media.file_name, media.file_type, media.mime_type, media.file_size, media.url, media.alt_text, media.caption, media.uploaded_by, media.created_at, divisions.name AS division_name, divisions.slug AS division_slug
+FROM events
 LEFT JOIN media ON events.cover_media_id = media.id
+LEFT JOIN divisions ON events.division_id = divisions.id
 ORDER BY events.start_time DESC
 LIMIT $1 OFFSET $2
 `
@@ -208,6 +222,7 @@ type ListEventsRow struct {
 	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
 	Status          sql.NullString `json:"status"`
 	IsPublished     sql.NullBool   `json:"is_published"`
+	DivisionID      uuid.NullUUID  `json:"division_id"`
 	CreatedBy       uuid.NullUUID  `json:"created_by"`
 	CreatedAt       sql.NullTime   `json:"created_at"`
 	UpdatedAt       sql.NullTime   `json:"updated_at"`
@@ -221,6 +236,8 @@ type ListEventsRow struct {
 	Caption         sql.NullString `json:"caption"`
 	UploadedBy      uuid.NullUUID  `json:"uploaded_by"`
 	CreatedAt_2     sql.NullTime   `json:"created_at_2"`
+	DivisionName    sql.NullString `json:"division_name"`
+	DivisionSlug    sql.NullString `json:"division_slug"`
 }
 
 func (q *Queries) ListEvents(ctx context.Context, arg ListEventsParams) ([]ListEventsRow, error) {
@@ -246,6 +263,7 @@ func (q *Queries) ListEvents(ctx context.Context, arg ListEventsParams) ([]ListE
 			&i.CoverMediaID,
 			&i.Status,
 			&i.IsPublished,
+			&i.DivisionID,
 			&i.CreatedBy,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -259,6 +277,8 @@ func (q *Queries) ListEvents(ctx context.Context, arg ListEventsParams) ([]ListE
 			&i.Caption,
 			&i.UploadedBy,
 			&i.CreatedAt_2,
+			&i.DivisionName,
+			&i.DivisionSlug,
 		); err != nil {
 			return nil, err
 		}
@@ -287,9 +307,10 @@ SET title = $2,
     cover_media_id = $11,
     status = $12,
     is_published = $13,
+    division_id = $14,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by, created_at, updated_at
+RETURNING id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, division_id, created_by, created_at, updated_at
 `
 
 type UpdateEventParams struct {
@@ -306,6 +327,7 @@ type UpdateEventParams struct {
 	CoverMediaID    uuid.NullUUID  `json:"cover_media_id"`
 	Status          sql.NullString `json:"status"`
 	IsPublished     sql.NullBool   `json:"is_published"`
+	DivisionID      uuid.NullUUID  `json:"division_id"`
 }
 
 func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error) {
@@ -323,6 +345,7 @@ func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event
 		arg.CoverMediaID,
 		arg.Status,
 		arg.IsPublished,
+		arg.DivisionID,
 	)
 	var i Event
 	err := row.Scan(
@@ -339,6 +362,7 @@ func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event
 		&i.CoverMediaID,
 		&i.Status,
 		&i.IsPublished,
+		&i.DivisionID,
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,

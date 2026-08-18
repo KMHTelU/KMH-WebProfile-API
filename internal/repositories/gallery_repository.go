@@ -49,6 +49,10 @@ func (r *Repository) DeleteGalleryItem(id uuid.UUID, c fiber.Ctx) error {
 	return r.Queries.DeleteGalleryItem(c, id)
 }
 
+func (r *Repository) DeleteGalleryItemsByGalleryID(galleryID uuid.NullUUID, c fiber.Ctx) error {
+	return r.Queries.DeleteGalleryItemsByGalleryID(c, galleryID)
+}
+
 func (r *Repository) ListGalleryItemsByGalleryID(galleryID uuid.NullUUID, c fiber.Ctx) ([]generated.SelectGalleryItemsByGalleryIDRow, error) {
 	return r.Queries.SelectGalleryItemsByGalleryID(c, galleryID)
 }

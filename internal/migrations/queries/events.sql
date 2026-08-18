@@ -1,6 +1,6 @@
 -- name: InsertEvent :one
-INSERT INTO events (id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, created_by)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+INSERT INTO events (id, title, slug, description, event_type, start_time, end_time, location, google_maps_url, registration_url, cover_media_id, status, is_published, division_id, created_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 RETURNING *;
 
 -- name: UpdateEvent :one
@@ -17,6 +17,7 @@ SET title = $2,
     cover_media_id = $11,
     status = $12,
     is_published = $13,
+    division_id = $14,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;
@@ -26,13 +27,17 @@ DELETE FROM events
 WHERE id = $1;
 
 -- name: GetEventByID :one
-SELECT * FROM events
+SELECT events.*, media.*, divisions.name AS division_name, divisions.slug AS division_slug
+FROM events
 LEFT JOIN media ON events.cover_media_id = media.id
+LEFT JOIN divisions ON events.division_id = divisions.id
 WHERE events.id = $1;
 
 -- name: ListEvents :many
-SELECT * FROM events
+SELECT events.*, media.*, divisions.name AS division_name, divisions.slug AS division_slug
+FROM events
 LEFT JOIN media ON events.cover_media_id = media.id
+LEFT JOIN divisions ON events.division_id = divisions.id
 ORDER BY events.start_time DESC
 LIMIT $1 OFFSET $2;
 

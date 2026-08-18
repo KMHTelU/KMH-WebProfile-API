@@ -227,6 +227,7 @@ func (s *Service) createEvent(req requests.CreateEventRequest, createdBy uuid.UU
 		CoverMediaID:    utils.NullUUID(req.CoverMediaID),
 		Status:          utils.NullString(req.Status),
 		IsPublished:     utils.NullBool(req.IsPublished),
+		DivisionID:      utils.NullUUID(req.DivisionID),
 		CreatedBy:       utils.NullUUID(createdBy),
 	}, c); err != nil {
 		return uuid.Nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create event")
@@ -256,6 +257,7 @@ func (s *Service) updateEvent(id uuid.UUID, req requests.UpdateEventRequest, c f
 		CoverMediaID:    utils.NullUUID(req.CoverMediaID),
 		Status:          utils.NullString(req.Status),
 		IsPublished:     utils.NullBool(req.IsPublished),
+		DivisionID:      utils.NullUUID(req.DivisionID),
 	}, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update event")
 	}

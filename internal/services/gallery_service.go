@@ -107,6 +107,12 @@ func (s *Service) DeleteGalleryService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 		return ferr
 	}
 
+	// Item gallery harus dihapus lebih dulu karena gallery_items punya foreign
+	// key ke galleries tanpa ON DELETE CASCADE; kalau tidak, delete gagal.
+	if err := s.Repository.DeleteGalleryItemsByGalleryID(uuid.NullUUID{UUID: id, Valid: true}, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete gallery items")
+	}
+
 	if err := s.Repository.DeleteGallery(id, c); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete gallery")
 	}

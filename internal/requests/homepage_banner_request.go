@@ -20,14 +20,19 @@ type HomepageBannerJSONRequest struct {
 	EndDate   time.Time `json:"end_date" validate:"required"`
 }
 
+// Nama field form sengaja datar (tanpa prefix "data.") karena decoder form
+// Fiber memperlakukan titik sebagai path struct bersarang, sehingga key
+// seperti "data.title" tidak pernah cocok dan seluruh field dibiarkan kosong.
+// IsActive tidak boleh divalidasi "required" karena nilai false dianggap kosong
+// oleh validator dan membuat banner nonaktif mustahil dibuat.
 type HomepageBannerRequest struct {
-	Title     string    `form:"data.title" json:"title" validate:"required"`
-	Subtitle  string    `form:"data.subtitle" json:"subtitle" validate:"omitempty"`
-	CtaText   string    `form:"data.cta_text" json:"cta_text" validate:"omitempty"`
-	CtaUrl    string    `form:"data.cta_url" json:"cta_url" validate:"omitempty,url"`
-	IsActive  bool      `form:"data.is_active" json:"is_active" validate:"required"`
-	StartDate time.Time `form:"data.start_date" json:"start_date" validate:"required"`
-	EndDate   time.Time `form:"data.end_date" json:"end_date" validate:"required"`
-	AltText   string    `form:"data.alt_text" json:"alt_text" validate:"omitempty"`
-	Caption   string    `form:"data.caption" json:"caption" validate:"omitempty"`
+	Title     string    `form:"title" json:"title" validate:"required"`
+	Subtitle  string    `form:"subtitle" json:"subtitle" validate:"omitempty"`
+	CtaText   string    `form:"cta_text" json:"cta_text" validate:"omitempty"`
+	CtaUrl    string    `form:"cta_url" json:"cta_url" validate:"omitempty,url"`
+	IsActive  bool      `form:"is_active" json:"is_active"`
+	StartDate time.Time `form:"start_date" json:"start_date" validate:"required"`
+	EndDate   time.Time `form:"end_date" json:"end_date" validate:"required"`
+	AltText   string    `form:"alt_text" json:"alt_text" validate:"omitempty"`
+	Caption   string    `form:"caption" json:"caption" validate:"omitempty"`
 }
