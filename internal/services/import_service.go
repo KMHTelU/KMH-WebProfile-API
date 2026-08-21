@@ -154,6 +154,11 @@ func (s *Service) importMemberRow(row importer.Row, dryRun bool, seen seenKeys, 
 		return uuid.Nil, fmt.Errorf("NIM %s sudah terdaftar atas nama %s", nim, existing.Name.String)
 	}
 
+	cohortYear, err := row.Int32("cohort_year")
+	if err != nil {
+		return uuid.Nil, err
+	}
+
 	req := requests.CreateMemberRequest{
 		Name:         name,
 		Nim:          nim,
@@ -161,6 +166,9 @@ func (s *Service) importMemberRow(row importer.Row, dryRun bool, seen seenKeys, 
 		Phone:        row.String("phone"),
 		Bio:          row.String("bio"),
 		InstagramUrl: row.String("instagram_url"),
+		Faculty:      row.String("faculty"),
+		StudyProgram: row.String("study_program"),
+		CohortYear:   cohortYear,
 		PeriodStart:  periodStart,
 		PeriodEnd:    periodEnd,
 	}

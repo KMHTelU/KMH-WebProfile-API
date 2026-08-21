@@ -40,11 +40,14 @@ func isCoreDivision(slug, name string) bool {
 }
 
 type OrgTreePerson struct {
-	MemberID  string `json:"member_id"`
-	Name      string `json:"name"`
-	Nim       string `json:"nim"`
-	PhotoUrl  string `json:"photo_url"`
-	RoleTitle string `json:"role_title"`
+	MemberID     string `json:"member_id"`
+	Name         string `json:"name"`
+	Nim          string `json:"nim"`
+	Faculty      string `json:"faculty"`
+	StudyProgram string `json:"study_program"`
+	CohortYear   int32  `json:"cohort_year"`
+	PhotoUrl     string `json:"photo_url"`
+	RoleTitle    string `json:"role_title"`
 }
 
 type OrgTreeDivision struct {
@@ -82,11 +85,14 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 	fallbackCoordinator := make(map[string]OrgTreePerson)
 	for _, row := range assignmentRows {
 		person := OrgTreePerson{
-			MemberID:  row.MemberID.String(),
-			Name:      row.MemberName.String,
-			Nim:       row.MemberNim.String,
-			PhotoUrl:  row.PhotoUrl.String,
-			RoleTitle: row.RoleTitle.String,
+			MemberID:     row.MemberID.String(),
+			Name:         row.MemberName.String,
+			Nim:          row.MemberNim.String,
+			Faculty:      row.MemberFaculty.String,
+			StudyProgram: row.MemberStudyProgram.String,
+			CohortYear:   row.MemberCohortYear.Int32,
+			PhotoUrl:     row.PhotoUrl.String,
+			RoleTitle:    row.RoleTitle.String,
 		}
 		if isCoreDivision(row.DivisionSlug.String, row.DivisionName.String) {
 			resp.Leadership = append(resp.Leadership, person)
@@ -121,11 +127,14 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 		}
 		if row.CoordinatorID.Valid {
 			division.Coordinator = &OrgTreePerson{
-				MemberID:  row.CoordinatorID.UUID.String(),
-				Name:      row.CoordinatorName.String,
-				Nim:       row.CoordinatorNim.String,
-				PhotoUrl:  row.CoordinatorPhotoUrl.String,
-				RoleTitle: "Koordinator",
+				MemberID:     row.CoordinatorID.UUID.String(),
+				Name:         row.CoordinatorName.String,
+				Nim:          row.CoordinatorNim.String,
+				Faculty:      row.CoordinatorFaculty.String,
+				StudyProgram: row.CoordinatorStudyProgram.String,
+				CohortYear:   row.CoordinatorCohortYear.Int32,
+				PhotoUrl:     row.CoordinatorPhotoUrl.String,
+				RoleTitle:    "Koordinator",
 			}
 		} else if person, ok := fallbackCoordinator[row.ID.String()]; ok {
 			division.Coordinator = &person

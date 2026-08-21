@@ -9,6 +9,46 @@ import (
 	"github.com/google/uuid"
 )
 
+// Regresi: kolom JSONB (json.RawMessage) harus tersisip sebagai JSON asli,
+// bukan berubah menjadi deretan angka byte (mis. ["a"] → [91,34,97,34,93]).
+func TestSanitizeForJSONKeepsRawJSON(t *testing.T) {
+	type sample struct {
+		Responsibilities json.RawMessage `json:"responsibilities"`
+		Programs         json.RawMessage `json:"programs"`
+		Empty            json.RawMessage `json:"empty"`
+	}
+
+	got := SanitizeForJSON(sample{
+		Responsibilities: json.RawMessage(`["health check rutin","dokumentasi"]`),
+		Programs:         json.RawMessage(`[{"name":"Bazaar","description":"tahunan"}]`),
+		Empty:            nil,
+	})
+
+	raw, err := json.Marshal(got)
+	if err != nil {
+		t.Fatalf("marshal gagal: %v", err)
+	}
+
+	var decoded struct {
+		Responsibilities []string                 `json:"responsibilities"`
+		Programs         []map[string]interface{} `json:"programs"`
+		Empty            interface{}              `json:"empty"`
+	}
+	if err := json.Unmarshal(raw, &decoded); err != nil {
+		t.Fatalf("hasil sanitasi bukan JSON yang diharapkan: %v (raw: %s)", err, raw)
+	}
+
+	if len(decoded.Responsibilities) != 2 || decoded.Responsibilities[0] != "health check rutin" {
+		t.Errorf("responsibilities rusak: %s", raw)
+	}
+	if len(decoded.Programs) != 1 || decoded.Programs[0]["name"] != "Bazaar" {
+		t.Errorf("programs rusak: %s", raw)
+	}
+	if decoded.Empty != nil {
+		t.Errorf("raw kosong seharusnya null, dapat: %v", decoded.Empty)
+	}
+}
+
 func TestSanitizeForJSONUnwrapsNullTypes(t *testing.T) {
 	type sample struct {
 		Name         sql.NullString `json:"name"`

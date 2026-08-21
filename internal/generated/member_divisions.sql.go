@@ -67,10 +67,12 @@ func (q *Queries) GetMemberDivisionByPair(ctx context.Context, arg GetMemberDivi
 }
 
 const getMemberDivisionsByDivisionID = `-- name: GetMemberDivisionsByDivisionID :many
-SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at
+SELECT member_divisions.id, member_divisions.member_id, member_divisions.division_id, member_divisions.role_title, member_divisions.created_at, members.id, members.name, members.nim, members.photo_media_id, members.bio, members.email, members.phone, members.instagram_url, members.faculty, members.study_program, members.cohort_year, members.period_start, members.period_end, members.is_active, members.created_at, members.updated_at, media.url AS photo_url
 FROM member_divisions
 INNER JOIN members ON member_divisions.member_id = members.id
+LEFT JOIN media ON members.photo_media_id = media.id
 WHERE division_id = $1
+ORDER BY member_divisions.created_at ASC
 `
 
 type GetMemberDivisionsByDivisionIDRow struct {
@@ -87,11 +89,15 @@ type GetMemberDivisionsByDivisionIDRow struct {
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`
 	CreatedAt_2  sql.NullTime   `json:"created_at_2"`
 	UpdatedAt    sql.NullTime   `json:"updated_at"`
+	PhotoUrl     sql.NullString `json:"photo_url"`
 }
 
 func (q *Queries) GetMemberDivisionsByDivisionID(ctx context.Context, divisionID uuid.NullUUID) ([]GetMemberDivisionsByDivisionIDRow, error) {
@@ -117,11 +123,15 @@ func (q *Queries) GetMemberDivisionsByDivisionID(ctx context.Context, divisionID
 			&i.Email,
 			&i.Phone,
 			&i.InstagramUrl,
+			&i.Faculty,
+			&i.StudyProgram,
+			&i.CohortYear,
 			&i.PeriodStart,
 			&i.PeriodEnd,
 			&i.IsActive,
 			&i.CreatedAt_2,
 			&i.UpdatedAt,
+			&i.PhotoUrl,
 		); err != nil {
 			return nil, err
 		}

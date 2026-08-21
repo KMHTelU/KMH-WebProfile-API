@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"time"
 
@@ -43,6 +44,15 @@ func sanitizeValue(value reflect.Value) interface{} {
 		return unwrapped
 	}
 
+	// json.RawMessage (kolom JSONB) adalah []byte berisi teks JSON mentah.
+	// Tanpa penanganan khusus ia jatuh ke cabang Slice generik dan berubah
+	// menjadi deretan angka byte (mis. ["a"] → [91,34,97,34,93]).
+	if value.CanInterface() {
+		if raw, ok := value.Interface().(json.RawMessage); ok {
+			return decodeRawJSON(raw)
+		}
+	}
+
 	switch value.Kind() {
 	case reflect.Struct:
 		return sanitizeStruct(value)
@@ -70,6 +80,20 @@ func sanitizeValue(value reflect.Value) interface{} {
 		}
 		return nil
 	}
+}
+
+// decodeRawJSON menerjemahkan JSONB mentah menjadi nilai JSON biasa agar
+// tersisip apa adanya di respons (bukan array byte). Bila isinya bukan JSON
+// valid, kembalikan sebagai string agar tidak menjatuhkan respons.
+func decodeRawJSON(raw json.RawMessage) interface{} {
+	if len(raw) == 0 {
+		return nil
+	}
+	var out interface{}
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return string(raw)
+	}
+	return out
 }
 
 func unwrapNullable(value reflect.Value) (interface{}, bool) {

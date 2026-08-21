@@ -23,7 +23,7 @@ func (q *Queries) DeleteMember(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllMembers = `-- name: GetAllMembers :many
-SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
+SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
 FROM members
 LEFT JOIN media ON members.photo_media_id = media.id
 ORDER BY members.name ASC
@@ -44,6 +44,9 @@ type GetAllMembersRow struct {
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`
@@ -79,6 +82,9 @@ func (q *Queries) GetAllMembers(ctx context.Context, arg GetAllMembersParams) ([
 			&i.Email,
 			&i.Phone,
 			&i.InstagramUrl,
+			&i.Faculty,
+			&i.StudyProgram,
+			&i.CohortYear,
 			&i.PeriodStart,
 			&i.PeriodEnd,
 			&i.IsActive,
@@ -109,7 +115,7 @@ func (q *Queries) GetAllMembers(ctx context.Context, arg GetAllMembersParams) ([
 }
 
 const getMemberByID = `-- name: GetMemberByID :one
-SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
+SELECT members.id, name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active, members.created_at, updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at
 FROM members
 LEFT JOIN media ON members.photo_media_id = media.id
 WHERE members.id = $1
@@ -124,6 +130,9 @@ type GetMemberByIDRow struct {
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`
@@ -153,6 +162,9 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (GetMemberByI
 		&i.Email,
 		&i.Phone,
 		&i.InstagramUrl,
+		&i.Faculty,
+		&i.StudyProgram,
+		&i.CohortYear,
 		&i.PeriodStart,
 		&i.PeriodEnd,
 		&i.IsActive,
@@ -173,7 +185,7 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (GetMemberByI
 }
 
 const getMemberByNIM = `-- name: GetMemberByNIM :one
-SELECT id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+SELECT id, name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active, created_at, updated_at
 FROM members
 WHERE nim = $1
 `
@@ -190,6 +202,9 @@ func (q *Queries) GetMemberByNIM(ctx context.Context, nim sql.NullString) (Membe
 		&i.Email,
 		&i.Phone,
 		&i.InstagramUrl,
+		&i.Faculty,
+		&i.StudyProgram,
+		&i.CohortYear,
 		&i.PeriodStart,
 		&i.PeriodEnd,
 		&i.IsActive,
@@ -200,9 +215,9 @@ func (q *Queries) GetMemberByNIM(ctx context.Context, nim sql.NullString) (Membe
 }
 
 const insertMember = `-- name: InsertMember :one
-INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, period_start, period_end, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active, created_at, updated_at
 `
 
 type InsertMemberParams struct {
@@ -213,6 +228,9 @@ type InsertMemberParams struct {
 	Phone        sql.NullString `json:"phone"`
 	Bio          sql.NullString `json:"bio"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`
@@ -227,6 +245,9 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 		arg.Phone,
 		arg.Bio,
 		arg.InstagramUrl,
+		arg.Faculty,
+		arg.StudyProgram,
+		arg.CohortYear,
 		arg.PeriodStart,
 		arg.PeriodEnd,
 		arg.IsActive,
@@ -241,6 +262,9 @@ func (q *Queries) InsertMember(ctx context.Context, arg InsertMemberParams) (Mem
 		&i.Email,
 		&i.Phone,
 		&i.InstagramUrl,
+		&i.Faculty,
+		&i.StudyProgram,
+		&i.CohortYear,
 		&i.PeriodStart,
 		&i.PeriodEnd,
 		&i.IsActive,
@@ -258,12 +282,15 @@ SET name = $2,
     phone = $5,
     bio = $6,
     instagram_url = $7,
-    period_start = $8,
-    period_end = $9,
-    is_active = $10,
+    faculty = $8,
+    study_program = $9,
+    cohort_year = $10,
+    period_start = $11,
+    period_end = $12,
+    is_active = $13,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, is_active, created_at, updated_at
+RETURNING id, name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active, created_at, updated_at
 `
 
 type UpdateMemberParams struct {
@@ -274,6 +301,9 @@ type UpdateMemberParams struct {
 	Phone        sql.NullString `json:"phone"`
 	Bio          sql.NullString `json:"bio"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`
@@ -288,6 +318,9 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 		arg.Phone,
 		arg.Bio,
 		arg.InstagramUrl,
+		arg.Faculty,
+		arg.StudyProgram,
+		arg.CohortYear,
 		arg.PeriodStart,
 		arg.PeriodEnd,
 		arg.IsActive,
@@ -302,6 +335,9 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 		&i.Email,
 		&i.Phone,
 		&i.InstagramUrl,
+		&i.Faculty,
+		&i.StudyProgram,
+		&i.CohortYear,
 		&i.PeriodStart,
 		&i.PeriodEnd,
 		&i.IsActive,
