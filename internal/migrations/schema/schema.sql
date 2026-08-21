@@ -63,6 +63,9 @@ CREATE TABLE IF NOT EXISTS members (
   email           VARCHAR(150),
   phone           VARCHAR(50),
   instagram_url   TEXT,
+  faculty         VARCHAR(100),  -- fakultas
+  study_program   VARCHAR(150),  -- program studi
+  cohort_year     INT,           -- tahun angkatan masuk kuliah
   period_start    YEAR,
   period_end      YEAR,
   is_active       BOOLEAN DEFAULT true,

@@ -24,7 +24,7 @@ func (q *Queries) DeleteDivision(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllDivisions = `-- name: GetAllDivisions :many
-SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -62,6 +62,9 @@ type GetAllDivisionsRow struct {
 	Email            sql.NullString  `json:"email"`
 	Phone            sql.NullString  `json:"phone"`
 	InstagramUrl     sql.NullString  `json:"instagram_url"`
+	Faculty          sql.NullString  `json:"faculty"`
+	StudyProgram     sql.NullString  `json:"study_program"`
+	CohortYear       sql.NullInt32   `json:"cohort_year"`
 	PeriodStart      interface{}     `json:"period_start"`
 	PeriodEnd        interface{}     `json:"period_end"`
 	IsActive_2       sql.NullBool    `json:"is_active_2"`
@@ -109,6 +112,9 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 			&i.Email,
 			&i.Phone,
 			&i.InstagramUrl,
+			&i.Faculty,
+			&i.StudyProgram,
+			&i.CohortYear,
 			&i.PeriodStart,
 			&i.PeriodEnd,
 			&i.IsActive_2,
@@ -129,7 +135,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 }
 
 const getDivisionByID = `-- name: GetDivisionByID :one
-SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -167,6 +173,9 @@ type GetDivisionByIDRow struct {
 	Email            sql.NullString  `json:"email"`
 	Phone            sql.NullString  `json:"phone"`
 	InstagramUrl     sql.NullString  `json:"instagram_url"`
+	Faculty          sql.NullString  `json:"faculty"`
+	StudyProgram     sql.NullString  `json:"study_program"`
+	CohortYear       sql.NullInt32   `json:"cohort_year"`
 	PeriodStart      interface{}     `json:"period_start"`
 	PeriodEnd        interface{}     `json:"period_end"`
 	IsActive_2       sql.NullBool    `json:"is_active_2"`
@@ -208,6 +217,9 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 		&i.Email,
 		&i.Phone,
 		&i.InstagramUrl,
+		&i.Faculty,
+		&i.StudyProgram,
+		&i.CohortYear,
 		&i.PeriodStart,
 		&i.PeriodEnd,
 		&i.IsActive_2,

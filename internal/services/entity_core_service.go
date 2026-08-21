@@ -41,6 +41,9 @@ func (s *Service) createMember(req requests.CreateMemberRequest, c fiber.Ctx) (u
 		Phone:        utils.NullString(req.Phone),
 		Bio:          utils.NullString(req.Bio),
 		InstagramUrl: utils.NullString(req.InstagramUrl),
+		Faculty:      utils.NullString(req.Faculty),
+		StudyProgram: utils.NullString(req.StudyProgram),
+		CohortYear:   sql.NullInt32{Int32: req.CohortYear, Valid: req.CohortYear != 0},
 		PeriodStart:  req.PeriodStart,
 		PeriodEnd:    req.PeriodEnd,
 		IsActive:     utils.NullBool(true),
@@ -89,6 +92,18 @@ func (s *Service) updateMember(id uuid.UUID, req requests.UpdateMemberRequest, c
 	if req.InstagramUrl != "" {
 		instagram = utils.NullString(req.InstagramUrl)
 	}
+	faculty := existing.Faculty
+	if req.Faculty != "" {
+		faculty = utils.NullString(req.Faculty)
+	}
+	studyProgram := existing.StudyProgram
+	if req.StudyProgram != "" {
+		studyProgram = utils.NullString(req.StudyProgram)
+	}
+	cohortYear := existing.CohortYear
+	if req.CohortYear != 0 {
+		cohortYear = sql.NullInt32{Int32: req.CohortYear, Valid: true}
+	}
 	periodStart := existing.PeriodStart
 	if req.PeriodStart != 0 {
 		periodStart = req.PeriodStart
@@ -110,6 +125,9 @@ func (s *Service) updateMember(id uuid.UUID, req requests.UpdateMemberRequest, c
 		Phone:        phone,
 		Bio:          bio,
 		InstagramUrl: instagram,
+		Faculty:      faculty,
+		StudyProgram: studyProgram,
+		CohortYear:   cohortYear,
 		PeriodStart:  periodStart,
 		PeriodEnd:    periodEnd,
 		IsActive:     isActive,

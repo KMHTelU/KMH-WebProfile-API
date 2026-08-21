@@ -1,6 +1,6 @@
 -- name: InsertMember :one
-INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, period_start, period_end, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+INSERT INTO members (id, name, nim, email, phone, bio, instagram_url, faculty, study_program, cohort_year, period_start, period_end, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
 
 -- name: UpdateMember :one
@@ -11,9 +11,12 @@ SET name = $2,
     phone = $5,
     bio = $6,
     instagram_url = $7,
-    period_start = $8,
-    period_end = $9,
-    is_active = $10,
+    faculty = $8,
+    study_program = $9,
+    cohort_year = $10,
+    period_start = $11,
+    period_end = $12,
+    is_active = $13,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;

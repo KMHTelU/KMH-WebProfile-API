@@ -203,6 +203,9 @@ type Member struct {
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
 	InstagramUrl sql.NullString `json:"instagram_url"`
+	Faculty      sql.NullString `json:"faculty"`
+	StudyProgram sql.NullString `json:"study_program"`
+	CohortYear   sql.NullInt32  `json:"cohort_year"`
 	PeriodStart  interface{}    `json:"period_start"`
 	PeriodEnd    interface{}    `json:"period_end"`
 	IsActive     sql.NullBool   `json:"is_active"`

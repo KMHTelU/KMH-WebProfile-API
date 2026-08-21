@@ -10,10 +10,13 @@ SELECT
   divisions.subtitle,
   divisions.description,
   divisions.responsibilities,
-  members.id   AS coordinator_id,
-  members.name AS coordinator_name,
-  members.nim  AS coordinator_nim,
-  media.url    AS coordinator_photo_url
+  members.id            AS coordinator_id,
+  members.name          AS coordinator_name,
+  members.nim           AS coordinator_nim,
+  members.faculty       AS coordinator_faculty,
+  members.study_program AS coordinator_study_program,
+  members.cohort_year   AS coordinator_cohort_year,
+  media.url             AS coordinator_photo_url
 FROM divisions
 LEFT JOIN members ON divisions.coordinator_id = members.id
 LEFT JOIN media ON members.photo_media_id = media.id
@@ -28,10 +31,13 @@ SELECT
   divisions.id   AS division_id,
   divisions.slug AS division_slug,
   divisions.name AS division_name,
-  members.id     AS member_id,
-  members.name   AS member_name,
-  members.nim    AS member_nim,
-  media.url      AS photo_url
+  members.id            AS member_id,
+  members.name          AS member_name,
+  members.nim           AS member_nim,
+  members.faculty       AS member_faculty,
+  members.study_program AS member_study_program,
+  members.cohort_year   AS member_cohort_year,
+  media.url             AS photo_url
 FROM member_divisions
 INNER JOIN divisions ON member_divisions.division_id = divisions.id
 INNER JOIN members ON member_divisions.member_id = members.id

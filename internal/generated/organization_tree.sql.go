@@ -21,10 +21,13 @@ SELECT
   divisions.id   AS division_id,
   divisions.slug AS division_slug,
   divisions.name AS division_name,
-  members.id     AS member_id,
-  members.name   AS member_name,
-  members.nim    AS member_nim,
-  media.url      AS photo_url
+  members.id            AS member_id,
+  members.name          AS member_name,
+  members.nim           AS member_nim,
+  members.faculty       AS member_faculty,
+  members.study_program AS member_study_program,
+  members.cohort_year   AS member_cohort_year,
+  media.url             AS photo_url
 FROM member_divisions
 INNER JOIN divisions ON member_divisions.division_id = divisions.id
 INNER JOIN members ON member_divisions.member_id = members.id
@@ -35,16 +38,19 @@ ORDER BY member_divisions.created_at ASC
 `
 
 type SelectOrgTreeAssignmentsRow struct {
-	ID           uuid.UUID      `json:"id"`
-	RoleTitle    sql.NullString `json:"role_title"`
-	CreatedAt    sql.NullTime   `json:"created_at"`
-	DivisionID   uuid.UUID      `json:"division_id"`
-	DivisionSlug sql.NullString `json:"division_slug"`
-	DivisionName sql.NullString `json:"division_name"`
-	MemberID     uuid.UUID      `json:"member_id"`
-	MemberName   sql.NullString `json:"member_name"`
-	MemberNim    sql.NullString `json:"member_nim"`
-	PhotoUrl     sql.NullString `json:"photo_url"`
+	ID                 uuid.UUID      `json:"id"`
+	RoleTitle          sql.NullString `json:"role_title"`
+	CreatedAt          sql.NullTime   `json:"created_at"`
+	DivisionID         uuid.UUID      `json:"division_id"`
+	DivisionSlug       sql.NullString `json:"division_slug"`
+	DivisionName       sql.NullString `json:"division_name"`
+	MemberID           uuid.UUID      `json:"member_id"`
+	MemberName         sql.NullString `json:"member_name"`
+	MemberNim          sql.NullString `json:"member_nim"`
+	MemberFaculty      sql.NullString `json:"member_faculty"`
+	MemberStudyProgram sql.NullString `json:"member_study_program"`
+	MemberCohortYear   sql.NullInt32  `json:"member_cohort_year"`
+	PhotoUrl           sql.NullString `json:"photo_url"`
 }
 
 func (q *Queries) SelectOrgTreeAssignments(ctx context.Context) ([]SelectOrgTreeAssignmentsRow, error) {
@@ -66,6 +72,9 @@ func (q *Queries) SelectOrgTreeAssignments(ctx context.Context) ([]SelectOrgTree
 			&i.MemberID,
 			&i.MemberName,
 			&i.MemberNim,
+			&i.MemberFaculty,
+			&i.MemberStudyProgram,
+			&i.MemberCohortYear,
 			&i.PhotoUrl,
 		); err != nil {
 			return nil, err
@@ -90,10 +99,13 @@ SELECT
   divisions.subtitle,
   divisions.description,
   divisions.responsibilities,
-  members.id   AS coordinator_id,
-  members.name AS coordinator_name,
-  members.nim  AS coordinator_nim,
-  media.url    AS coordinator_photo_url
+  members.id            AS coordinator_id,
+  members.name          AS coordinator_name,
+  members.nim           AS coordinator_nim,
+  members.faculty       AS coordinator_faculty,
+  members.study_program AS coordinator_study_program,
+  members.cohort_year   AS coordinator_cohort_year,
+  media.url             AS coordinator_photo_url
 FROM divisions
 LEFT JOIN members ON divisions.coordinator_id = members.id
 LEFT JOIN media ON members.photo_media_id = media.id
@@ -102,16 +114,19 @@ ORDER BY divisions.name ASC
 `
 
 type SelectOrgTreeDivisionsRow struct {
-	ID                  uuid.UUID       `json:"id"`
-	Name                sql.NullString  `json:"name"`
-	Slug                sql.NullString  `json:"slug"`
-	Subtitle            sql.NullString  `json:"subtitle"`
-	Description         sql.NullString  `json:"description"`
-	Responsibilities    json.RawMessage `json:"responsibilities"`
-	CoordinatorID       uuid.NullUUID   `json:"coordinator_id"`
-	CoordinatorName     sql.NullString  `json:"coordinator_name"`
-	CoordinatorNim      sql.NullString  `json:"coordinator_nim"`
-	CoordinatorPhotoUrl sql.NullString  `json:"coordinator_photo_url"`
+	ID                      uuid.UUID       `json:"id"`
+	Name                    sql.NullString  `json:"name"`
+	Slug                    sql.NullString  `json:"slug"`
+	Subtitle                sql.NullString  `json:"subtitle"`
+	Description             sql.NullString  `json:"description"`
+	Responsibilities        json.RawMessage `json:"responsibilities"`
+	CoordinatorID           uuid.NullUUID   `json:"coordinator_id"`
+	CoordinatorName         sql.NullString  `json:"coordinator_name"`
+	CoordinatorNim          sql.NullString  `json:"coordinator_nim"`
+	CoordinatorFaculty      sql.NullString  `json:"coordinator_faculty"`
+	CoordinatorStudyProgram sql.NullString  `json:"coordinator_study_program"`
+	CoordinatorCohortYear   sql.NullInt32   `json:"coordinator_cohort_year"`
+	CoordinatorPhotoUrl     sql.NullString  `json:"coordinator_photo_url"`
 }
 
 // Query untuk halaman struktur organisasi (organization tree) publik.
@@ -136,6 +151,9 @@ func (q *Queries) SelectOrgTreeDivisions(ctx context.Context) ([]SelectOrgTreeDi
 			&i.CoordinatorID,
 			&i.CoordinatorName,
 			&i.CoordinatorNim,
+			&i.CoordinatorFaculty,
+			&i.CoordinatorStudyProgram,
+			&i.CoordinatorCohortYear,
 			&i.CoordinatorPhotoUrl,
 		); err != nil {
 			return nil, err

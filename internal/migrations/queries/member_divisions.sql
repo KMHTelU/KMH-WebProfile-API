@@ -28,10 +28,12 @@ INNER JOIN divisions ON member_divisions.division_id = divisions.id
 WHERE member_id = $1;
 
 -- name: GetMemberDivisionsByDivisionID :many
-SELECT *
+SELECT member_divisions.*, members.*, media.url AS photo_url
 FROM member_divisions
 INNER JOIN members ON member_divisions.member_id = members.id
-WHERE division_id = $1;
+LEFT JOIN media ON members.photo_media_id = media.id
+WHERE division_id = $1
+ORDER BY member_divisions.created_at ASC;
 
 -- name: DeleteMemberDivision :exec
 DELETE FROM member_divisions
