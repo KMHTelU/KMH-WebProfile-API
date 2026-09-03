@@ -56,6 +56,7 @@ type OrgTreeDivision struct {
 	Slug             string         `json:"slug"`
 	Subtitle         string         `json:"subtitle"`
 	Description      string         `json:"description"`
+	DivisionType     string         `json:"division_type"`
 	Responsibilities []string       `json:"responsibilities"`
 	Coordinator      *OrgTreePerson `json:"coordinator"`
 }
@@ -123,6 +124,7 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 			Slug:             row.Slug.String,
 			Subtitle:         row.Subtitle.String,
 			Description:      row.Description.String,
+			DivisionType:     row.DivisionType,
 			Responsibilities: responsibilities,
 		}
 		if row.CoordinatorID.Valid {

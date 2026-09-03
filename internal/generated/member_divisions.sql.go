@@ -167,7 +167,7 @@ func (q *Queries) GetMemberDivisionsByDivisionID(ctx context.Context, divisionID
 }
 
 const getMemberDivisionsByMemberID = `-- name: GetMemberDivisionsByMemberID :many
-SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, divisions.id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, divisions.created_at, updated_at
+SELECT member_divisions.id, member_id, division_id, role_title, member_divisions.created_at, divisions.id, name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, is_active, divisions.created_at, updated_at
 FROM member_divisions
 INNER JOIN divisions ON member_divisions.division_id = divisions.id
 WHERE member_id = $1
@@ -184,6 +184,7 @@ type GetMemberDivisionsByMemberIDRow struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
@@ -213,6 +214,7 @@ func (q *Queries) GetMemberDivisionsByMemberID(ctx context.Context, memberID uui
 			&i.Slug,
 			&i.Subtitle,
 			&i.Description,
+			&i.DivisionType,
 			&i.Responsibilities,
 			&i.Programs,
 			&i.IconMediaID,

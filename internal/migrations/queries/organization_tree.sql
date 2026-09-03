@@ -9,6 +9,7 @@ SELECT
   divisions.slug,
   divisions.subtitle,
   divisions.description,
+  divisions.division_type,
   divisions.responsibilities,
   members.id            AS coordinator_id,
   members.name          AS coordinator_name,

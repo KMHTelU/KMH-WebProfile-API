@@ -243,11 +243,17 @@ func (s *Service) importDivisionRow(row importer.Row, dryRun bool, seen seenKeys
 		return uuid.Nil, err
 	}
 
+	divisionType := strings.ToLower(row.String("division_type"))
+	if divisionType != "" && divisionType != "internal" && divisionType != "external" {
+		return uuid.Nil, fmt.Errorf("division_type harus internal atau external, dapat: %s", divisionType)
+	}
+
 	req := requests.CreateDivisionRequest{
 		Name:             name,
 		Slug:             slug,
 		Subtitle:         row.String("subtitle"),
 		Description:      row.String("description"),
+		DivisionType:     divisionType,
 		Responsibilities: splitListColumn(row.String("responsibilities")),
 		Programs:         programs,
 		CoordinatorID:    coordinatorID,

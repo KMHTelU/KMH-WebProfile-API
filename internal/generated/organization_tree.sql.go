@@ -98,6 +98,7 @@ SELECT
   divisions.slug,
   divisions.subtitle,
   divisions.description,
+  divisions.division_type,
   divisions.responsibilities,
   members.id            AS coordinator_id,
   members.name          AS coordinator_name,
@@ -119,6 +120,7 @@ type SelectOrgTreeDivisionsRow struct {
 	Slug                    sql.NullString  `json:"slug"`
 	Subtitle                sql.NullString  `json:"subtitle"`
 	Description             sql.NullString  `json:"description"`
+	DivisionType            string          `json:"division_type"`
 	Responsibilities        json.RawMessage `json:"responsibilities"`
 	CoordinatorID           uuid.NullUUID   `json:"coordinator_id"`
 	CoordinatorName         sql.NullString  `json:"coordinator_name"`
@@ -147,6 +149,7 @@ func (q *Queries) SelectOrgTreeDivisions(ctx context.Context) ([]SelectOrgTreeDi
 			&i.Slug,
 			&i.Subtitle,
 			&i.Description,
+			&i.DivisionType,
 			&i.Responsibilities,
 			&i.CoordinatorID,
 			&i.CoordinatorName,
