@@ -16,7 +16,7 @@ type CreateDivisionRequest struct {
 	Description      string            `json:"description" validate:"omitempty"`
 	// Tipe divisi: internal (di bawah Wakil Ketua Internal) atau external
 	// (di bawah Wakil Ketua External). Kosong dianggap internal.
-	DivisionType     string            `json:"division_type" validate:"omitempty,oneof=internal external"`
+	DivisionType     string            `json:"division_type" validate:"omitempty,oneof=internal external core"`
 	Responsibilities []string          `json:"responsibilities" validate:"omitempty,dive,required"`
 	Programs         []DivisionProgram `json:"programs" validate:"omitempty,dive"`
 	CoordinatorID    uuid.UUID         `json:"coordinator_id" validate:"omitempty,uuid4"`
@@ -27,7 +27,7 @@ type UpdateDivisionRequest struct {
 	Slug             string            `json:"slug" validate:"omitempty"`
 	Subtitle         string            `json:"subtitle" validate:"omitempty"`
 	Description      string            `json:"description" validate:"omitempty"`
-	DivisionType     string            `json:"division_type" validate:"omitempty,oneof=internal external"`
+	DivisionType     string            `json:"division_type" validate:"omitempty,oneof=internal external core"`
 	Responsibilities []string          `json:"responsibilities" validate:"omitempty,dive,required"`
 	Programs         []DivisionProgram `json:"programs" validate:"omitempty,dive"`
 	CoordinatorID    uuid.UUID         `json:"coordinator_id" validate:"omitempty,uuid4"`

@@ -18,9 +18,10 @@ SELECT
   member_divisions.id,
   member_divisions.role_title,
   member_divisions.created_at,
-  divisions.id   AS division_id,
-  divisions.slug AS division_slug,
-  divisions.name AS division_name,
+  divisions.id            AS division_id,
+  divisions.slug          AS division_slug,
+  divisions.name          AS division_name,
+  divisions.division_type AS division_type,
   members.id            AS member_id,
   members.name          AS member_name,
   members.nim           AS member_nim,
@@ -44,6 +45,7 @@ type SelectOrgTreeAssignmentsRow struct {
 	DivisionID         uuid.UUID      `json:"division_id"`
 	DivisionSlug       sql.NullString `json:"division_slug"`
 	DivisionName       sql.NullString `json:"division_name"`
+	DivisionType       string         `json:"division_type"`
 	MemberID           uuid.UUID      `json:"member_id"`
 	MemberName         sql.NullString `json:"member_name"`
 	MemberNim          sql.NullString `json:"member_nim"`
@@ -69,6 +71,7 @@ func (q *Queries) SelectOrgTreeAssignments(ctx context.Context) ([]SelectOrgTree
 			&i.DivisionID,
 			&i.DivisionSlug,
 			&i.DivisionName,
+			&i.DivisionType,
 			&i.MemberID,
 			&i.MemberName,
 			&i.MemberNim,
