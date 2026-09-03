@@ -38,7 +38,7 @@ func (q *Queries) DeleteDivision(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllDivisions = `-- name: GetAllDivisions :many
-SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -51,6 +51,7 @@ type GetAllDivisionsRow struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
@@ -101,6 +102,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 			&i.Slug,
 			&i.Subtitle,
 			&i.Description,
+			&i.DivisionType,
 			&i.Responsibilities,
 			&i.Programs,
 			&i.IconMediaID,
@@ -149,7 +151,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 }
 
 const getDivisionByID = `-- name: GetDivisionByID :one
-SELECT divisions.id, divisions.name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -162,6 +164,7 @@ type GetDivisionByIDRow struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`
@@ -206,6 +209,7 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 		&i.Slug,
 		&i.Subtitle,
 		&i.Description,
+		&i.DivisionType,
 		&i.Responsibilities,
 		&i.Programs,
 		&i.IconMediaID,
@@ -244,7 +248,7 @@ func (q *Queries) GetDivisionByID(ctx context.Context, id uuid.UUID) (GetDivisio
 }
 
 const getDivisionBySlug = `-- name: GetDivisionBySlug :one
-SELECT id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
+SELECT id, name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 FROM divisions
 WHERE slug = $1
 `
@@ -258,6 +262,7 @@ func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (D
 		&i.Slug,
 		&i.Subtitle,
 		&i.Description,
+		&i.DivisionType,
 		&i.Responsibilities,
 		&i.Programs,
 		&i.IconMediaID,
@@ -270,9 +275,9 @@ func (q *Queries) GetDivisionBySlug(ctx context.Context, slug sql.NullString) (D
 }
 
 const insertDivision = `-- name: InsertDivision :one
-INSERT INTO divisions (id, name, slug, subtitle, description, responsibilities, programs, coordinator_id, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
+INSERT INTO divisions (id, name, slug, subtitle, description, division_type, responsibilities, programs, coordinator_id, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
 type InsertDivisionParams struct {
@@ -281,6 +286,7 @@ type InsertDivisionParams struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
@@ -294,6 +300,7 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		arg.Slug,
 		arg.Subtitle,
 		arg.Description,
+		arg.DivisionType,
 		arg.Responsibilities,
 		arg.Programs,
 		arg.CoordinatorID,
@@ -306,6 +313,7 @@ func (q *Queries) InsertDivision(ctx context.Context, arg InsertDivisionParams) 
 		&i.Slug,
 		&i.Subtitle,
 		&i.Description,
+		&i.DivisionType,
 		&i.Responsibilities,
 		&i.Programs,
 		&i.IconMediaID,
@@ -323,13 +331,14 @@ SET name = $2,
     slug = $3,
     subtitle = $4,
     description = $5,
-    responsibilities = $6,
-    programs = $7,
-    coordinator_id = $8,
-    is_active = $9,
+    division_type = $6,
+    responsibilities = $7,
+    programs = $8,
+    coordinator_id = $9,
+    is_active = $10,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, slug, subtitle, description, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
+RETURNING id, name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, is_active, created_at, updated_at
 `
 
 type UpdateDivisionParams struct {
@@ -338,6 +347,7 @@ type UpdateDivisionParams struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	CoordinatorID    uuid.NullUUID   `json:"coordinator_id"`
@@ -351,6 +361,7 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		arg.Slug,
 		arg.Subtitle,
 		arg.Description,
+		arg.DivisionType,
 		arg.Responsibilities,
 		arg.Programs,
 		arg.CoordinatorID,
@@ -363,6 +374,7 @@ func (q *Queries) UpdateDivision(ctx context.Context, arg UpdateDivisionParams) 
 		&i.Slug,
 		&i.Subtitle,
 		&i.Description,
+		&i.DivisionType,
 		&i.Responsibilities,
 		&i.Programs,
 		&i.IconMediaID,

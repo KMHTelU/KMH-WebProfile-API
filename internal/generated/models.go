@@ -71,6 +71,7 @@ type Division struct {
 	Slug             sql.NullString  `json:"slug"`
 	Subtitle         sql.NullString  `json:"subtitle"`
 	Description      sql.NullString  `json:"description"`
+	DivisionType     string          `json:"division_type"`
 	Responsibilities json.RawMessage `json:"responsibilities"`
 	Programs         json.RawMessage `json:"programs"`
 	IconMediaID      uuid.NullUUID   `json:"icon_media_id"`

@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS divisions (
   slug              VARCHAR(120) UNIQUE,
   subtitle          TEXT,
   description       TEXT,
+  division_type     VARCHAR(20) NOT NULL DEFAULT 'internal', -- internal | external
+
   responsibilities  JSONB NOT NULL DEFAULT '[]',
   programs          JSONB NOT NULL DEFAULT '[]',
   icon_media_id     UUID,

@@ -143,6 +143,11 @@ func (s *Service) createDivision(req requests.CreateDivisionRequest, c fiber.Ctx
 			fmt.Sprintf("Slug divisi %s sudah dipakai", req.Slug))
 	}
 
+	divisionType := req.DivisionType
+	if divisionType == "" {
+		divisionType = "internal"
+	}
+
 	id := uuid.New()
 	if err := s.Repository.CreateDivision(generated.InsertDivisionParams{
 		ID:               id,
@@ -150,6 +155,7 @@ func (s *Service) createDivision(req requests.CreateDivisionRequest, c fiber.Ctx
 		Slug:             utils.NullString(req.Slug),
 		Subtitle:         utils.NullString(req.Subtitle),
 		Description:      utils.NullString(req.Description),
+		DivisionType:     divisionType,
 		Responsibilities: marshalJSONList(req.Responsibilities),
 		Programs:         marshalJSONList(req.Programs),
 		CoordinatorID:    utils.NullUUID(req.CoordinatorID),
@@ -189,6 +195,10 @@ func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionReques
 	if req.Description != "" {
 		description = utils.NullString(req.Description)
 	}
+	divisionType := existing.DivisionType
+	if req.DivisionType != "" {
+		divisionType = req.DivisionType
+	}
 	// Slice nil berarti field tidak dikirim; slice kosong berarti admin sengaja
 	// mengosongkan daftar, jadi tetap menimpa nilai lama.
 	responsibilities := existing.Responsibilities
@@ -217,6 +227,7 @@ func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionReques
 		Slug:             slug,
 		Subtitle:         subtitle,
 		Description:      description,
+		DivisionType:     divisionType,
 		Responsibilities: responsibilities,
 		Programs:         programs,
 		CoordinatorID:    coordinatorID,
