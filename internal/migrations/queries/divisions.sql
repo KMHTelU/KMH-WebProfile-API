@@ -32,7 +32,20 @@ LEFT JOIN members ON divisions.coordinator_id = members.id
 WHERE divisions.id = $1;
 
 -- name: GetAllDivisions :many
-SELECT *
+-- member_count = jumlah anggota unik divisi (penugasan member_divisions
+-- digabung koordinator, tanpa dobel) — dipakai kartu daftar divisi publik.
+SELECT divisions.*, media.*, members.*,
+  (
+    SELECT COUNT(*)
+    FROM (
+      SELECT md.member_id
+      FROM member_divisions md
+      WHERE md.division_id = divisions.id
+      UNION
+      SELECT divisions.coordinator_id
+      WHERE divisions.coordinator_id IS NOT NULL
+    ) AS team
+  ) AS member_count
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
