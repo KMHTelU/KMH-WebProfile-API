@@ -26,6 +26,13 @@ RETURNING *;
 DELETE FROM events
 WHERE id = $1;
 
+-- name: ClearEventsDivision :exec
+-- Melepas tautan divisi dari semua event (dipakai sebelum divisi dihapus).
+UPDATE events
+SET division_id = NULL,
+    updated_at = NOW()
+WHERE division_id = $1;
+
 -- name: GetEventByID :one
 SELECT events.*, media.*, divisions.name AS division_name, divisions.slug AS division_slug
 FROM events

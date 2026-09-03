@@ -12,6 +12,19 @@ import (
 	"github.com/google/uuid"
 )
 
+const clearEventsDivision = `-- name: ClearEventsDivision :exec
+UPDATE events
+SET division_id = NULL,
+    updated_at = NOW()
+WHERE division_id = $1
+`
+
+// Melepas tautan divisi dari semua event (dipakai sebelum divisi dihapus).
+func (q *Queries) ClearEventsDivision(ctx context.Context, divisionID uuid.NullUUID) error {
+	_, err := q.exec(ctx, q.clearEventsDivisionStmt, clearEventsDivision, divisionID)
+	return err
+}
+
 const deleteEvent = `-- name: DeleteEvent :exec
 DELETE FROM events
 WHERE id = $1

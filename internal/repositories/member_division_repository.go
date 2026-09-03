@@ -35,6 +35,14 @@ func (r *Repository) ListMembersByDivisionID(divisionID uuid.NullUUID, c fiber.C
 	return r.Queries.GetMemberDivisionsByDivisionID(c, divisionID)
 }
 
+func (r *Repository) DeleteMemberDivisionsByMemberID(memberID uuid.NullUUID, c fiber.Ctx) error {
+	return r.Queries.DeleteMemberDivisionsByMemberID(c, memberID)
+}
+
+func (r *Repository) DeleteMemberDivisionsByDivisionID(divisionID uuid.NullUUID, c fiber.Ctx) error {
+	return r.Queries.DeleteMemberDivisionsByDivisionID(c, divisionID)
+}
+
 func (r *Repository) DeleteMemberDivision(id uuid.UUID, c fiber.Ctx) error {
 	return r.Queries.DeleteMemberDivision(c, id)
 }

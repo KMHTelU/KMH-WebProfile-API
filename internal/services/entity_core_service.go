@@ -200,7 +200,10 @@ func (s *Service) updateDivision(id uuid.UUID, req requests.UpdateDivisionReques
 		programs = marshalJSONList(req.Programs)
 	}
 	coordinatorID := existing.CoordinatorID
-	if req.CoordinatorID != uuid.Nil {
+	if req.ClearCoordinator {
+		// Lepas koordinator: kolom di-set NULL.
+		coordinatorID = uuid.NullUUID{}
+	} else if req.CoordinatorID != uuid.Nil {
 		coordinatorID = utils.NullUUID(req.CoordinatorID)
 	}
 	isActive := existing.IsActive

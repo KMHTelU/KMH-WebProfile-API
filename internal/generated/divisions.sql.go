@@ -13,6 +13,20 @@ import (
 	"github.com/google/uuid"
 )
 
+const clearDivisionCoordinator = `-- name: ClearDivisionCoordinator :exec
+UPDATE divisions
+SET coordinator_id = NULL,
+    updated_at = NOW()
+WHERE coordinator_id = $1
+`
+
+// Melepas seorang anggota dari posisi koordinator di semua divisi
+// (dipakai sebelum anggota tersebut dihapus).
+func (q *Queries) ClearDivisionCoordinator(ctx context.Context, coordinatorID uuid.NullUUID) error {
+	_, err := q.exec(ctx, q.clearDivisionCoordinatorStmt, clearDivisionCoordinator, coordinatorID)
+	return err
+}
+
 const deleteDivision = `-- name: DeleteDivision :exec
 DELETE FROM divisions
 WHERE id = $1

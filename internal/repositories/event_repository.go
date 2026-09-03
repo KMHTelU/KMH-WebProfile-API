@@ -24,6 +24,10 @@ func (r *Repository) UpdateEvent(params generated.UpdateEventParams, c fiber.Ctx
 	return err
 }
 
+func (r *Repository) ClearEventsDivision(divisionID uuid.NullUUID, c fiber.Ctx) error {
+	return r.Queries.ClearEventsDivision(c, divisionID)
+}
+
 func (r *Repository) DeleteEvent(id uuid.UUID, c fiber.Ctx) error {
 	return r.Queries.DeleteEvent(c, id)
 }

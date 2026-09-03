@@ -84,8 +84,22 @@ func (s *Service) DeleteMemberService(id uuid.UUID, c fiber.Ctx) *fiber.Error {
 	if ferr != nil {
 		return ferr
 	}
+	// Lepaskan keterkaitan lebih dulu supaya tidak melanggar foreign key:
+	// penugasan divisi milik anggota ini dan posisi koordinator yang ia pegang.
+	memberRef := utils.NullUUID(id)
+	if err := s.Repository.DeleteMemberDivisionsByMemberID(memberRef, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal melepas penugasan divisi milik anggota ini")
+	}
+	if err := s.Repository.ClearDivisionCoordinator(memberRef, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal melepas posisi koordinator milik anggota ini")
+	}
+
 	if err := s.Repository.DeleteMember(id, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete member")
+		if utils.IsForeignKeyViolation(err) {
+			return fiber.NewError(fiber.StatusConflict,
+				"Anggota tidak bisa dihapus karena masih dirujuk data lain. Lepaskan keterkaitan tersebut terlebih dahulu, lalu coba lagi.")
+		}
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal menghapus anggota")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),
