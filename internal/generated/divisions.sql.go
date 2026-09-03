@@ -38,7 +38,18 @@ func (q *Queries) DeleteDivision(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllDivisions = `-- name: GetAllDivisions :many
-SELECT divisions.id, divisions.name, slug, subtitle, description, division_type, responsibilities, programs, icon_media_id, coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, file_name, file_type, mime_type, file_size, url, alt_text, caption, uploaded_by, media.created_at, members.id, members.name, nim, photo_media_id, bio, email, phone, instagram_url, faculty, study_program, cohort_year, period_start, period_end, members.is_active, members.created_at, members.updated_at
+SELECT divisions.id, divisions.name, divisions.slug, divisions.subtitle, divisions.description, divisions.division_type, divisions.responsibilities, divisions.programs, divisions.icon_media_id, divisions.coordinator_id, divisions.is_active, divisions.created_at, divisions.updated_at, media.id, media.file_name, media.file_type, media.mime_type, media.file_size, media.url, media.alt_text, media.caption, media.uploaded_by, media.created_at, members.id, members.name, members.nim, members.photo_media_id, members.bio, members.email, members.phone, members.instagram_url, members.faculty, members.study_program, members.cohort_year, members.period_start, members.period_end, members.is_active, members.created_at, members.updated_at,
+  (
+    SELECT COUNT(*)
+    FROM (
+      SELECT md.member_id
+      FROM member_divisions md
+      WHERE md.division_id = divisions.id
+      UNION
+      SELECT divisions.coordinator_id
+      WHERE divisions.coordinator_id IS NOT NULL
+    ) AS team
+  ) AS member_count
 FROM divisions
 LEFT JOIN media ON divisions.icon_media_id = media.id
 LEFT JOIN members ON divisions.coordinator_id = members.id
@@ -85,8 +96,11 @@ type GetAllDivisionsRow struct {
 	IsActive_2       sql.NullBool    `json:"is_active_2"`
 	CreatedAt_3      sql.NullTime    `json:"created_at_3"`
 	UpdatedAt_2      sql.NullTime    `json:"updated_at_2"`
+	MemberCount      int64           `json:"member_count"`
 }
 
+// member_count = jumlah anggota unik divisi (penugasan member_divisions
+// digabung koordinator, tanpa dobel) — dipakai kartu daftar divisi publik.
 func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, error) {
 	rows, err := q.query(ctx, q.getAllDivisionsStmt, getAllDivisions)
 	if err != nil {
@@ -136,6 +150,7 @@ func (q *Queries) GetAllDivisions(ctx context.Context) ([]GetAllDivisionsRow, er
 			&i.IsActive_2,
 			&i.CreatedAt_3,
 			&i.UpdatedAt_2,
+			&i.MemberCount,
 		); err != nil {
 			return nil, err
 		}
