@@ -244,8 +244,8 @@ func (s *Service) importDivisionRow(row importer.Row, dryRun bool, seen seenKeys
 	}
 
 	divisionType := strings.ToLower(row.String("division_type"))
-	if divisionType != "" && divisionType != "internal" && divisionType != "external" {
-		return uuid.Nil, fmt.Errorf("division_type harus internal atau external, dapat: %s", divisionType)
+	if divisionType != "" && divisionType != "internal" && divisionType != "external" && divisionType != "core" {
+		return uuid.Nil, fmt.Errorf("division_type harus internal, external, atau core, dapat: %s", divisionType)
 	}
 
 	req := requests.CreateDivisionRequest{

@@ -15,10 +15,12 @@ import (
 // anggotanya mengisi bagian atas tree (Ketua, Wakil, Sekretaris, Bendahara)
 // dan divisinya sendiri tidak ditampilkan sebagai kotak divisi.
 //
-// Deteksinya toleran: cocok pada SLUG maupun NAMA, dengan tanda hubung/garis
-// bawah dinormalisasi jadi spasi — jadi "Pengurus Inti", "pengurus_inti",
-// "BPH", "Badan Pengurus Harian", maupun "inti" semuanya dikenali.
-func isCoreDivision(slug, name string) bool {
+// Penanda utama: division_type = 'core'. Heuristik slug/nama dipertahankan
+// sebagai cadangan untuk data lama yang belum mengisi tipenya.
+func isCoreDivision(slug, name, divisionType string) bool {
+	if strings.EqualFold(strings.TrimSpace(divisionType), "core") {
+		return true
+	}
 	normalize := func(v string) string {
 		v = strings.ToLower(strings.TrimSpace(v))
 		v = strings.ReplaceAll(v, "-", " ")
@@ -95,7 +97,7 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 			PhotoUrl:     row.PhotoUrl.String,
 			RoleTitle:    row.RoleTitle.String,
 		}
-		if isCoreDivision(row.DivisionSlug.String, row.DivisionName.String) {
+		if isCoreDivision(row.DivisionSlug.String, row.DivisionName.String, row.DivisionType) {
 			resp.Leadership = append(resp.Leadership, person)
 			continue
 		}
@@ -109,7 +111,7 @@ func (s *Service) GetOrganizationTreeService(c fiber.Ctx) (OrgTreeResponse, *fib
 	}
 
 	for _, row := range divisionRows {
-		if isCoreDivision(row.Slug.String, row.Name.String) {
+		if isCoreDivision(row.Slug.String, row.Name.String, row.DivisionType) {
 			continue
 		}
 
