@@ -23,6 +23,26 @@ func (q *Queries) DeleteMemberDivision(ctx context.Context, id uuid.UUID) error 
 	return err
 }
 
+const deleteMemberDivisionsByDivisionID = `-- name: DeleteMemberDivisionsByDivisionID :exec
+DELETE FROM member_divisions
+WHERE division_id = $1
+`
+
+func (q *Queries) DeleteMemberDivisionsByDivisionID(ctx context.Context, divisionID uuid.NullUUID) error {
+	_, err := q.exec(ctx, q.deleteMemberDivisionsByDivisionIDStmt, deleteMemberDivisionsByDivisionID, divisionID)
+	return err
+}
+
+const deleteMemberDivisionsByMemberID = `-- name: DeleteMemberDivisionsByMemberID :exec
+DELETE FROM member_divisions
+WHERE member_id = $1
+`
+
+func (q *Queries) DeleteMemberDivisionsByMemberID(ctx context.Context, memberID uuid.NullUUID) error {
+	_, err := q.exec(ctx, q.deleteMemberDivisionsByMemberIDStmt, deleteMemberDivisionsByMemberID, memberID)
+	return err
+}
+
 const getMemberDivisionByID = `-- name: GetMemberDivisionByID :one
 SELECT id, member_id, division_id, role_title, created_at
 FROM member_divisions

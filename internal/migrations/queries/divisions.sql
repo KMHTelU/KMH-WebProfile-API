@@ -45,3 +45,11 @@ WHERE slug = $1;
 -- name: DeleteDivision :exec
 DELETE FROM divisions
 WHERE id = $1;
+
+-- name: ClearDivisionCoordinator :exec
+-- Melepas seorang anggota dari posisi koordinator di semua divisi
+-- (dipakai sebelum anggota tersebut dihapus).
+UPDATE divisions
+SET coordinator_id = NULL,
+    updated_at = NOW()
+WHERE coordinator_id = $1;

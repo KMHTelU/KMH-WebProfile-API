@@ -2,9 +2,11 @@ package utils
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 // Helper konversi ke tipe nullable milik sqlc. Nilai kosong (string kosong,
@@ -29,6 +31,17 @@ func NullInt32(value int32) sql.NullInt32 {
 
 func NullUUID(value uuid.UUID) uuid.NullUUID {
 	return uuid.NullUUID{UUID: value, Valid: value != uuid.Nil}
+}
+
+// IsForeignKeyViolation mendeteksi error Postgres 23503 (foreign key
+// violation) — dipakai untuk menerjemahkan kegagalan delete menjadi pesan
+// yang bisa dipahami admin, bukan 500 generik.
+func IsForeignKeyViolation(err error) bool {
+	var pqErr *pq.Error
+	if errors.As(err, &pqErr) {
+		return pqErr.Code == "23503"
+	}
+	return false
 }
 
 // BoolPtr dan TimePtr mengubah nilai nullable sqlc menjadi pointer agar NULL

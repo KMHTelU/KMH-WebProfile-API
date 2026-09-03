@@ -38,3 +38,11 @@ ORDER BY member_divisions.created_at ASC;
 -- name: DeleteMemberDivision :exec
 DELETE FROM member_divisions
 WHERE id = $1;
+
+-- name: DeleteMemberDivisionsByMemberID :exec
+DELETE FROM member_divisions
+WHERE member_id = $1;
+
+-- name: DeleteMemberDivisionsByDivisionID :exec
+DELETE FROM member_divisions
+WHERE division_id = $1;

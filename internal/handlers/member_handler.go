@@ -71,7 +71,7 @@ func (h *Handler) DeleteMemberHandler(c fiber.Ctx) error {
 	}
 	err := h.Service.DeleteMemberService(id, c)
 	if err != nil {
-		return err
+		return utils.RespondWithError(c, err.Code, err.Message)
 	}
 	return utils.RespondWithOK(c, "Member deleted successfully", nil)
 }

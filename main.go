@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"os"
 
 	"github.com/KMHTelU/KMH-WebProfile-API/configs"
@@ -79,6 +80,22 @@ func main() {
 		},
 		ServerHeader: "KMH Tel-U",
 		AppName:      "🔥 KMH Tel-U Profile Web API v" + config.Version,
+		// Semua error yang lolos dari handler (termasuk *fiber.Error yang
+		// dikembalikan mentah) diformat ke amplop JSON standar, sehingga
+		// frontend selalu bisa menampilkan pesan yang bermakna — bukan
+		// sekadar "request failed with status code 500".
+		ErrorHandler: func(c fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			message := "Terjadi kesalahan pada server"
+			var fiberErr *fiber.Error
+			if errors.As(err, &fiberErr) {
+				code = fiberErr.Code
+				if fiberErr.Message != "" {
+					message = fiberErr.Message
+				}
+			}
+			return utils.RespondWithError(c, code, message)
+		},
 	})
 
 	// Recover: cegah satu panic di handler menjatuhkan seluruh server.

@@ -38,6 +38,10 @@ func (r *Repository) UpdateDivision(params generated.UpdateDivisionParams, c fib
 	return nil
 }
 
+func (r *Repository) ClearDivisionCoordinator(memberID uuid.NullUUID, c fiber.Ctx) error {
+	return r.Queries.ClearDivisionCoordinator(c, memberID)
+}
+
 func (r *Repository) DeleteDivision(id uuid.UUID, c fiber.Ctx) error {
 	err := r.Queries.DeleteDivision(c, id)
 	if err != nil {

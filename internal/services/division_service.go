@@ -80,8 +80,22 @@ func (s *Service) DeleteDivisionService(id uuid.UUID, c fiber.Ctx) *fiber.Error 
 	if ferr != nil {
 		return ferr
 	}
+	// Lepaskan keterkaitan lebih dulu supaya tidak melanggar foreign key:
+	// penugasan anggota di divisi ini dan tautan divisi pada event.
+	divisionRef := utils.NullUUID(id)
+	if err := s.Repository.DeleteMemberDivisionsByDivisionID(divisionRef, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal melepas anggota dari divisi ini")
+	}
+	if err := s.Repository.ClearEventsDivision(divisionRef, c); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal melepas tautan event dari divisi ini")
+	}
+
 	if err := s.Repository.DeleteDivision(id, c); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete division")
+		if utils.IsForeignKeyViolation(err) {
+			return fiber.NewError(fiber.StatusConflict,
+				"Divisi tidak bisa dihapus karena masih dirujuk data lain. Lepaskan keterkaitan tersebut terlebih dahulu, lalu coba lagi.")
+		}
+		return fiber.NewError(fiber.StatusInternalServerError, "Gagal menghapus divisi")
 	}
 	if err := s.Repository.InsertLog(generated.InsertActivityLogParams{
 		ID:        uuid.New(),

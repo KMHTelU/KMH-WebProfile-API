@@ -27,5 +27,8 @@ type UpdateDivisionRequest struct {
 	Responsibilities []string          `json:"responsibilities" validate:"omitempty,dive,required"`
 	Programs         []DivisionProgram `json:"programs" validate:"omitempty,dive"`
 	CoordinatorID    uuid.UUID         `json:"coordinator_id" validate:"omitempty,uuid4"`
-	IsActive         *bool             `json:"is_active" validate:"omitempty"`
+	// ClearCoordinator melepas koordinator (coordinator_id di-set NULL).
+	// Diperlukan karena coordinator_id kosong berarti "tidak diubah".
+	ClearCoordinator bool  `json:"clear_coordinator" validate:"omitempty"`
+	IsActive         *bool `json:"is_active" validate:"omitempty"`
 }

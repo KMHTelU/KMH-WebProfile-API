@@ -24,6 +24,12 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.clearDivisionCoordinatorStmt, err = db.PrepareContext(ctx, clearDivisionCoordinator); err != nil {
+		return nil, fmt.Errorf("error preparing query ClearDivisionCoordinator: %w", err)
+	}
+	if q.clearEventsDivisionStmt, err = db.PrepareContext(ctx, clearEventsDivision); err != nil {
+		return nil, fmt.Errorf("error preparing query ClearEventsDivision: %w", err)
+	}
 	if q.countBlogPostsByTagIDStmt, err = db.PrepareContext(ctx, countBlogPostsByTagID); err != nil {
 		return nil, fmt.Errorf("error preparing query CountBlogPostsByTagID: %w", err)
 	}
@@ -95,6 +101,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deleteMemberDivisionStmt, err = db.PrepareContext(ctx, deleteMemberDivision); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteMemberDivision: %w", err)
+	}
+	if q.deleteMemberDivisionsByDivisionIDStmt, err = db.PrepareContext(ctx, deleteMemberDivisionsByDivisionID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteMemberDivisionsByDivisionID: %w", err)
+	}
+	if q.deleteMemberDivisionsByMemberIDStmt, err = db.PrepareContext(ctx, deleteMemberDivisionsByMemberID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteMemberDivisionsByMemberID: %w", err)
 	}
 	if q.deleteOrganizationProfileStmt, err = db.PrepareContext(ctx, deleteOrganizationProfile); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOrganizationProfile: %w", err)
@@ -392,6 +404,16 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.clearDivisionCoordinatorStmt != nil {
+		if cerr := q.clearDivisionCoordinatorStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing clearDivisionCoordinatorStmt: %w", cerr)
+		}
+	}
+	if q.clearEventsDivisionStmt != nil {
+		if cerr := q.clearEventsDivisionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing clearEventsDivisionStmt: %w", cerr)
+		}
+	}
 	if q.countBlogPostsByTagIDStmt != nil {
 		if cerr := q.countBlogPostsByTagIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing countBlogPostsByTagIDStmt: %w", cerr)
@@ -510,6 +532,16 @@ func (q *Queries) Close() error {
 	if q.deleteMemberDivisionStmt != nil {
 		if cerr := q.deleteMemberDivisionStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteMemberDivisionStmt: %w", cerr)
+		}
+	}
+	if q.deleteMemberDivisionsByDivisionIDStmt != nil {
+		if cerr := q.deleteMemberDivisionsByDivisionIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteMemberDivisionsByDivisionIDStmt: %w", cerr)
+		}
+	}
+	if q.deleteMemberDivisionsByMemberIDStmt != nil {
+		if cerr := q.deleteMemberDivisionsByMemberIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteMemberDivisionsByMemberIDStmt: %w", cerr)
 		}
 	}
 	if q.deleteOrganizationProfileStmt != nil {
@@ -1036,6 +1068,8 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                    DBTX
 	tx                                    *sql.Tx
+	clearDivisionCoordinatorStmt          *sql.Stmt
+	clearEventsDivisionStmt               *sql.Stmt
 	countBlogPostsByTagIDStmt             *sql.Stmt
 	countRecentPasswordResetTokensStmt    *sql.Stmt
 	countTagsByBlogPostIDStmt             *sql.Stmt
@@ -1060,6 +1094,8 @@ type Queries struct {
 	deleteMediaStmt                       *sql.Stmt
 	deleteMemberStmt                      *sql.Stmt
 	deleteMemberDivisionStmt              *sql.Stmt
+	deleteMemberDivisionsByDivisionIDStmt *sql.Stmt
+	deleteMemberDivisionsByMemberIDStmt   *sql.Stmt
 	deleteOrganizationProfileStmt         *sql.Stmt
 	deleteRoleStmt                        *sql.Stmt
 	deleteUserStmt                        *sql.Stmt
@@ -1163,6 +1199,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                    tx,
 		tx:                                    tx,
+		clearDivisionCoordinatorStmt:          q.clearDivisionCoordinatorStmt,
+		clearEventsDivisionStmt:               q.clearEventsDivisionStmt,
 		countBlogPostsByTagIDStmt:             q.countBlogPostsByTagIDStmt,
 		countRecentPasswordResetTokensStmt:    q.countRecentPasswordResetTokensStmt,
 		countTagsByBlogPostIDStmt:             q.countTagsByBlogPostIDStmt,
@@ -1187,6 +1225,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteMediaStmt:                       q.deleteMediaStmt,
 		deleteMemberStmt:                      q.deleteMemberStmt,
 		deleteMemberDivisionStmt:              q.deleteMemberDivisionStmt,
+		deleteMemberDivisionsByDivisionIDStmt: q.deleteMemberDivisionsByDivisionIDStmt,
+		deleteMemberDivisionsByMemberIDStmt:   q.deleteMemberDivisionsByMemberIDStmt,
 		deleteOrganizationProfileStmt:         q.deleteOrganizationProfileStmt,
 		deleteRoleStmt:                        q.deleteRoleStmt,
 		deleteUserStmt:                        q.deleteUserStmt,

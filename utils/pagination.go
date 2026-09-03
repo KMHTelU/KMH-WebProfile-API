@@ -17,8 +17,10 @@ func GetPaginationParams(c fiber.Ctx) (int32, int32) {
 	if params.Limit <= 0 {
 		params.Limit = 10
 	}
-	if params.Limit > 100 {
-		params.Limit = 100
+	// Batas atas dinaikkan supaya dashboard bisa memuat seluruh data (anggota
+	// sudah 140+); tetap dibatasi agar query tak terkendali tidak mungkin.
+	if params.Limit > 1000 {
+		params.Limit = 1000
 	}
 	if params.Offset < 0 {
 		params.Offset = 0
